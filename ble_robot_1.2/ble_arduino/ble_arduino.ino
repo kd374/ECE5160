@@ -280,25 +280,45 @@ handle_command()
         }
         case CALCULATE_DATA_RATE: 
         {
-            // int total_bytes;
-            // int array[sent] = 0;
-            // rx_characteristic_string.value(sent_bytes);
-            int sent_bytes = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120];
-            // success = robot_cmd.get_next_value(sent_bytes);
+            // // int total_bytes;
+            // //  int array[sent_bytes] = 0;
+            // // rx_characteristic_string.value(sent_bytes);
+            //  int sent_bytes[] = {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120};
+            //  success = robot_cmd.get_next_value(sent_bytes);
             // if (!success) return;
             
-            // rx_characteristic_string.value(sent_bytes);
-            for (int j = 0; j < sent_bytes; j++) {
-              int array[sent_byte[i]] = {0};
-            }
+            //  rx_characteristic_string.value(sent_bytes);
+            //  for (int j = 0; j < sent_bytes; j++) {
+            //    int array[sent_byte[j]] = {0};
+            //  }
 
+
+            // tx_estring_value.clear();
+            // tx_estring_value.append(array[sent_bytes[j]]);
+            // tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+       
+
+            int sent_bytes[] = {5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120};
+            String receivedData = (char*)rx_characteristic_string.value();  // Extract received data
+
+            int data_size = receivedData.toInt();  // Convert received string to integer
 
             tx_estring_value.clear();
-            tx_estring_value.append(array);
+            tx_estring_value.append("Data Size: ");
+            tx_estring_value.append(data_size);
+    
             tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            Serial.print("Sent back: ");
+            Serial.println(tx_estring_value.c_str());
 
+            break;
         }
-                     
+
+
+
+        
+               
     }
 }
 
