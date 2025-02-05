@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <!DOCTYPE HTML>
 
 <html>
@@ -16,8 +16,8 @@
 
 				<!-- Intro -->
 					<div id="intro">
-						<h1>Portfolio</h1>
-						<p>Welcome to my ECE 5160: Fast Robots project portfolio!</p>
+						<h1>LAB 1</h1>
+						<p>Artemis Setup and Bluetooth Connection</p>
 						<ul class="actions">
 							<li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
 						</ul>
@@ -25,13 +25,13 @@
 
 				<!-- Header -->
 				<header id="header">
-						<a href="index.html" class="logo">ECE 5160 | Fast Robots</a>
+						<a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 1</a>
 					</header>
 
 				<!-- Nav -->
 					<nav id="nav">
 						<ul class="links">
-							<li class="active"><a href="index.html">Portfolio</a></li>
+							<li class="active"><a href="index.html">LAB 1</a></li>
 						</ul>
 						<ul class="icons">
 							<li><a href="https://www.linkedin.com/in/katarina-duric/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li> 
@@ -42,176 +42,139 @@
 					<div id="main">
 
 						<!-- Featured Post -->
+						<!DOCTYPE html>
+						<html lang="en">
+						<head>
+							<meta charset="UTF-8">
+							<meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<title>LAB 1A - Artemis Setup</title>
+						
+							<!-- Inline CSS for this page only -->
+							<style>
+								/* Reduce spacing between paragraphs, sections, and images */
+								p, h3, h2, pre, img {
+									margin-bottom: 10px; /* Less space between rows */
+								}
+						
+								/* Reduce spacing between sections */
+								.content-section {
+									margin-bottom: 15px; /* Less space between sections */
+									padding-bottom: 5px;
+								}
+						
+								/* Make subtitles (h3) left-aligned */
+								h3 {
+									text-align: left;
+									font-size: 20px; /* Adjust subtitle font size */
+									margin-left: 5px;
+								}
+						
+								/* Center images */
+								.center-content img {
+									display: block;
+									margin: 0 auto;
+									width: 500px; /* Adjust width */
+									height: auto;
+								}
+						
+								/* Center code blocks */
+								pre {
+									background-color: #f4f4f4;
+									padding: 10px;
+									border-radius: 5px;
+									overflow-x: auto;
+									text-align: left;
+									font-family: monospace;
+								}
+							</style>
+						</head>
+						<body>
+						
+							<!-- Featured Post -->
 							<article class="post featured">
 								<header class="major">
-									<span class="date">Spring 2025</span>
-									<h2><a href="#">About me<br />
-									</a></h2>
-									<p>Hi! I'm Katarina Duric and I'm currently studying Electrical and Computer Engineering as well as pursiuing 
-										my Early MEng in ECE with the focus in Analog Design. I enjoy playing the piano, reading, watching movies, dancing, and cooking. 
-									</p>
+									<span class="date">February 5th, 2025</span>
+									<h2>LAB 1A - Artemis Setup</h2>
 								</header>
-									<center>
-										<a class="image main">
-										<img src="images/IMG_0866.jpg" style="width: 300px; height: auto;" alt="" />
-										</a>
-									</center>
-								<ul class="actions special">
-									</ul>
-									<ul class="icons">
-									</ul>
-								</ul>
+						
+								<!-- Introduction -->
+								<section class="content-section">
+									<h3>Introduction</h3>
+									<p>The aim of this lab to set up Sparkfun Artemis board, which is going to be used for the rest of the semester and be the crucial aspect of communication between robots.</p>
+								</section>
+						
+								<!-- Virtual Environment Setup -->
+								<section class="content-section">
+									<h3>Prelab 1A: Installation of Arduino IDE </h3>
+									<p>The first step of the Prelab 1A was to install the latest versions of Arduino IDE (version 2.3.4) and Sparkfun Apollo3 boards manager. Furthermore, I was able to successfully install all the required libraries for the prelab and thus perform the proposed tasks below. </p>
+						
+
+								<!-- Image Centered -->
+								<section class="content-section">
+									<h3>Lab 1A </h3>
+									<h4>Task 1: Blink</h4>
+									<p>The example Blink code was run in order to confirm that we are able to program simple code onto the Artemis board.</p>
+								
+									<!-- Embed YouTube Video -->
+									<iframe width="560" height="315" 
+											src="https://youtube.com/embed/KoN-ThVAMeQ?si=6m4XyxSAxhybqqML" 
+											frameborder="0" allowfullscreen>
+									</iframe>
+								</section>
+								<section class="content-section">
+									<h4>Task 2: Serial</h3>
+									<p>This task was implemented in order to test for the UART communication between the computer and the board. Considering that I experienced issues with my Serial Monitor due to which my laptop restarted, I set the baud rate to 9600 instead of 115200 which was successful.</p>
+								
+									<!-- Centered Image -->
+									<div style="text-align: center;">
+										<img src="images/lab1a_example04_serial_output.png" alt="Lab 1 Setup" width="600">
+									</div>
+								</section>
+								<section class="content-section">
+									<h4>Task 3: Analog Read</h3>
+									<p>This task was performed by utilizing the analog-to-digital converter (ADC), which is an integrated device which converts analog voltage to a digital signal. AnalogRead() function thus enables reading out the temperature data from the sensor. The temperature recorded was about 33400 counts, however, once the chip was held, the temperature would slightly increase. Therefore, the temperature sensor was able to successfully detect the changes. </p>
+								
+									<!-- Centered Image -->
+									<div style="text-align: center;">
+										<img src="images/analog_read.PNG" alt="Lab 1 Setup" width="600">
+									</div>
+								</section>
+								<section class="content-section">
+									<h4>Task 4: Microphone Output</h3>
+									<p>This task taught us how to use the microphone integrated onto the Artemis board. This is performed through using the PDM or pulse-density-modulation code provided. The first image demonstrates the frequency while there was no to little sound detected. However, the second image demonstrates the frequencies captured while talking. Hence, the microphone sensor was able to distingues between loud and quiet sounds successfully.</p>
+								
+									<!-- Centered Image -->
+									<div style="text-align: center;">
+										<img src="images/example1_microphoneoutput_withouttalking.PNG" alt="Lab 1 Setup" width="600">
+									</div>
+									<div style="text-align: center;">
+										<img src="images/example1+withtalking.PNG" alt="Lab 1 Setup" width="600">
+									</div>
+								</section>
+								<section class="content-section">
+									<h4>Additional task for ECE 5160: "C" note detector  </h3>
+									<p>This task taught us how to program a "C" note detector by manipulating on-board LED switching into the Microphone_Output code.</p>
+								
+									<!-- Embed YouTube Video -->
+									<iframe width="560" height="315" 
+											src="https://www.youtube.com/embed/fsi8UU5osiI" 
+											frameborder="0" allowfullscreen>
+									</iframe>
+								</section>
+								<section class="content-section">
+								<section class="content-section">
+									<h3>Discussion and Reflection</h3>
+									<p>The performed tasks were very insightful and helpful in teaching us how to navigate the Arduino IDE environment, and with the "C" speaker assignment, practice playing with the provided code to create new functionalities. </p>
+
+								</section>
 							</article>
+						
+						</body>
+						</html>
+						
 
 						<!-- Posts -->
-							<section class="posts">
-								<article>
-									<header>
-										<span class="date">January 31, 2025</span>
-										<h2>
-											<a href="https://kd374.github.io/ECE5160/lab1.html">LAB 1:</a><br>
-											<span>The Artemis Board and Bluetooth</span>
-										</h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="https://kd374.github.io/ECE5160/lab1.html" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 2<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic03.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 3<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic04.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 4<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic05.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 5<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic06.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 6<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic07.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 7<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 8<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 9<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 10<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 11<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-								<article>
-									<header>
-										<span class="date">TBD</span>
-										<h2><a href="#">LAB 12<br />
-										</a></h2>
-									</header>
-									<a href="#" class="image fit"><img src="images/pic02.jpg" alt="" /></a>
-									<p></p>
-									<ul class="actions special">
-										<li><a href="#" class="button">Full Story</a></li>
-									</ul>
-								</article>
-							</section>
+	
 
 						<!-- Footer -->
 
@@ -264,17 +227,3 @@
 			<script src="assets/js/main.js"></script>
 	</body>
 </html>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 1</title>
-</head>
-<body>
-    <h1>Lab 1: The Artemis Board and Bluetooth</h1>
-    <p>This page contains details about Lab 1.</p>
-</body>
-</html>
->>>>>>> e1cf04d99c836e49574d259ecae1cf61564f7e5e
