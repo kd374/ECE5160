@@ -1,1 +1,149 @@
 
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>ECE5160 Portfolio</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+		<!--	<div id="wrapper" class="fade-in"> -->
+
+				<!-- Intro -->
+					<div id="intro">
+						<h1>LAB 1</h1>
+						<p>Artemis Setup and Bluetooth Connection</p>
+						<ul class="actions">
+							<li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+						</ul>
+					</div>
+
+				<!-- Header -->
+				<header id="header">
+						<a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 1</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li class="active"><a href="index.html">LAB 1</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/katarina-duric/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li> 
+							<li><a href="https://github.com/kd374" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Featured Post -->
+						<!DOCTYPE html>
+						<html lang="en">
+						<head>
+							<meta charset="UTF-8">
+							<meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<title>LAB 1A - Artemis Setup</title>
+						
+							<!-- Inline CSS for this page only -->
+							<style>
+								/* Reduce spacing between paragraphs, sections, and images */
+								p, h3, h2, pre, img {
+									margin-bottom: 10px; /* Less space between rows */
+								}
+						
+								/* Reduce spacing between sections */
+								.content-section {
+									margin-bottom: 15px; /* Less space between sections */
+									padding-bottom: 5px;
+									
+    								border-bottom: 1px solid #ddd;  /* Adds a light gray line */
+    								padding-bottom: 15px;
+     								margin-bottom: 20px;
+
+								}
+						
+								/* Make subtitles (h3) left-aligned */
+								h3 {
+									text-align: left;
+									font-size: 20px; /* Adjust subtitle font size */
+									margin-left: 5px;
+								}
+						
+								/* Center images */
+								.center-content img {
+									display: block;
+									margin: 0 auto;
+									width: 500px; /* Adjust width */
+									height: auto;
+								}
+						
+								/* Center code blocks */
+								pre {
+									background-color: #f4f4f4;
+									padding: 10px;
+									border-radius: 5px;
+									overflow-x: auto;
+									text-align: left;
+									font-family: monospace;
+								}
+							</style>
+						</head>
+						<body>
+						
+							<!-- Featured Post -->
+							<article class="post featured">
+								<header class="major">
+									<span class="date">February 5th, 2025</span>
+									<h2>LAB 1A - Artemis Setup</h2>
+								</header>
+						
+								<!-- Introduction -->
+								<section class="content-section">
+									<h3>Introduction:</h3>
+									<p>The aim of this lab to set up Sparkfun Artemis board, which is going to be used for the rest of the semester and be the crucial aspect of communication between robots.</p>
+								</section>
+						
+								<!-- Virtual Environment Setup -->
+								<section class="content-section">
+									<h3>Prelab 1A: Installation of Arduino IDE </h3>
+									<p>The first step of the Prelab 1A was to install the latest versions of Arduino IDE (version 2.3.4) and Sparkfun Apollo3 boards manager. Furthermore, I was able to successfully install all the required libraries for the prelab and thus perform the proposed tasks below. </p>
+						
+
+								<!-- Image Centered -->
+								<section class="content-section">
+									<h3>Lab 1A: </h3>
+									<h4>Task 1: Blink</h4>
+									<p>The example Blink code was run in order to confirm that we are able to program simple code onto the Artemis board.</p>
+								
+									<!-- Embed YouTube Video -->
+									<iframe width="560" height="315" 
+											src="https://youtube.com/embed/KoN-ThVAMeQ?si=6m4XyxSAxhybqqML" 
+											frameborder="0" allowfullscreen>
+									</iframe>
+								</section>
+								<section class="content-section">
+									<h4>Task 2: Serial</h3>
+									<p>This task was implemented in order to test for the UART communication between the computer and the board. Considering that I experienced issues with my Serial Monitor due to which my laptop restarted, I set the baud rate to 9600 instead of 115200 which was successful.</p>
+								
+									<!-- Centered Image -->
+									<div style="text-align: center;">
+										<img src="images/serial_4.png" alt="Lab 1 Setup" width="600">
+									</div>
+								</section>
+								<section class="content-section">
+									<h4>Task 3: Analog Read</h3>
+									<p>This task was performed by utilizing the analog-to-digital converter (ADC), which is an integrated device which converts analog voltage to a digital signal. AnalogRead() function thus enables reading out the temperature data from the sensor. The temperature recorded was about 33400 counts, however, once the chip was held, the temperature would slightly increase. Therefore, the temperature sensor was able to successfully detect the changes. </p>
+								
+									<!-- Centered Image -->
+									<div style="text-align: center;">
+										<img src="images/analog_read.PNG" alt="Lab 1 Setup" width="600">
+									</div>
+								</section>
+								<section class="content-section">
+									<h4>Task 4: Microphone Output</h3>
+									<p>This task taught us how to use the microphone integrated onto the Artemis board. This is performed through using the PDM or pulse-density-modulation code provided. The first image demonstrates the frequency while there was no to little sound detected. However, the second image demonstrates the frequencies captured while talking. Hence, the microphone sensor was able to distingues between loud and quiet sounds successfully.</p>
