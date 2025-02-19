@@ -113,7 +113,7 @@
 									<h3>Prelab 2: Setup of IMU </h3>
 									<p>The initial step towards using the IMU was to download the Sparkfun ICM 20948 library which was performed by connecting the IMU device to the Artemis board through the QWIIC connector, as seen in the image below. A significant step towards the very end of the lab was to prepare the RC car by charging the provided 850 mAh batteries.</p>
 									<div>
-										<img src="/images/IMG_0244.jpg" alt="Images" style="width: 400px !important; height: auto;">
+										<img src="images/IMG_0244.jpg" alt="Images" style="width: 400px !important; height: auto;">
 									</div>
 									
 						
@@ -151,7 +151,7 @@
                                     
 									<!-- Centered Image -->
 									<div style="text-align: center;">
-										<img src="/images/ad0_val2.png" alt="Lab 1 Setup" width="200">
+										<img src="images/ad0_val2.png" alt="Lab 1 Setup" width="200">
 									</div>
 								</section>
 								<section class="content-section">
@@ -241,10 +241,10 @@
 
 									<!-- Centered Image -->
 									<div style="text-align: center;">
-										<img src="/images/collect_imu_data_acc.png" alt="Lab 2" width="600">
+										<img src="images/collect_imu_data_acc.png" alt="Lab 2" width="600">
 									</div>
                                     <div style="text-align: center;">
-										<img src="/images/send_imu_data_acc.png" alt="Lab 2" width="600">
+										<img src="images/send_imu_data_acc.png" alt="Lab 2" width="600">
 									</div>
                                     <p>The data is thus sent over through Bluetooth, similarly to lab 1, after which the collected data may be graphed. By oscillating the IMU about the x and y axis as labeled on the device, the following graphs are obtained. The first graph from left to right represents pitch data with respect to time, and the second represents roll data with respect to time of the accelerometer. It can be observed that the IMU is thus able to correctly identify the orientations as learned from class lectures. </p>
 									<div style="text-align: center;">
@@ -304,12 +304,12 @@
 											<body>
 
 												<div class="image-container">
-													<img src="/images/fft_pitch_acceler.png" alt="Lab 2" width="600">
-													<img src="/images/fft_roll_acceler.png" alt="Lab 2" width="600">
+													<img src="images/fft_pitch_acceler.png" alt="Lab 2" width="600">
+													<img src="images/fft_roll_acceler.png" alt="Lab 2" width="600">
 												</div>
 
 												<div class="image-container">
-													<img src="/images/fft_general.png" alt="Image 1" style="width: 500px !important; height: auto;">
+													<img src="images/fft_general.png" alt="Image 1" style="width: 500px !important; height: auto;">
 												</div>
 												<p>Based on the provided graphs, it can be inferred that the sampling frequency can be estimated to be around 50 Hz, hence I chose the low-pass filter cutoff frequency <code>f<sub>c</sub></code>to be about 5 Hz. </p>
 
@@ -435,22 +435,22 @@
 														
 													<p>The sampling frequency of the captured IMU data was found to 10 ms per sample. Hence, with the cutoff frequency of about 5 Hz, the value of &#945; ends up being equal to <code>0.2</code>. Utilizing the aforementioned equations for the implementation of the low-pass filter, the Arduino code ought to be updated as the following:</p>
 													<div class="image-container">
-														<img src="/images/filter_imu_acc_arduino.png" alt="Lab 2" width="600">
+														<img src="images/filter_imu_acc_arduino.png" alt="Lab 2" width="600">
 													</div>
 													<div class="image-container">
-														<img src="/images/send_imu_data_acc_filtered_new_arduino.png" alt="Lab 2" width="600">
+														<img src="images/send_imu_data_acc_filtered_new_arduino.png" alt="Lab 2" width="600">
 													</div>
 													<p>Furthermore, on the Python side, the computation code for with the filter applied was implemented as the following:</p>
 													<div class="image-container">
-														<img src="/images/filtered_acc_python1.png" alt="Lab 2" width="600">
+														<img src="images/filtered_acc_python1.png" alt="Lab 2" width="600">
 													</div>
 													<div class="image-container">
-														<img src="/images/filtered_acc_python2.png" alt="Lab 2" width="600">
+														<img src="images/filtered_acc_python2.png" alt="Lab 2" width="600">
 													</div>
 													<p>Finally, the applied low-pass filter on the recorded and stored pitch and roll data would be presented as following:</p>
 													<div class="image-container">
-														<img src="/images/pitchvstime_filtered2.png" alt="Image 1" style="width: 300px !important; height: auto;">
-														<img src="/images/rollvstime_filtered.png" alt="Image 1" style="width: 300px !important; height: auto;">
+														<img src="images/pitchvstime_filtered2.png" alt="Image 1" style="width: 300px !important; height: auto;">
+														<img src="images/rollvstime_filtered.png" alt="Image 1" style="width: 300px !important; height: auto;">
 													</div>
 
 													<p>As can be observed from the provided graphs, the low-pass filter (as indicated in orange) is able to significantly reduce the noise in the originally recorded data (as indicated in blue). The noise levels were already minor considering that the accelerometer has an integrated low-pass filter (as is stated in the ICM 20948 datasheet). However, with this implementation of low-pass filter, the noise levels remain negligible and are almost fully reduced.</p>
@@ -501,17 +501,17 @@
 
 														<p>Similarly, to the code for accelerometer, I created a I created a function called collectIMUData_GYRO() which computes pitch, roll, and yaw values of the accelerometer while collecting data in real time. Furthermore, pitch, roll, as well as time values are stored in respective arrays of length ARRAY_LENGTH2 = 2000. The function is called from the SEND_IMU_DATA_GYRO case for as long as the number of entries collected is less than the proposed ARRAY_LENGTH2.</p>
 														<div class="image-container">
-															<img src="/images/send_imu_data_gyro.png" alt="Image 1" style="width: 400px !important; height: auto;">
+															<img src="images/send_imu_data_gyro.png" alt="Image 1" style="width: 400px !important; height: auto;">
 														</div>
 														<div class="image-container">
-															<img src="/images/collect_gyro.png" alt="Image 1" style="width: 400px !important; height: auto;">
+															<img src="images/collect_gyro.png" alt="Image 1" style="width: 400px !important; height: auto;">
 														</div>
 
 														<p>Similarly to testing the accelerometer, I tested the gyroscope by varying {-90, 0, 90} angles for pitch, roll, and yaw respectively. Pitch and roll data were computed unfiltered initially, in order for them to be more easily compared to the accelerometer pitch and roll data. Lastly, yaw data was computed. It could have been observed that pitch and roll data were much less noisy overall compared to the accelerometer's respective data.</p>
 														<div >
-															<img src="/images/gyro_pitchvstime_unfiltered.png" alt="Image 1" style="width: 400px !important; height: auto;">
-															<img src="/images/gyro_rollvstime.png" alt="image 1" style="width:400px !important; height:auto;">
-															<img src="/images/gyro_yawvstime.png" alt="image 1" style="width:400px !important; height:auto;">
+															<img src="images/gyro_pitchvstime_unfiltered.png" alt="Image 1" style="width: 400px !important; height: auto;">
+															<img src="images/gyro_rollvstime.png" alt="image 1" style="width:400px !important; height:auto;">
+															<img src="images/gyro_yawvstime.png" alt="image 1" style="width:400px !important; height:auto;">
 														</div>
 														<p>Another significant observation while computing the filtered versions of gyroscope's pitch and roll data is that gyroscopre significantly drifts over time, as can be observed below. I decided to compute the gyroscope pitch and roll data as reliably as possible by developing a complimentary filter, which combines the aforementioned definition of accelerometer's RC filter and gyroscope's formulas in order to obtain the following equations. The value of &#947; represents the coefficient which weighs the relationship between the accelerometer and the gyroscope. Considering the higher accuracy of the accelerometer, the coefficient of &#947; is set to be <code>0.8</code>. </p>
 														<div class = "math-equation">
@@ -520,25 +520,25 @@
 														</div>
 														<p>Hence, the code implementation on the Arduino side is as following: </p>
 														<div>
-															<img src="/images/complementarycode.png" alt="Image 1" style="width: 550px !important; height: auto;">
+															<img src="images/complementarycode.png" alt="Image 1" style="width: 550px !important; height: auto;">
 														</div>
 														<p>Finally, by rotating the IMU with varying speeds, the filtered accelerometer data was plotted on the same graph as the complementary filter data of the gyroscope, for easier comparison.</p>
 
 														<div>
-															<img src="/images/compl_pitch.png" alt="Image 1" style="width: 550px !important; height: auto;">
+															<img src="images/compl_pitch.png" alt="Image 1" style="width: 550px !important; height: auto;">
 														</div>
 														<div>
-															<img src="/images/compl_roll.png" alt="Image 1" style="width: 528px !important; height: auto;">
+															<img src="images/compl_roll.png" alt="Image 1" style="width: 528px !important; height: auto;">
 														</div>
 														<p>As can be observed, the complementary filter is very accurate with the computation of both pitch and roll data over time, it is able to remain uninfluenced by the detectible drift in data, yet is not influenced by rapid varying and rotating of the IMU. Hence, the complimentary filter is evaluated to be very reliable from the presented graphs. Another observation was that decreasing the sampling frequency ultimately resulted in a greater fluctuation between the measurements of the filtered and unfiltered data. Hence, the sampling rate ought to be high in order to maintain high accuracy in data acquisition.</p>
 														<h3>Sample Data</h3>
 														<h4>Timing Analysis and time-stamped arrays</h4>
 														<p>Following the proposed instructions, all the time-consuming and repetitive statements in the main loop have been removed, including all Serial.print() functions, and all the implemented delay() functions. In order to create time-stamped IMU data arrays, a flag RECORD_IMU was instantiated in Arduino cases. Afterwards, GET_IMU_DATA_ACC was called on the Python side in order to determine the computation time or the speed of sampling. This was performed on the ARRAY_LENGTH size of the array, which was previously used in this lab. The code for computation can be found below.</p>
 														<div>
-															<img src="/images/stop_start.png" alt="Image 1" style="width: 528px !important; height: auto;">
+															<img src="images/stop_start.png" alt="Image 1" style="width: 528px !important; height: auto;">
 														</div>
 														<div>
-															<img src="/images/computation_oft.png" alt="Image 1" style="width: 528px !important; height: auto;">
+															<img src="images/computation_oft.png" alt="Image 1" style="width: 528px !important; height: auto;">
 														</div>
 														<p>As can be inferred from the provided outputs, the time step T, which represents the speed of data transmission of the data points sent over from Arduino is approximately 0.102.</p>
 														<h4>data storage</h4>
@@ -546,7 +546,7 @@
 														<h4>5s of Data Demonstration</h4>
 														<p>I set the flag indicating that the data collection ought to last for 5 seconds. Furthermore, my array consisted of the GET_IMU_DATA_ACC array, and each of the received arrays had a time stamp indicated.</p>
 														<div>
-															<img src="/images/5sdata.png" alt="Image 1" style="width: 528px !important; height: auto;">
+															<img src="images/5sdata.png" alt="Image 1" style="width: 528px !important; height: auto;">
 														</div>
 
 
