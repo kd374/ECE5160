@@ -254,11 +254,12 @@
 												<meta name="viewport" content="width=device-width, initial-scale=1.0">
 												<title>Two Images Side by Side</title>
 												<style>
-													.image-container {
+													/* .image-container {
 														display: flex; /* Puts images in a row */
-														justify-content: center; /* Centers them horizontally */
-														gap: 10px; /* Adds space between images */
-													}
+														/*#justify-content: center; /* Centers them horizontally */
+														/*gap: 10px; /* Adds space between images */
+												
+												
 													.image-container img {
 														width: 400px; /* Adjust width as needed */
 														height: auto; /* Maintain aspect ratio */
@@ -506,7 +507,7 @@
 														</div>
 
 														<p>Similarly to testing the accelerometer, I tested the gyroscope by varying {-90, 0, 90} angles for pitch, roll, and yaw respectively. Pitch and roll data were computed unfiltered initially, in order for them to be more easily compared to the accelerometer pitch and roll data. Lastly, yaw data was computed. It could have been observed that pitch and roll data were much less noisy overall compared to the accelerometer's respective data.</p>
-														<div>
+														<div >
 															<img src="/images/gyro_pitchvstime_unfiltered.png" alt="Image 1" style="width: 400px !important; height: auto;">
 															<img src="/images/gyro_rollvstime.png" alt="image 1" style="width:400px !important; height:auto;">
 															<img src="/images/gyro_yawvstime.png" alt="image 1" style="width:400px !important; height:auto;">
