@@ -17,7 +17,7 @@
 				<!-- Intro -->
 					<div id="intro">
 						<h1>LAB 2</h1>
-						<p>Artemis Setup and Bluetooth Connection</p>
+						<p>The Inertial Measurement Unit (IMU)</p>
 						<ul class="actions">
 							<li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
 						</ul>
@@ -121,57 +121,440 @@
 									<p>The first step was to confirm that the IMU example Arduino code was functional with our IMU device. Hence, SparkFun 9DOF IMU Breakout_ICM 20948_Arduino Library was installed. The outputs observed on the Serial Monitor once the example1_basicscode in the ICM 20948 library was run suggested that there is a variation in accelerometer and gyroscope values once the IMU position was changed. </p>
 								
 									<!-- Embed YouTube Video -->
-									<!--<iframe width="560" height="315" 
-											src="https://youtube.com/embed/KoN-ThVAMeQ?si=6m4XyxSAxhybqqML" 
-											frameborder="0" allowfullscreen>
-									</iframe>
+                                    <iframe width="300" height ="400"
+                                    src="https://youtube.com/embed/K0CzdoDJNoU" 
+                                    title="Lab 2: LED blink" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                    allowfullscreen>
+                                    </iframe>
+                                    <p>The provided video displays the change in the output data of the Serial Monitor for accelerometer and gyroscope values dependending on the orientation of the IMU. It can be inferred that the accelerometer measures accelerations relative to the gravitational acceleration (g) direction. On the other hand, the gyroscope detects the change in angle per time unit with regards to the zeroth state at the IMU start. The data of the gyroscope is represented in degrees, hence, the angular rate is integrated over time.</p>
+                                </section>
+                                <section>
+
+                                    <iframe width="300" height ="400"
+                                    src="https://youtube.com/embed/sn1r9OSQCZc" 
+                                    title="Lab 2: LED blink" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                    allowfullscreen>
+                                    </iframe>
+                            <p>As can be inferred from the video, the provided Example1_Basics code was expanded with the visual in terms of the LED blinking slowly three times. This visual is to indicate that the board is running and has uploaded the code successfully. </p>
 								</section>
-								<section class="content-section"> -->
+								<section class="content-section"> 
 									<h4>AD0_Val Definition</h3>
 									<p>The Ad0_VAL signal is crucial because it represents the last bit of the I2C address for the IMU. This value is set to have the value of 1, due to the fact that we have a single IMU on the I2C bus. If we were to have multiple, the bit would have been jumped on the IMU breakout board in order to have multiple IMUs on the same I2C bus.</p>
-								
+                                    
 									<!-- Centered Image -->
 									<div style="text-align: center;">
-										<img src="images/serial_4.png" alt="Lab 1 Setup" width="600">
+										<img src="/images/ad0_val2.png" alt="Lab 1 Setup" width="200">
 									</div>
 								</section>
 								<section class="content-section">
-									<h4>Task 3: Analog Read</h3>
-									<p>This task was performed by utilizing the analog-to-digital converter (ADC), which is an integrated device which converts analog voltage to a digital signal. AnalogRead() function thus enables reading out the temperature data from the sensor. The temperature recorded was about 33400 counts, however, once the chip was held, the temperature would slightly increase. Therefore, the temperature sensor was able to successfully detect the changes. </p>
-								
+									<h3>Accelerometer</h3>
+									<p>The accelerometer reading require specifications of x, y, and z axes of the coordinate system, which is indicated on the IMU itself. In order to calculate pitch &#952; and roll &#934;, the following equations may be implemented for the Artemis. The equations were incorporated from lecture 4. </p>
+
+                                    <html lang="en">
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                        <title>Italic Equations with MathJax</title>
+                                        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+                                        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+                                        <style>
+                                            .center-container {
+                                                /* display: table-cell;
+                                                vertical-align: middle; */
+
+                                            }
+                                            body, html{
+                                                height: 100%;
+                                                /* justify-content: center;
+                                                align-items: center;
+                                                text-align: center;
+                                                place-items: center; */
+                                                margin: 0;
+                                                /* display: table; */
+                                                position: relative;
+                                            }
+                                            .math-equation {
+                                                font-size: 18px;
+                                                display:inline-block;
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class = "center-container">
+                                            <div class = "math-equation">
+                                                $$  \theta_a = atan2 \left( {a_x} ,{a_z} \right)  $$
+                                            </div>
+                                        </div>
+                                    <!-- <p><span class="center-container"> \( \theta_a = \tan^{-1} \left( \frac{a_x}{a_y} \right) \) </span></p> -->
+                                    </body>
+                                    </html>
+
+                                    <html lang="en">
+                                        <head>
+                                            <meta charset="UTF-8">
+                                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                            <title>Italic Equations with MathJax</title>
+                                            <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+                                            <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+                                            <style>
+                                                .center-container {
+                                                    /* display: table-cell;
+                                                    vertical-align: middle; */
+    
+                                                }
+                                                body, html{
+                                                    height: 100%;
+                                                    /* justify-content: center;
+                                                    align-items: center;
+                                                    text-align: center;
+                                                    place-items: center; */
+                                                    margin: 0;
+                                                    /* display: table; */
+                                                    position: relative;
+                                                }
+                                                .math-equation {
+                                                    font-size: 18px;
+                                                    display:inline-block;
+                                                }
+                                            </style>
+                                        </head>
+                                        <body>
+                                            <div class = "center-container">
+                                                <div class = "math-equation">
+                                                    $$  \phi_a = atan2 \left( {a_y} ,{a_z} \right)  $$
+                                                </div>
+                                            </div>
+                                        <!-- <p><span class="center-container"> \( \theta_a = \tan^{-1} \left( \frac{a_x}{a_y} \right) \) </span></p> -->
+                                        </body>
+                                        </html>
+
+                                        <p>These equations are first incorporated in the Arduino code as in the snippet provided below. As can be seen, I created a function called collectIMUData_ACC() which computes pitch and roll values of the accelerometer while collecting data in real time. Furthermore, pitch, roll, as well as time values are stored in respective arrays of length ARRAY_LENGTH = 2000. The function is called from the SEND_IMU_DATA_ACC case for as long as the number of entries collected is less than the proposed ARRAY_LENGTH.</p>
+
+
 									<!-- Centered Image -->
 									<div style="text-align: center;">
-										<img src="images/analog_read.PNG" alt="Lab 1 Setup" width="600">
+										<img src="images/collect_imu_data_acc.png" alt="Lab 2" width="600">
 									</div>
+                                    <div style="text-align: center;">
+										<img src="images/send_imu_data_acc.png" alt="Lab 2" width="600">
+									</div>
+                                    <p>The data is thus sent over through Bluetooth, similarly to lab 1, after which the collected data may be graphed. By oscillating the IMU about the x and y axis as labeled on the device, the following graphs are obtained. The first graph from left to right represents pitch data with respect to time, and the second represents roll data with respect to time of the accelerometer. It can be observed that the IMU is thus able to correctly identify the orientations as learned from class lectures. </p>
+									<div style="text-align: center;">
+										<html lang="en">
+											<head>
+												<meta charset="UTF-8">
+												<meta name="viewport" content="width=device-width, initial-scale=1.0">
+												<title>Two Images Side by Side</title>
+												<style>
+													.image-container {
+														display: flex; /* Puts images in a row */
+														justify-content: center; /* Centers them horizontally */
+														gap: 10px; /* Adds space between images */
+													}
+													.image-container img {
+														width: 400px; /* Adjust width as needed */
+														height: auto; /* Maintain aspect ratio */
+													}
+												</style>
+											</head>
+											<body>
+
+												<div class="image-container">
+													<img src="/images/pitchvstime_unfiltered2.png" alt="Image 1">
+													<img src="/images/rollvstime_unfiltered.png" alt="Image 2">
+												</div>
+
+											</body>
+											</html>
+									</div>
+									<p>As can be observed, the output for both pitch and roll data display the sequence of {-90, 0, 90} degrees. The graphs were generated by developing a Python script for plotting the data sent from Arduino over time. The results of the accelerometer appear to accurately detect and record the orientation changes, hence the two-point calibration is not necessary. However, the results appear noisy, especially in the regions of switching between orientations of the accelerometer, and thus, a Fourier spectrum might be observed.</p>
 								</section>
 								<section class="content-section">
-									<h4>Task 4: Microphone Output</h3>
-									<p>This task taught us how to use the microphone integrated onto the Artemis board. This is performed through using the PDM or pulse-density-modulation code provided. The first image demonstrates the frequency while there was no to little sound detected. However, the second image demonstrates the frequencies captured while talking. Hence, the microphone sensor was able to distingues between loud and quiet sounds successfully.</p>
-								
-									<!-- Centered Image -->
-									<div style="text-align: center;">
-										<img src="images/example1_microphoneoutput_withouttalking.PNG" alt="Lab 1 Setup" width="600">
-									</div>
-									<div style="text-align: center;">
-										<img src="images/example1+withtalking.PNG" alt="Lab 1 Setup" width="600">
-									</div>
-								</section>
-								<section class="content-section">
-									<h4>Additional task for 5000-level students: "C" note detector  </h3>
-									<p>This task taught us how to program a "C" note detector by manipulating on-board LED switching into the Microphone_Output code. The way I implemented the task is by detecting the frequency that is 523 HZ +/- 10 Hz to introduce some error, and in case the freqency detected is in-between the desired range for not "C5", then the LED turns on (blue light) as can be seen in the recorded video. For other frequencies, the LED turns off.</p>
-									<div style="text-align: center;">
-										<img src="images/cnote.png" alt="BLE Connection" width="">
-									</div>
-									<!-- Embed YouTube Video -->
-									<iframe width="560" height="315" 
-											src="https://www.youtube.com/embed/fsi8UU5osiI" 
-											frameborder="0" allowfullscreen>
-									</iframe>
-								</section>
-								<section class="content-section">
-								<section class="content-section">
+									<h4>Fourier Transform of accelerometer data</h3>
+									<p>The Fourier transform was performed by utilizing SciPy's <code>fft()</code> function in order to detect the periodicity in the signal. As can be observed in the FFT spectrum analysis below, due to the fact that there is significant noise observed for the fact that there was minimal movement while recording pitch and roll data, a low-pass filter ought to be implemented for smoothing out the non-negligible noise. </p>
+									
+
+									<html lang="en">
+											<head>
+												<meta charset="UTF-8">
+												<meta name="viewport" content="width=device-width, initial-scale=1.0">
+												<title>Two Images Side by Side</title>
+												<style>
+													.image-container {
+														display: flex; /* Puts images in a row */
+														justify-content: center; /* Centers them horizontally */
+														gap: 10px; /* Adds space between images */
+													}
+													.image-container img {
+														width: 300px; /* Adjust width as needed */
+														height: auto; /* Maintain aspect ratio */
+													}
+												</style>
+											</head>
+											<body>
+
+												<div class="image-container">
+													<img src="/images/fft_pitch_acceler.png" alt="Image 1">
+													<img src="/images/fft_roll_acceler.png" alt="Image 2">
+												</div>
+
+												<div class="image-container">
+													<img src="/images/fft_general.png" alt="Image 1" style="width: 500px !important; height: auto;">
+												</div>
+												<p>Based on the provided graphs, it can be inferred that the sampling frequency can be estimated to be around 50 Hz, hence I chose the low-pass filter cutoff frequency <code>f<sub>c</sub></code>to be about 5 Hz. </p>
+
+												<h4>Implementation of Low-pass filter</h3>
+												<html lang="en">
+													<head>
+														<meta charset="UTF-8">
+														<meta name="viewport" content="width=device-width, initial-scale=1.0">
+														<title>Italic Equations with MathJax</title>
+														<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+														<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+														<style>
+															.center-container {
+																/* display: table-cell;
+																vertical-align: middle; */
+				
+															}
+															body, html{
+																height: 100%;
+																/* justify-content: center;
+																align-items: center;
+																text-align: center;
+																place-items: center; */
+																margin: 0;
+																/* display: table; */
+																position: relative;
+															}
+															.math-equation {
+																font-size: 18px;
+																display:inline-block;
+															}
+														</style>
+													</head>
+													<body>
+														<div class = "center-container">
+															<div class = "math-equation">
+																$$  \theta_{lpf}[n] = \alpha \theta_{unfiltered} + (1-\alpha)\theta_{lpf}[n-1]  $$
+															</div>
+														</div>
+													<!-- <p><span class="center-container"> \( \theta_a = \tan^{-1} \left( \frac{a_x}{a_y} \right) \) </span></p> -->
+													</body>
+													</html>
+
+													<html lang="en">
+													<head>
+														<meta charset="UTF-8">
+														<meta name="viewport" content="width=device-width, initial-scale=1.0">
+														<title>Italic Equations with MathJax</title>
+														<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+														<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+														<style>
+															.center-container {
+																/* display: table-cell;
+																vertical-align: middle; */
+				
+															}
+															body, html{
+																height: 100%;
+																/* justify-content: center;
+																align-items: center;
+																text-align: center;
+																place-items: center; */
+																margin: 0;
+																/* display: table; */
+																position: relative;
+															}
+															.math-equation {
+																font-size: 18px;
+																display:inline-block;
+															}
+														</style>
+													</head>
+													<body>
+														<div class = "center-container">
+															<div class = "math-equation">
+																$$  \theta_{lpf}[n-1] = \theta_{lpf}[n]  $$
+															</div>
+														</div>
+													<!-- <p><span class="center-container"> \( \theta_a = \tan^{-1} \left( \frac{a_x}{a_y} \right) \) </span></p> -->
+													</body>
+													</html>
+													<p>The coefficient &#945; as well as the sampling period T may be calculated through the following formulas:
+													
+														<html lang="en">
+															<head>
+																<meta charset="UTF-8">
+																<meta name="viewport" content="width=device-width, initial-scale=1.0">
+																<title>Italic Equations with MathJax</title>
+																<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+																<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+																<style>
+																	.center-container {
+																		/* display: table-cell;
+																		vertical-align: middle; */
+						
+																	}
+																	body, html{
+																		height: 100%;
+																		/* justify-content: center;
+																		align-items: center;
+																		text-align: center;
+																		place-items: center; */
+																		margin: 0;
+																		/* display: table; */
+																		position: relative;
+																	}
+																	.math-equation {
+																		font-size: 18px;
+																		display:inline-block;
+																	}
+																</style>
+															</head>
+															<body>
+																<div class = "center-container">
+																	<div class = "math-equation">
+																		$$  \alpha = T / (T+RC)  $$
+																		$$  f_{c} = 1/(2 \pi RC)$$
+																	</div>
+																</div>
+															<!-- <p><span class="center-container"> \( \theta_a = \tan^{-1} \left( \frac{a_x}{a_y} \right) \) </span></p> -->
+															</body>
+															</html>
+														
+													<p>The sampling frequency of the captured IMU data was found to 10 ms per sample. Hence, with the cutoff frequency of about 5 Hz, the value of &#945; ends up being equal to <code>0.2</code>. Utilizing the aforementioned equations for the implementation of the low-pass filter, the Arduino code ought to be updated as the following:</p>
+													<div class="image-container">
+														<img src="/images/filter_imu_acc_arduino.png" alt="Image 1" style="width: 550px !important; height: auto;">
+													</div>
+													<div class="image-container">
+														<img src="/images/send_imu_data_acc_filtered_new_arduino.png" alt="Image 1" style="width: 550px !important; height: auto;">
+													</div>
+													<p>Furthermore, on the Python side, the computation code for with the filter applied was implemented as the following:</p>
+													<div class="image-container">
+														<img src="/images/filtered_acc_python1.png" alt="Image 1" style="width: 650px !important; height: auto;">
+													</div>
+													<div class="image-container">
+														<img src="/images/filtered_acc_python2.png" alt="Image 1" style="width: 400px !important; height: auto;">
+													</div>
+													<p>Finally, the applied low-pass filter on the recorded and stored pitch and roll data would be presented as following:</p>
+													<div class="image-container">
+														<img src="/images/pitchvstime_filtered2.png" alt="Image 1" style="width: 300px !important; height: auto;">
+														<img src="/images/rollvstime_filtered.png" alt="Image 1" style="width: 300px !important; height: auto;">
+													</div>
+
+													<p>As can be observed from the provided graphs, the low-pass filter (as indicated in orange) is able to significantly reduce the noise in the originally recorded data (as indicated in blue). The noise levels were already minor considering that the accelerometer has an integrated low-pass filter (as is stated in the ICM 20948 datasheet). However, with this implementation of low-pass filter, the noise levels remain negligible and are almost fully reduced.</p>
+													<h3>Gyroscope</h3>
+
+													<p>As opposed to the accelerometer, the gyroscope is reflected in three leading equations that describe its movement. Each of the equations are integrated over time.</p>
+													
+													<html lang="en">
+														<head>
+															<meta charset="UTF-8">
+															<meta name="viewport" content="width=device-width, initial-scale=1.0">
+															<title>Italic Equations with MathJax</title>
+															<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+															<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+															<style>
+																.center-container {
+																	/* display: table-cell;
+																	vertical-align: middle; */
+					
+																}
+																body, html{
+																	height: 100%;
+																	/* justify-content: center;
+																	align-items: center;
+																	text-align: center;
+																	place-items: center; */
+																	margin: 0;
+																	/* display: table; */
+																	position: relative;
+																}
+																.math-equation {
+																	font-size: 18px;
+																	display:inline-block;
+																}
+															</style>
+														</head>
+														<body>
+															<div class = "center-container">
+																<div class = "math-equation">
+																	$$  \theta_g = \theta_g + g_{y} * dt $$
+																	$$  \phi_g = \phi_g + g_{x} * dt $$
+																	$$  \psi_g = \psi_g + g_{z} * dt $$
+																</div>
+															</div>
+														<!-- <p><span class="center-container"> \( \theta_a = \tan^{-1} \left( \frac{a_x}{a_y} \right) \) </span></p> -->
+														</body>
+														</html>
+
+														<p>Similarly, to the code for accelerometer, I created a I created a function called collectIMUData_GYRO() which computes pitch, roll, and yaw values of the accelerometer while collecting data in real time. Furthermore, pitch, roll, as well as time values are stored in respective arrays of length ARRAY_LENGTH2 = 2000. The function is called from the SEND_IMU_DATA_GYRO case for as long as the number of entries collected is less than the proposed ARRAY_LENGTH2.</p>
+														<div class="image-container">
+															<img src="/images/send_imu_data_gyro.png" alt="Image 1" style="width: 400px !important; height: auto;">
+														</div>
+														<div>
+															<img src="/images/collect_gyro.png" alt="Image 1" style="width: 400px !important; height: auto;">
+														</div>
+
+														<p>Similarly to testing the accelerometer, I tested the gyroscope by varying {-90, 0, 90} angles for pitch, roll, and yaw respectively. Pitch and roll data were computed unfiltered initially, in order for them to be more easily compared to the accelerometer pitch and roll data. Lastly, yaw data was computed. It could have been observed that pitch and roll data were much less noisy overall compared to the accelerometer's respective data.</p>
+														<div>
+															<img src="/images/gyro_pitchvstime_unfiltered.png" alt="Image 1" style="width: 400px !important; height: auto;">
+															<img src="/images/gyro_rollvstime.png" alt="image 1" style="width:400px !important; height:auto;">
+															<img src="/images/gyro_yawvstime.png" alt="image 1" style="width:400px !important; height:auto;">
+														</div>
+														<p>Another significant observation while computing the filtered versions of gyroscope's pitch and roll data is that gyroscopre significantly drifts over time, as can be observed below. I decided to compute the gyroscope pitch and roll data as reliably as possible by developing a complimentary filter, which combines the aforementioned definition of accelerometer's RC filter and gyroscope's formulas in order to obtain the following equations. The value of &#947; represents the coefficient which weighs the relationship between the accelerometer and the gyroscope. Considering the higher accuracy of the accelerometer, the coefficient of &#947; is set to be <code>0.8</code>. </p>
+														<div class = "math-equation">
+															$$  \theta = (1-\gamma)(\theta+\theta_{g}*dt) + \theta_{a}* \gamma $$
+															$$  \phi = (1-\gamma)(\phi + \phi_{g} * dt) + \phi_{a}* \gamma $$
+														</div>
+														<p>Hence, the code implementation on the Arduino side is as following: </p>
+														<div>
+															<img src="/images/complementarycode.png" alt="Image 1" style="width: 550px !important; height: auto;">
+														</div>
+														<p>Finally, by rotating the IMU with varying speeds, the filtered accelerometer data was plotted on the same graph as the complementary filter data of the gyroscope, for easier comparison.</p>
+
+														<div>
+															<img src="/images/compl_pitch.png" alt="Image 1" style="width: 550px !important; height: auto;">
+														</div>
+														<div>
+															<img src="/images/compl_roll.png" alt="Image 1" style="width: 528px !important; height: auto;">
+														</div>
+														<p>As can be observed, the complementary filter is very accurate with the computation of both pitch and roll data over time, it is able to remain uninfluenced by the detectible drift in data, yet is not influenced by rapid varying and rotating of the IMU. Hence, the complimentary filter is evaluated to be very reliable from the presented graphs. Another observation was that decreasing the sampling frequency ultimately resulted in a greater fluctuation between the measurements of the filtered and unfiltered data. Hence, the sampling rate ought to be high in order to maintain high accuracy in data acquisition.</p>
+														<h3>Sample Data</h3>
+														<h4>Timing Analysis and time-stamped arrays</h4>
+														<p>Following the proposed instructions, all the time-consuming and repetitive statements in the main loop have been removed, including all Serial.print() functions, and all the implemented delay() functions. In order to create time-stamped IMU data arrays, a flag RECORD_IMU was instantiated in Arduino cases. Afterwards, GET_IMU_DATA_ACC was called on the Python side in order to determine the computation time or the speed of sampling. This was performed on the ARRAY_LENGTH size of the array, which was previously used in this lab. The code for computation can be found below.</p>
+														<div>
+															<img src="/images/stop_start.png" alt="Image 1" style="width: 528px !important; height: auto;">
+														</div>
+														<div>
+															<img src="/images/computation_oft.png" alt="Image 1" style="width: 528px !important; height: auto;">
+														</div>
+														<p>As can be inferred from the provided outputs, the time step T, which represents the speed of data transmission of the data points sent over from Arduino is approximately 0.102.</p>
+														<h4>data storage</h4>
+														<p>In order to compute and store the data for the lab, I stored pitch, roll, and yaw respectively into separate float arrays. This choice ended up aligning with easier manipulation of the data and possibility of easier calculations in the future labs. Each of the float arrays takes up a third of Artemis's 384 kiB of memory. Hence, this corresponds to about 33000 data points. Considering that the sampling rate of the IMU was approximated to be about 220 Hz, this would in theory equate to about 150 seconds to fill the available memory.However, realistically this might not be the case since there are more things occupying the memory, hence the proposed sampling rate would be somewhat smaller in reality.</p>
+														<h4>5s of Data Demonstration</h4>
+														<p>I set the flag indicating that the data collection ought to last for 5 seconds. Furthermore, my array consisted of the GET_IMU_DATA_ACC array, and each of the received arrays had a time stamp indicated.</p>
+														<div>
+															<img src="/images/5sdata.png" alt="Image 1" style="width: 528px !important; height: auto;">
+														</div>
+
+
+														<h3>Record a stunt!</h3>
+														<iframe width="560" height="315" 
+														src="https://www.youtube.com/embed/78uB5jMgX5I" 
+														frameborder="0" allowfullscreen>
+												</iframe>
+
+												
+
+							
 									<h3>Discussion:</h3>
-									<p>The performed tasks were very insightful and helpful in teaching us how to navigate the Arduino IDE environment, and with the "C" speaker assignment, practice playing with the provided code to create new functionalities. </p>
+									<p>The performed tasks were very insightful and helpful in demonstrating how to properly use the IMU and has set crucial fundamentals for navigating the future labs. </p>
 
 								</section>
 							<!-- </article> -->
@@ -179,29 +562,9 @@
 						</body>
 						</html>
 
-						<section class="content-section" style="text-align: center;">
-							<header class="major">
-								<h1>LAB 1B - Bluetooth Communication</h2>
-							</header>
-						
-							<h3>Introduction:</h3>
-							<p>This section of the lab focuses on establishing a Bluetooth connection between the Artemis board and the computer. The environments used for this part of the lab were Arduino IDE and Jupyter Lab in order for the bluetooth connection to be established.</p>
-						</section>
+					
 						
 						<section class="content-section">
-							<h3>Prelab 1B: Installation of Python and Virtual Environment</h3>
-							<p>Before implementing Bluetooth communication, the necessary libraries were installed, including ArduinoBLE (Bluetooth Low Energy, which refers to circumstances of Bluetooth optimization that do not need large data transfers). These libraries allow the Artemis board to act as a BLE peripheral, enabling it to send and receive data wirelessly.</p>
-							<p>The newest version of Python - Python 3.13 - as well as pip were installed. The versions were verified by the commands:</p>
-							<pre><code> python3 --version </code></pre>
-							<p> Afterwards, we may set up the Jupyter Lab environment for the computer interface, which is enabled through the following code snippet:
-							<pre><code> python3 -m pip install --user virtualenv
- python3 -m venv FastRobots_ble </code></pre>
-							<p> Furthermore, virtual environment ought to be activated in order for Jupyter Notebooks to be used: </p>
-							<pre><code> .\FastRobots_ble\Scripts\activate </code></pre>
-							<p>Another significant aspect of the Prelab 1B was the installation of ArduinoBLE, which thus enabled loading and burning of ble_arduino.ino. My device's MAC address was thus printed out on the Serial Monitor, after which connections.yaml file in Jupyter Lab was edited to reflect the MAC address. </p>
-							<div style="text-align: center;">
-								<img src="images/MAcaddress.png" alt="Lab 1 Setup" width="">
-							</div>
 						</section>
 						
 						<section class="content-section">
@@ -335,54 +698,7 @@
 
 							<!-- Example Video Embed -->
 						</section>
-						
-						<section class="content-section">
-							<h4>Task 8: Advantages and disadvantages between the methods</h4>
-							<p>From what can be observed, the first method, that is the method of the TIME_LOOP function, cannot send data as fast as SEND_TIME_DATA, due to the fact that it can be observed it has a bigger difference in-between consecutive timestamps. This method can send about 60 messages/s as calculated. Hence, even though it may not be able to send high-resolution data as well, it is the preferred method in the cases where we want the data to be transferred in the exact moment, yet we do not mind for the quality of it as much. This is due to the fact that TIME_LOOP can consistently send the last sample as the most recent sample of the data. </p>
-
-							<p>On the other hand, the second method utilized by SEND_TIME_DATA as well as GET_TEMP_READINGS is much better at sending high resolution data, and can send thousands of samples/s. However, unlike TIME_LOOP, this methodology cannot be used for most recent, or real-time data sending, as it distributes and collects data into different loops. Furthermore, those arrays and loops instantiated can take up a lot of memory. Considering that Artemis board has 384 kB of RAM, and a float uses 4 bytes of RAM, then we have in total of 96 000 data points available. If we sample 16-bit values at 150 Hz every 5 seconds, we would use 1500 bytes. Hence, 384 kB/1500 bytes would be equal to about 256 5-second intervals of data that are available in the memory.*</p>
-
-
-							<!-- Example Video Embed -->
-						</section>
-
-						<section class="content-section">
-							<h3>Additional tasks for 5000-level students</h3>
-							<h4>Effective Data Rate and Overhead</h4>
-							<p>My idea behind this was to send a message from the computer and then receive a reply from the Artemis. The sent_bytes were incremented in increments of 5 from 0 to 120. The first screenshot represents the Jupyter Notebook code, after which we can see a screenshot representing the packets being sent (from 80 bytes to 120 bytes in this screenshot example) with their data rate displayed, as well as the duration of transmission. Lastly, a graph can be seen, showing the data rate versus the packet size. From the graph, it can be inferred that the curve is almost linear with a few outliers, where with the increase of the bytes sent to the Artemis, we have an increase in the data rate as well as the duration of transmission.</p>
-							<p>Short packets cause overhead because the transmission has a fixed size, and thus with sending 5-byte packets we have a lower effective data rate. On the other hand, larger packets definitely do improve the efficiency because there is a higher effective data rate and the transmission is more efficient as the overhead is spread out more across the actual data.</p>
-							<div style="text-align: center;">
-								<img src="images/codefordatarate.png" alt="BLE Connection" width="">
-							</div>
-							<div style="text-align: center;">
-								<img src="images/rateeepacketsloading.png" alt="BLE Connection" width="">
-							</div>
-							<div style="text-align: center;">
-								<img src="images/dataratevspacketsize.png" alt="BLE Connection" width="">
-							</div>
-						</section>
-
-						<h4>Reliability</h4>
-						<p>Reliability was tested through sending data at higher rate. Furthermore, I compared the outputs of Arduino IDE Serial Monitor's output with the Jupyter Lab's output to verify the reliability. As can be inferred from the two screenshots, the Jupyter Notebook and the Serial Monitor outputs match completely, hence there is high reliability even when sending higher rate from robot to computer. In extreme cases where data is sent very quickly, there might be a loss in packets as the computer would not be able to process the data quickly. However, that was not detected in this case.</p>
-						<div style="text-align: center;">
-							<img src="images/python_reliability.png" alt="BLE Connection" width="">
-						</div>
-						<div style="text-align: center;">
-							<img src="images/serialmonitor_reliability.png" alt="BLE Connection" width="">
-						</div>
-					</section>
-						
-						<section class="content-section">
-							<h3>Discussion:</h3>
-							<p>Lab 1 provided me with a hands-on experience in working with Bluetooth Low Energy (BLE) and understanding its significance for wireless communication. The lab was important for setting up Artemis for future lab projects.</p>
-						</section>
-
-
-						<section class="content-section">
-							<p>*The equation was learned from Mikayla Lahr's Lab 1 Page (Spring 2024).</p>
-						</section>
-						
-						
+	
 
 						<!-- Posts -->
 	

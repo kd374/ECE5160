@@ -20,8 +20,8 @@
 
 /////////// Lab 2 ////////////
 #define SERIAL_PORT Serial
-#define ARRAY_LENGTH 3000
-#define ARRAY_LENGTH2 3000
+#define ARRAY_LENGTH 1000
+#define ARRAY_LENGTH2 1000
 ICM_20948_I2C myICM;
 
 
@@ -52,6 +52,8 @@ float roll_a_acc_lpf[ARRAY_LENGTH];
 float pitch_a_acc_lpf[ARRAY_LENGTH];
 float roll_a_gyro_lpf[ARRAY_LENGTH2];
 float pitch_a_gyro_lpf[ARRAY_LENGTH2];
+float complementary_pitch[ARRAY_LENGTH];
+float complementary_roll[ARRAY_LENGTH];
 int time_array_acc[ARRAY_LENGTH];
 unsigned long time_array_gyro[ARRAY_LENGTH2];
 // unsigned long last_time[ARRAY_LENGTH2];
@@ -69,6 +71,7 @@ bool send_IMU_data = false;
 bool send_IMU_data2 = false;
 int IMU_entries_gathered_acc = 0;
 int IMU_entries_gathered_gyro = 0;
+bool RECORD_IMU = false;
 
 
 
@@ -98,7 +101,9 @@ enum CommandTypes
     CALCULATE_DATA_RATE,
     COLLECT_IMU_DATA,
     SEND_IMU_DATA_ACC,
-    SEND_IMU_DATA_GYRO
+    SEND_IMU_DATA_GYRO, 
+    START_IMU_DATA,
+    STOP_IMU_DATA
 };
 
 // Lab 2 - Accelerometer
@@ -446,7 +451,6 @@ void handle_command()
         //     }
         //     break;
         case SEND_IMU_DATA_ACC:
-            // goto COLLECT_IMU_DATA;
             Serial.println("Collecting IMU Accelerator data... ");
             while (IMU_entries_gathered_acc < ARRAY_LENGTH) {
               collectIMUData_ACC();
@@ -470,8 +474,6 @@ void handle_command()
               tx_estring_value.append("Roll filtered: ");
               tx_estring_value.append(roll_a_acc_lpf[i]);
               tx_characteristic_string.writeValue(tx_estring_value.c_str());
-            //   Serial.println(tx_estring_value.c_str());
-              // delay(50);
             } 
             IMU_entries_gathered_acc = 0;
             send_IMU_data = false;
@@ -481,7 +483,7 @@ void handle_command()
             Serial.println("Collecting IMU Gyroscope data... ");
             while (IMU_entries_gathered_gyro < ARRAY_LENGTH2) {
               collectIMUData_GYRO();
-              filterIMUData_GYRO();
+              filterIMUData_ACC();
             }
             Serial.println("Colleting IMU Gyroscope data complete! Now sending...");
             if (IMU_entries_gathered_gyro == 0) {
@@ -498,12 +500,28 @@ void handle_command()
               tx_estring_value.append(roll_g_array[i]);
               tx_estring_value.append("Yaw: ");
               tx_estring_value.append(yaw_g_array[i]);
+              tx_estring_value.append("Pitch filtered: ");
+              tx_estring_value.append(complementary_pitch[i]);
+              tx_estring_value.append("Roll filtered: ");
+              tx_estring_value.append(complementary_roll[i]);
               tx_characteristic_string.writeValue(tx_estring_value.c_str());
             }
             IMU_entries_gathered_gyro = 0;
             send_IMU_data2 = false;
             break; 
-    }
+
+        case START_IMU_DATA:
+            Serial.println("Recording IMU data...");
+            digitalWrite(LED_BUILTIN, HIGH);
+            RECORD_IMU = true;
+            break;
+
+        case STOP_IMU_DATA:
+            RECORD_IMU = false;
+            digitalWrite(LED_BUILTIN, LOW);
+            Serial.println("Stopped recording IMU data");
+            break;
+            }
 }
 
 void write_data() {
@@ -592,7 +610,6 @@ void collectIMUData_ACC() {
       time_array_acc[IMU_entries_gathered_acc] = millis();
       pitch_a[IMU_entries_gathered_acc] = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
       roll_a[IMU_entries_gathered_acc] = atan2(myICM.accY(),myICM.accZ())*180/M_PI; 
-      // Serial.print(IMU_entries_gathered);
       Serial.print("Pitch: ");
       Serial.print(pitch_a[IMU_entries_gathered_acc]);
       Serial.print("Roll: ");
@@ -610,8 +627,6 @@ void collectIMUData_GYRO() {
       if (myICM.dataReady()) {
         myICM.getAGMT();
         dt = (micros()-last_time)/1000000.0;
-        // Serial.print("dt: ");
-        // Serial.print(dt); 
         last_time = micros();
         time_array_gyro[IMU_entries_gathered_gyro] = last_time;
         Serial.print("IMU_entries_gathered_gyro: ");
@@ -622,20 +637,8 @@ void collectIMUData_GYRO() {
         roll_g_array[IMU_entries_gathered_gyro] = roll_g;
         yaw_g = yaw_g + myICM.gyrZ()*dt;
         yaw_g_array[IMU_entries_gathered_gyro] = yaw_g;
-        // Serial.print("myICM.gyrY: ");
-        // Serial.print(myICM.gyrY());
-        // Serial.print("myICM.gyrX: ");
-        // Serial.print(myICM.gyrX());
-        // Serial.print("myICM.gyrZ: ");
-        // Serial.print(myICM.gyrZ());
-        // Serial.print("myICM.gryY()");
-        // Serial.print(myICM.gyrY());
         Serial.print(", pitch_g:");
         Serial.print(pitch_g_array[IMU_entries_gathered_gyro]);
-        // Serial.print("\t \n roll_g:");
-        // Serial.println(roll_g[IMU_entries_gathered_gyro]);
-        // Serial.print(", yaw_g:");
-        // Serial.println(yaw_g[IMU_entries_gathered_gyro]);
         Serial.print(", roll_g:");
         Serial.print(roll_g_array[IMU_entries_gathered_gyro]);
         Serial.print(", yaw_g:");
@@ -647,14 +650,22 @@ void collectIMUData_GYRO() {
 }
 
 void filterIMUData_ACC() {
+  float alpha = 0.95;
   pitch_a_acc_lpf[0] = pitch_a[0];
   roll_a_acc_lpf[0] = roll_a[0];
   for (int n = 1; n < ARRAY_LENGTH; n++) {
-    const float alpha = 0.2;
-    pitch_a_acc_lpf[n] = alpha*pitch_a[n] + (1-alpha)*pitch_a_acc_lpf[n-1];
+    const float acc_alpha = 0.2;
+    pitch_a_acc_lpf[n] = acc_alpha*pitch_a[n] + (1-acc_alpha)*pitch_a_acc_lpf[n-1];
     pitch_a_acc_lpf[n-1] = pitch_a_acc_lpf[n];
-    roll_a_acc_lpf[n] = alpha*roll_a[n] + (1-alpha)*roll_a_acc_lpf[n-1];
+    roll_a_acc_lpf[n] = acc_alpha*roll_a[n] + (1-acc_alpha)*roll_a_acc_lpf[n-1];
     roll_a_acc_lpf[n-1] = roll_a_acc_lpf[n];
+
+    complementary_pitch[n] = 0.2 * pitch_g_array[n] + 0.8* pitch_a_acc_lpf[n];
+    complementary_roll[n] = 0.2 * roll_g_array[n] + 0.8 * roll_a_acc_lpf[n];
+    // complementary_pitch[n] = 0.18*pitch_a[n] + (1-0.18)*pitch_a_acc_lpf[n-1];
+    // complementary_pitch[n-1] = complementary_pitch[n];
+    // complementary_roll[n] = 0.18*roll_a[n] + (1-0.18)*roll_a_acc_lpf[n-1];
+    // complementary_roll[n-1] = complementary_roll[n];
   }
 }
 
