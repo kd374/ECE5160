@@ -266,29 +266,54 @@
                                 </figure>
                                 <p>As can be inferred from the graph above, the pitch and roll data was varied so that the IMU is rotated in pitch direction first, and the in roll direction, and so on.</p>
 
-                                <h4>Additional tasks for 5000-level students</h4>
-                                <>
+                                <h3>Additional tasks for 5000-level students</h4>
+                                <h4>IR Sensor Discussion</h4>
+                                <p>This lab used an IR Time-of-Fligth sensor, however, more such IR sensors exist, some of which include amplitude-based IR sensors, and triangulation IR sensors. Amplitude-based IR sensors particularly work by sending IR pulses and then measuring the difference in amplitude of the received signal compared to the sent signal., while the radio determines distances of objects. Their pros are that they are relatively cheap, much cheaper than ToF IR sensors, as well as have straightforward calculations. However, they fundamentally work on short distances, as well as have high sensitivity to texture, colour, and light ambience - due to which time integration might be adjusted.</p>
+                                <p>Another classification of IR sensors are the triangulation IR sensors, also known as angle-based IR sensors. These sensors operate by sending the IR pulse at an angle, and thus determining the angle at the receiving end, due to which the distance is determined. Some of the pros of these sensors are that they do not have sensitivity to colour or texture, and are of comparable price to the amplitude-based IR sesnors, as well as have a range up to 1 meter. However, the cons of this type of IR sensors is that they are bulky, and can be somewhat slow, as well as vary with the ambient lighting.</p>
+                                <p>Lastly, ToF IR sensors have the highest range, much larger than the aforementioned two, are of small footprint, and do not have sensitivity to texture or colour. However, their cons are that they are much more expensive that the previous two types, as well as have more complex math behind them. </p>
 
+                                <h4>ToF Sensitivity to Colours and Textures Discussion</h4>
+                                <p>Considering that ToF sensors do not have sensitivity to colour or texture, the proposed may be determined with the sensors used in this lab. For this part of the lab, I varied two colours, red and blue, which I attached to the wall at a distance of 20 cm from the red and blue images. It can be determined from the videos below that colour did not have any affect on the sensitivity of the sensor, and the distance remained at 20 cm (the position of the ruler in the videos is maintained). </p>
 
-                                  
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/C3JVcsUa5Wk"  
+                                title="Lab 3: Red Colour Test" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
 
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/j1RvzATYiIA"  
+                                title="Lab 3: Blue Colour Test" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
 
+                                <p>The second test performed was the test for texture, and the tested materials were a cardboard box and the wall. Similarly to the colour, it was determined that texture does not affect distance measured if the distance is set to a fixed distancewith a ruler. Hence, the ToF sensor is insensitive to texture as well. It can be observed that the distance from both textures to the ToF sensor is 20 cm.</p>
 
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/EodOk6Ki8zY"  
+                                title="Lab 3: Blue Colour Test" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
 
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/Yil17qfKnuk"  
+                                title="Lab 3: Blue Colour Test" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+
+                                <h3>Discussion</h3>
+                                <p>This lab provided me with new knowledge on how ToF sensors work, as well as made me become more cognizant about future steps of how I plan to attach the sensor to my robots and integrate them well.</p>
 
 
                     
-                              
-                                  
-                                  
-
-
-                            
-                                <!-- Embed YouTube Video -->
-                                <iframe width="560" height="315" 
-                                        src="https://youtube.com/embed/r6mWxkccSwo" 
-                                        frameborder="0" allowfullscreen>
-                                </iframe>
                             </section>
 
                         
