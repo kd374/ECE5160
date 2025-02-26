@@ -41,12 +41,10 @@
                 <div id="main">
 
                     <!-- Featured Post -->
-                    <!DOCTYPE html>
-                    <html lang="en">
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>LAB 1A - Artemis Setup</title>
+                        <title>LAB 3 - Artemis Setup</title>
                     
                         <!-- Inline CSS for this page only -->
                         <style>
@@ -97,8 +95,8 @@
                         <!-- Featured Post -->
                         <article class="post featured">
                             <header class="major">
-                                <span class="date">February 5th, 2025</span>
-                                <h2>LAB 1A - Artemis Setup</h2>
+                                <span class="date">February 26th, 2025</span>
+                                <h2>LAB 3 - Time of Flight (ToF)</h2>
                             </header>
                     
                             <!-- Introduction -->
@@ -176,6 +174,262 @@
                         <!-- </article> -->
                     
                     </body>
+                    <section class="content-section" style="text-align: center;">
+                        <header class="major">
+                            <h1>LAB 1B - Bluetooth Communication</h2>
+                        </header>
+                    
+                        <h3>Introduction:</h3>
+                        <p>This section of the lab focuses on establishing a Bluetooth connection between the Artemis board and the computer. The environments used for this part of the lab were Arduino IDE and Jupyter Lab in order for the bluetooth connection to be established.</p>
+                    </section>
+                    
+                    <section class="content-section">
+                        <h3>Prelab 1B: Installation of Python and Virtual Environment</h3>
+                        <p>Before implementing Bluetooth communication, the necessary libraries were installed, including ArduinoBLE (Bluetooth Low Energy, which refers to circumstances of Bluetooth optimization that do not need large data transfers). These libraries allow the Artemis board to act as a BLE peripheral, enabling it to send and receive data wirelessly.</p>
+                        <p>The newest version of Python - Python 3.13 - as well as pip were installed. The versions were verified by the commands:</p>
+                        <pre><code> python3 --version </code></pre>
+                        <p> Afterwards, we may set up the Jupyter Lab environment for the computer interface, which is enabled through the following code snippet:
+                        <pre><code> python3 -m pip install --user virtualenv
+python3 -m venv FastRobots_ble </code></pre>
+                        <p> Furthermore, virtual environment ought to be activated in order for Jupyter Notebooks to be used: </p>
+                        <pre><code> .\FastRobots_ble\Scripts\activate </code></pre>
+                        <p>Another significant aspect of the Prelab 1B was the installation of ArduinoBLE, which thus enabled loading and burning of ble_arduino.ino. My device's MAC address was thus printed out on the Serial Monitor, after which connections.yaml file in Jupyter Lab was edited to reflect the MAC address. </p>
+                        <div style="text-align: center;">
+                            <img src="images/MAcaddress.png" alt="Lab 1 Setup" width="">
+                        </div>
+                    </section>
+                    
+                    <section class="content-section">
+                        <h3>Lab 1B: Tasks</h3>
+                        <p>Throughout these lab 1B tasks, I had to connect to the Artemis Device in Jupyter Notebook whenever the Bluetooth connection ought to be established. </p>
+                        <div style="text-align: center;">
+                            <img src="images/connection.png" alt="Lab 1 Setup" width="">
+                        </div>
+                        <p>Furtermore, with every case initiation, we update enums in both ble_arduino.ino on the Arduino side, and cmd_types.py on the Jupyter Notebook side.</p>
+                        <div style="text-align: center;">
+                            <img src="images/enums.png" alt="Lab 1 Setup" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/enums2.png" alt="Lab 1 Setup" width="">
+                        </div>
+
+                        <h4>Task 1: ECHO</h4>
+                        <p>The first task aimed to send an echo command that holds a string to the Artemis board, and afterwards receive the augmented version of the string back to the computer, testing the mutual communication.
+                            Below are snippets of Arduino IDE code and Jupyter Notebook code, and the Serial Monitor Output, in order.
+                        </p>
+                    
+                        <!-- Example Image -->
+                        <div style="text-align: center;">
+                            <img src="images/echo_arduino.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/echo_python.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/echo_arduino_output.png" alt="BLE Connection" width="">
+                        </div>
+                    </section>
+                    
+                    <section class="content-section">
+                        <h4>Task 2: Send_THREE_FLOATS</h4>
+                        <p>Similarly to the previous task, in this task we send three floats instead. Arduino IDE code, Jupyter Notebook code, and the Serial Monitor output are in order.</p>
+                        <div style="text-align: center;">
+                            <img src="images/three_floats_arduino.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/three_floats_python.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/threefloats_output.png" alt="BLE Connection" width="">
+                        </div>
+                        <!-- Example Video Embed -->
+                    </section>
+
+                    <section class="content-section">
+                        <h4>Task 3: GET_TIME_MILLIS</h4>
+                        <p>This task asks for the Artemis to reply with a string representing current time. Arduino IDE code, Jupyter Notebook code, and the Serial Monitor output are in order. It can be seen that the Python code sends the GET_TIME_MILLIS command and receives a string representing the current time. The time is thus also reflected on the Serial Monitor.</p>
+                        <div style="text-align: center;">
+                            <img src="images/get_time_millis_arduino.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/get_time_millis_python .png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/get_time_millis_output.png" alt="BLE Connection" width="">
+                        </div>
+                        <!-- Example Video Embed -->
+                    </section>
+
+                    <section class="content-section">
+                        <h4>Task 4: Notification Handler</h4>
+                        <p>The notification handler integrates ble.start_notify() function, which calls the handler whenever a message is received from the Artemis board. The received string is printed out. Arduino IDE code, Jupyter Notebook code, and the Serial Monitor output are in order. It can be seen that the Python code sends the GET_TIME_MILLIS command and receives a string representing the current time. The time is thus also reflected on the Serial Monitor.</p>
+                        <div style="text-align: center;">
+                            <img src="images/notification_handler_python.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/handler_output.png" alt="BLE Connection" width="">
+                        </div>
+                        <!-- Example Video Embed -->
+                    </section>
+
+                    <section class="content-section">
+                        <h4>Task 5: Looped version of GET_TIME_MILLIS</h4>
+                        <p>The loop function named TIME_LOOP is created in order to consistently run GET_TIME_MILLIS and determine how fast the data is sent. Arduino IDE code, Jupyter Notebook code and output, and the Serial Monitor output are in order. </p>
+                        <div style="text-align: center;">
+                            <img src="images/time_loop_arduino.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/time_loop_python.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/time_loop_output1.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/time_loop_output2.png" alt="BLE Connection" width="">
+                        </div>
+                        <p>The looped function sent exactly 406 samples in 6.93 seconds, hence averaging at about 58.6 messages/s.</p>
+
+                        <!-- Example Video Embed -->
+                    </section>
+
+                    <section class="content-section">
+                        <h4>Task 6: SEND_TIME_DATA</h4>
+                        <p> This function stores timestamps in an array of 128, looping through the array and thus sending the entries fast. As opposed to the previous function TIME_LOOP, as in this case we gather the data and then send it in different loops. Arduino IDE code, Jupyter Notebook code and output are in order. Two new global variables of time_data representing an array and data_array are instantiated.</p>
+                        <div style="text-align: center;">
+                            <img src="images/send_time_correcttttt.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/send_time_data_arduino.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/send_time_data_beginning.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/send_time_data_python2.png" alt="BLE Connection" width="">
+                        </div>
+                        <p>Therefore, 128 time stamps were sent ranging from 2496060 ms to 2496064 ms. This method enhances frequency of the time stamps due to the fact that messages do not have to wait for the time stamps in between.</p>
+
+
+                        <!-- Example Video Embed -->
+                    </section>
+
+                    <section class="content-section">
+                        <h4>Task 7: GET_TEMP_READINGS</h4>
+                        <p> This task is very similar to the previous task, except that now we are incorporating temperature values as well with the time stamps. Arduino IDE code, Jupyter Notebook code and output are in order. A new global variable of temperature_data representing an array is instantiated.</p>
+                        <div style="text-align: center;">
+                            <img src="images/temp_variable.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/temp_arduino.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/temp_python.png" alt="BLE Connection" width="">
+                        </div>
+                        <p></p>
+
+
+                        <!-- Example Video Embed -->
+                    </section>
+                    
+                    <section class="content-section">
+                        <h4>Task 8: Advantages and disadvantages between the methods</h4>
+                        <p>From what can be observed, the first method, that is the method of the TIME_LOOP function, cannot send data as fast as SEND_TIME_DATA, due to the fact that it can be observed it has a bigger difference in-between consecutive timestamps. This method can send about 60 messages/s as calculated. Hence, even though it may not be able to send high-resolution data as well, it is the preferred method in the cases where we want the data to be transferred in the exact moment, yet we do not mind for the quality of it as much. This is due to the fact that TIME_LOOP can consistently send the last sample as the most recent sample of the data. </p>
+
+                        <p>On the other hand, the second method utilized by SEND_TIME_DATA as well as GET_TEMP_READINGS is much better at sending high resolution data, and can send thousands of samples/s. However, unlike TIME_LOOP, this methodology cannot be used for most recent, or real-time data sending, as it distributes and collects data into different loops. Furthermore, those arrays and loops instantiated can take up a lot of memory. Considering that Artemis board has 384 kB of RAM, and a float uses 4 bytes of RAM, then we have in total of 96 000 data points available. If we sample 16-bit values at 150 Hz every 5 seconds, we would use 1500 bytes. Hence, 384 kB/1500 bytes would be equal to about 256 5-second intervals of data that are available in the memory.*</p>
+
+
+                        <!-- Example Video Embed -->
+                    </section>
+
+                    <section class="content-section">
+                        <h3>Additional tasks for 5000-level students</h3>
+                        <h4>Effective Data Rate and Overhead</h4>
+                        <p>My idea behind this was to send a message from the computer and then receive a reply from the Artemis. The sent_bytes were incremented in increments of 5 from 0 to 120. The first screenshot represents the Jupyter Notebook code, after which we can see a screenshot representing the packets being sent (from 80 bytes to 120 bytes in this screenshot example) with their data rate displayed, as well as the duration of transmission. Lastly, a graph can be seen, showing the data rate versus the packet size. From the graph, it can be inferred that the curve is almost linear with a few outliers, where with the increase of the bytes sent to the Artemis, we have an increase in the data rate as well as the duration of transmission.</p>
+                        <p>Short packets cause overhead because the transmission has a fixed size, and thus with sending 5-byte packets we have a lower effective data rate. On the other hand, larger packets definitely do improve the efficiency because there is a higher effective data rate and the transmission is more efficient as the overhead is spread out more across the actual data.</p>
+                        <div style="text-align: center;">
+                            <img src="images/codefordatarate.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/rateeepacketsloading.png" alt="BLE Connection" width="">
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="images/dataratevspacketsize.png" alt="BLE Connection" width="">
+                        </div>
+                    </section>
+
+                    <h4>Reliability</h4>
+                    <p>Reliability was tested through sending data at higher rate. Furthermore, I compared the outputs of Arduino IDE Serial Monitor's output with the Jupyter Lab's output to verify the reliability. As can be inferred from the two screenshots, the Jupyter Notebook and the Serial Monitor outputs match completely, hence there is high reliability even when sending higher rate from robot to computer. In extreme cases where data is sent very quickly, there might be a loss in packets as the computer would not be able to process the data quickly. However, that was not detected in this case.</p>
+                    <div style="text-align: center;">
+                        <img src="images/python_reliability.png" alt="BLE Connection" width="">
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="images/serialmonitor_reliability.png" alt="BLE Connection" width="">
+                    </div>
+                </section>
+                    
+                    <section class="content-section">
+                        <h3>Discussion:</h3>
+                        <p>Lab 1 provided me with a hands-on experience in working with Bluetooth Low Energy (BLE) and understanding its significance for wireless communication. The lab was important for setting up Artemis for future lab projects.</p>
+                    </section>
+
+
+                    <section class="content-section">
+                        <p>*The equation was learned from Mikayla Lahr's Lab 1 Page (Spring 2024).</p>
+                    </section>
+                    
+                    
+
+                    <!-- Posts -->
+
+
+                    <!-- Footer -->
+                </div>
+                </div>
+            <!-- Footer -->
+            <footer id="footer">
+                    <!-- <section>
+                        <form method="post" action="#">
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" />
+                                </div>
+                                <div class="field">
+                                    <label for="email">Email</label>
+                                    <input type="text" name="email" id="email" />
+                                </div>
+                                <div class="field">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <ul class="actions">
+                                <li><input type="submit" value="Send Message" /></li>
+                            </ul>
+                        </form>
+                    </section>
+                    <section class="split contact"> -->
+                        <section>
+                            <h3>EMAIL @ </h3>
+                            <p><a href="#">kd374@cornell.edu</a></p>
+                        </section>
+                </footer> 
+
+            <!-- Copyright -->
+                <div id="copyright">
+                    <ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+                </div>
+
+        </div>
+
+    <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
 
 </body>
 </html>
