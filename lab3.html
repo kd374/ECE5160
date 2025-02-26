@@ -102,19 +102,22 @@
                             <!-- Introduction -->
                             <section class="content-section">
                                 <h3>Introduction:</h3>
-                                <p>The aim of this lab to set up Sparkfun Artemis board, which is going to be used for the rest of the semester and be the crucial aspect of communication between robots.</p>
+                                <p>The aim of this lab was to integrate Time of Flight (ToF) sensors which will be crucial in the ultimate functionality of the car by accurately detecting the surrounding objects.</p>
                             </section>
                     
                             <!-- Virtual Environment Setup -->
                             <section class="content-section">
-                                <h3>Prelab 1A: Installation of Arduino IDE </h3>
-                                <p>The first step of the Prelab 1A was to install the latest versions of Arduino IDE (version 2.3.4) and Sparkfun Apollo3 boards manager. Furthermore, I was able to successfully install all the required libraries for the prelab and thus perform the proposed tasks below. </p>
+                                <h3>Prelab 3: </h3>
+                                <p>The fundamental step of the prelab was to determine the wiring of the two ToF sensors, as well as how they would integrate with the IMU used in the previous lab. By reading through the datasheet, it was determined that the <code> blue connection indicated on the diagram below represents SDA, and the labeled yellow connection represents SCL.</code> The proposed sensors communicate through I2C, including the IMU from the previous lab, thus the QWIIC breakout board ought to be used establishing the connection among all sensors. The weires connecting from the QWIIC connector are further stripped and soldered onto the two ToF sensors.</p>
+                                <code> insert the picture</code>
+                                <h3> Lab 3 </h3>
+                                <p> Considering that the colour convention of the provided JST connector matched the colour convention of the LiPo battery connecting to the Artemis (that is, + terminal connecting to JST connector's red wire, and - terminal of the battery connecting to JST connector's black wire) the connector and the wires feeding into the LiPo battery connect as indicated in the diagram above. The connector from the LiPo battery was removed by reparating the wires one at a time, and then cutting them individually. The connection between the LiPo battery and the wires was heat shrunk for a secure connection.</p>
                     
 
                             <!-- Image Centered -->
                             <section class="content-section">
-                                <h3>Lab 1A: </h3>
-                                <h4>Task 1: Blink</h4>
+                                <h3> </h3>
+                                <h4></h4>
                                 <p>The example Blink code was run in order to confirm that we are able to program simple code onto the Artemis board.</p>
                             
                                 <!-- Embed YouTube Video -->
