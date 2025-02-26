@@ -109,7 +109,7 @@
                             <section class="content-section">
                                 <h3>Prelab 3: </h3>
                                 <p>The fundamental step of the prelab was to determine the wiring of the two ToF sensors, as well as how they would integrate with the IMU used in the previous lab. By reading through the datasheet, it was determined that the <code> blue connection indicated on the diagram below represents SDA, and the labeled yellow connection represents SCL.</code> The proposed sensors communicate through I2C, including the IMU from the previous lab, thus the QWIIC breakout board ought to be used establishing the connection among all sensors. The weires connecting from the QWIIC connector are further stripped and soldered onto the two ToF sensors.</p>
-                                <code> insert the picture</code>
+                               
                                 <p> Considering that the colour convention of the provided JST connector matched the colour convention of the LiPo battery connecting to the Artemis (that is, + terminal connecting to JST connector's red wire, and - terminal of the battery connecting to JST connector's black wire) the connector and the wires feeding into the LiPo battery connect as indicated in the diagram above. The connector from the LiPo battery was removed by separating the wires one at a time, and then cutting them individually. The connection between the LiPo battery and the wires was heat shrunk for a secure connection.</p>
                                 <p>Afterwards, SParkFun VL53L1X 4m laser distance sensor library was installed for ToF sensor operation.</p>
                     
@@ -120,7 +120,10 @@
                                 <h4></h4>
                                 <h4>ToF Sensors' Position on the car</h4>
                                 <p>My plan for this lab was to position the two ToF sensors at the front and on the side of the car, hence I connected them next to each other relative to the QWIIC connector, as opposed to on the opposite sides of the connector. This seemed like to most optimal choice in my opinion, considering that the car will be able to detect the obstacles in front and to its side. Fo detecting the obstacles on the other side of the car or behind the car, we ought to rotate the car. The two ToF sensor correspond to the longer QWIIC connector cables, due to the fact that they require higher positionality dependence as opposed to the IMU.</p>
-
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/diagram_overall.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Overall Diagram</figcaption>
+                                </figure>
                                 <h3>Lab tasks</h3>
                                 <h4>Testing the Time of Flight provided examples </h4>
                                 <p>The <code>XSHUT</code> connection is not necessary for the initial ToF sensor testing. The first test was performed by using Example1_Wire_I2C under the Apollo3 library for scanning the I2C bus in order to verify the address of the sensor. The proposed output is as the following: </p>
@@ -144,7 +147,7 @@
                                 <p>The code for testing the proposed mode was adapted from SparkFun_VL53L1X_4m_Laser library's example named Example1_ReadDistance and incorporated in the <code>ble_arduino.ino file.</code> </p>
                                 <figure style="margin: 0; text-align: center;">
                                     <img src="images/1tof_sensor_code_new.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
-                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Firts ToF sensor reading</figcaption>
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">First ToF sensor reading</figcaption>
                                 </figure>
                                 <p>The setup for the sensor's distance detection looks like in the following images.</p>
                                 <div style="display: flex; gap: 10px;">
