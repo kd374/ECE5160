@@ -110,7 +110,7 @@
                                 <h3>Prelab 3: </h3>
                                 <p>The fundamental step of the prelab was to determine the wiring of the two ToF sensors, as well as how they would integrate with the IMU used in the previous lab. By reading through the datasheet, it was determined that the <code> blue connection indicated on the diagram below represents SDA, and the labeled yellow connection represents SCL.</code> The proposed sensors communicate through I2C, including the IMU from the previous lab, thus the QWIIC breakout board ought to be used establishing the connection among all sensors. The weires connecting from the QWIIC connector are further stripped and soldered onto the two ToF sensors.</p>
                                
-                                <p> Considering that the colour convention of the provided JST connector matched the colour convention of the LiPo battery connecting to the Artemis (that is, + terminal connecting to JST connector's red wire, and - terminal of the battery connecting to JST connector's black wire) the connector and the wires feeding into the LiPo battery connect as indicated in the diagram above. The connector from the LiPo battery was removed by separating the wires one at a time, and then cutting them individually. The connection between the LiPo battery and the wires was heat shrunk for a secure connection.</p>
+                                <p> Considering that the colour convention of the provided JST connector matched the colour convention of the battery connecting to the Artemis (that is, + terminal connecting to JST connector's red wire, and - terminal of the battery connecting to JST connector's black wire) the connector and the wires feeding into the battery connect as indicated in the diagram above. The connector from the LiPo battery was removed by separating the wires one at a time, and then cutting them individually. The connection between the LiPo battery and the wires was heat shrunk for a secure connection.</p>
                                 <p>Afterwards, SParkFun VL53L1X 4m laser distance sensor library was installed for ToF sensor operation.</p>
                     
 
@@ -179,13 +179,13 @@
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Sensor Range Plot - Measured Distance vs Actual Distance</figcaption>
                                 </figure>
                                 <h4>Accuracy Discussion</h4>
-                                <p>Similarly to the plot above, the accuracy plot is represented in the difference between the measured and the actual distances against the actual distances recorded from the ToF sensor to the wall. It can be observed that the accuracy is slightly worse as we increase the distance, which is to be expected considering the proposed sensor range in the datasheet. Once the 130 cm range line is passed, the accuracy of our ToF sensor visibly deteriorates.</p>
+                                <p>Similarly to the plot above, the accuracy plot is represented in the difference between the measured and the actual distances against the actual distances recorded from the ToF sensor to the wall. It can be observed that the accuracy is slightly worse as we increase the distance, which is to be expected considering the proposed sensor range in the datasheet. Once the 130 cm range line is passed, the accuracy of our ToF sensor visibly deteriorates. The sensor range plot in the light and dark ambiance gives the same plot.</p>
                                 <figure style="margin: 0; text-align: center;">
                                     <img src="images/accuracy_plot.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Accuracy Plot - Difference in Measurement vs Actual Distance</figcaption>
                                 </figure>
                                 <h4>Repeatability Discussion</h4>
-                                <p>Repeatability is computed by calculating the standard deviation by utilizing <code>statistics.stdev()</code> on our recorded distance data, and afterwards computing it against the actual distance. Standard deviation is below 0.3 cm until the 130 cm range line indicated in orange, after which it significantly increases and reaches almost 1 cm at the distance of 150 cm, which is as expected considering the proposed graphs for accuracy and sensor range.</p>
+                                <p>Repeatability is computed by calculating the standard deviation by utilizing <code>statistics.stdev()</code> on our recorded distance data, and afterwards computing it against the actual distance. Standard deviation is below 0.3 cm until the 130 cm range line indicated in orange, after which it significantly increases and reaches almost 1 cm at the distance of 150 cm, which is as expected considering the proposed graphs for accuracy and sensor range. The sensor range plot in the light and dark ambiance gives the same plot.</p>
                                 <figure style="margin: 0; text-align: center;">
                                     <img src="images/repeatability_plot.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Repeatability Plot - Standard Deviation vs Actual Distance</figcaption>
@@ -318,6 +318,7 @@
 
                     
                             </section>
+                            <p>*This lab page is inspired by TA Mikayla Lahr's Lab 3 page from Spring 2024.</p>
 
                         
                         <!-- </article> -->
