@@ -44,7 +44,7 @@
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>LAB 3 - Artemis Setup</title>
+                        <title>LAB 3</title>
                     
                         <!-- Inline CSS for this page only -->
                         <style>
@@ -110,15 +110,41 @@
                                 <h3>Prelab 3: </h3>
                                 <p>The fundamental step of the prelab was to determine the wiring of the two ToF sensors, as well as how they would integrate with the IMU used in the previous lab. By reading through the datasheet, it was determined that the <code> blue connection indicated on the diagram below represents SDA, and the labeled yellow connection represents SCL.</code> The proposed sensors communicate through I2C, including the IMU from the previous lab, thus the QWIIC breakout board ought to be used establishing the connection among all sensors. The weires connecting from the QWIIC connector are further stripped and soldered onto the two ToF sensors.</p>
                                 <code> insert the picture</code>
-                                <h3> Lab 3 </h3>
-                                <p> Considering that the colour convention of the provided JST connector matched the colour convention of the LiPo battery connecting to the Artemis (that is, + terminal connecting to JST connector's red wire, and - terminal of the battery connecting to JST connector's black wire) the connector and the wires feeding into the LiPo battery connect as indicated in the diagram above. The connector from the LiPo battery was removed by reparating the wires one at a time, and then cutting them individually. The connection between the LiPo battery and the wires was heat shrunk for a secure connection.</p>
+                                <p> Considering that the colour convention of the provided JST connector matched the colour convention of the LiPo battery connecting to the Artemis (that is, + terminal connecting to JST connector's red wire, and - terminal of the battery connecting to JST connector's black wire) the connector and the wires feeding into the LiPo battery connect as indicated in the diagram above. The connector from the LiPo battery was removed by separating the wires one at a time, and then cutting them individually. The connection between the LiPo battery and the wires was heat shrunk for a secure connection.</p>
+                                <p>Afterwards, SParkFun VL53L1X 4m laser distance sensor library was installed for ToF sensor operation.</p>
                     
 
                             <!-- Image Centered -->
                             <section class="content-section">
                                 <h3> </h3>
                                 <h4></h4>
-                                <p>The example Blink code was run in order to confirm that we are able to program simple code onto the Artemis board.</p>
+                                <h4>ToF Sensors' Position on the car</h4>
+                                <p>My plan for this lab was to position the two ToF sensors at the front and on the side of the car, hence I connected them next to each other relative to the QWIIC connector, as opposed to on the opposite sides of the connector. This seemed like to most optimal choice in my opinion, considering that the car will be able to detect the obstacles in front and to its side. Fo detecting the obstacles on the other side of the car or behind the car, we ought to rotate the car. The two ToF sensor correspond to the longer QWIIC connector cables, due to the fact that they require higher positionality dependence as opposed to the IMU.</p>
+
+                                <h3>Lab tasks</h3>
+                                <h4>Testing the Time of Flight provided examples </h4>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/IMG_0295.jpg" alt="Lab 1 Setup" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px;">ToF sensor testing setup</figcaption>
+                                </figure>
+                                <p>The <code>XSHUT</code> connection is not necessary for the initial ToF sensor testing. The first test was performed by using Example1_Wire_I2C under the Apollo3 library for scanning the I2C bus in order to verify the address of the sensor. The proposed output is as the following: </p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/i2c_output.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Example1_Wire_I2C Serial Monitor Output</figcaption>
+                                </figure>
+                                <h4>Discussion on I2C address</h4>
+                                <p>The indicated address is 0x29 which represents 0x52 bit shifted by 1, or <code>0x52 >> 1</code>, thus negecting the last bit. The very last bit is supposed to represent the direction, thus 0 for a write and 1 for a read, hence we are paying attention to the first 7 bits, as can be confirmed from the ToF datasheet.</code></p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/message_from_datasheet.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Address description from the ToF datasheet</figcaption>
+                                </figure>
+                                <h4>Chosen mode discussion</h4>
+                                <p>The mode that I chose was the Short Distance Mode, as according to the datasheet description, it has the sensor range of 1.3 meters and hence seems like a great fit for the proposed car. Furthermore, it has the best maximum distance under strong ambient light compared to other modes, adequate in this case.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/datasheet_2.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Short distance mode description from the datasheet</figcaption>
+                                </figure>
+                                
                             
                                 <!-- Embed YouTube Video -->
                                 <iframe width="560" height="315" 
