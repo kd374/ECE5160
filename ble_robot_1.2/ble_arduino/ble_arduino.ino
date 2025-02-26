@@ -570,7 +570,7 @@ void handle_command()
         case TIME_OF_FLIGHT:
             Serial.println("VL53L1X Qwiic Test");
             distanceSensor1.setDistanceModeShort();
-            Serial.println("Sensor is online!");
+            Serial.println("Sensor 1 is online!");
 
             float distance[10], dt[10];
 
@@ -585,7 +585,6 @@ void handle_command()
                   }
                 }
                 distance[i] = (distanceSensor1.getDistance())/10.0;
-
                 distanceSensor1.clearInterrupt();
                 distanceSensor1.stopRanging();
                 dt[i] = millis() - starting_time;
@@ -593,7 +592,6 @@ void handle_command()
               Serial.println("Sending data...");
               for (int i = 0; i<10; i++) {
                 tx_estring_value.clear();
-                // tx_estring_value.append("Time: ");
                 tx_estring_value.append(dt[i]);
                 tx_estring_value.append("|");
                 tx_estring_value.append(distance[i]);

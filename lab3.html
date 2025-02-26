@@ -130,23 +130,49 @@
                                 <p>The <code>XSHUT</code> connection is not necessary for the initial ToF sensor testing. The first test was performed by using Example1_Wire_I2C under the Apollo3 library for scanning the I2C bus in order to verify the address of the sensor. The proposed output is as the following: </p>
                                 <figure style="margin: 0; text-align: center;">
                                     <img src="images/i2c_output.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
-                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Example1_Wire_I2C Serial Monitor Output</figcaption>
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Example1_Wire_I2C Serial Monitor Output</figcaption>
                                 </figure>
                                 <h4>Discussion on I2C address</h4>
                                 <p>The indicated address is 0x29 which represents 0x52 bit shifted by 1, or <code>0x52 >> 1</code>, thus negecting the last bit. The very last bit is supposed to represent the direction, thus 0 for a write and 1 for a read, hence we are paying attention to the first 7 bits, as can be confirmed from the ToF datasheet.</code></p>
                                 <figure style="margin: 0; text-align: center;">
                                     <img src="images/message_from_datasheet.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
-                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Address description from the ToF datasheet</figcaption>
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Address description from the ToF datasheet</figcaption>
                                 </figure>
                                 <h4>Chosen mode discussion</h4>
                                 <p>The mode that I chose was the Short Distance Mode, as according to the datasheet description, it has the sensor range of 1.3 meters and hence seems like a great fit for the proposed car. Furthermore, it has the best maximum distance under strong ambient light compared to other modes, adequate in this case.</p>
                                 <figure style="margin: 0; text-align: center;">
                                     <img src="images/datasheet_2.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
-                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Short distance mode description from the datasheet</figcaption>
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Short distance mode description from the datasheet</figcaption>
                                 </figure>
                                 <h4>Testing the chosen mode: Distance Mode SHort</h4>
-                                <p>The code for testing the proposed mode was adapted from SparkFun_VL53L1X_4m_Laser library's example named Example1_ReadDistance. </p>
+                                <p>The code for testing the proposed mode was adapted from SparkFun_VL53L1X_4m_Laser library's example named Example1_ReadDistance and incorporated in the <code>ble_arduino.ino file.</code> </p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/1tof_sensor_code_new.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: 100px;">Firts ToF sensor reading</figcaption>
+                                </figure>
+                                <p>The setup for the sensor's distance detection looks like in the following images.</p>
+                                <div style="display: flex; gap: 10px;">
+                                    <img src="images/IMG_0279.jpg" alt="Image 1" style="width: 50%;">
+                                    <img src="images/IMG_0281.jpg" alt="Image 2" style="width: 50%;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">The sensor distance measurement setup</figcaption>
+                                </div>
+                                  <p></p>
 
+                                <p>What is more, the distanceSensor1 was instantiated. Afterwards, I implemented a case called <code>TIME_OF_FLIGHT</code> as can be seen below, which enabled sending data over to Python for easier visualization of the data obtained.</p>
+                                <p></p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/case_TOF.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Firts ToF sensor reading</figcaption>
+                                </figure>
+                                <p>On the Python side, the code receiving the data for easier plotting will be as in the following images. Note, the second screenshot below represents the calculation of mean and standard deviation for the distance of 15 cm specificially. The calcultions were performed for distances for 15 cm to 150 cm, in increments of 15 cm.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/python_code_for_tof.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                </figure>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/python_code_for_tof2.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Python code</figcaption>
+                                </figure>
+                    
                               
                                   
                                   
@@ -160,7 +186,7 @@
                                 </iframe>
                             </section>
 
-                                
+                        
                         <!-- </article> -->
                     
                     </body>
