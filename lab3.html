@@ -172,6 +172,32 @@
                                     <img src="images/python_code_for_tof2.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Python code</figcaption>
                                 </figure>
+                                <p>After obtaining data for the proposed distance increments, we ought to compute ToF sensor range, accuracy, repeatability, and ranging time. </p>
+                                <h4>Sensor Range Discussion</h4>
+                                <p>The proposed datasheet indicated that the short mode range of the ToF sensor is about 130 cm. In order to confirm the range myself, I tested the sensor behaviour at distances from 15 cm to 150 cm in increments of 15 cm. Hence, the graph below computed through the sent distance readings from Arduino displays the distance of ToF sensor to the wall. As shown in the "ToF Python code" figure, there were 10 means obtained for each distance measurements, and were plotted against the actual distances. The 130 cm line was indicated to display the proposed sensor range limit. There is a slight outlier at the 60 cm point mean measurement, which might be due to the sensor adapting to the new distance. The sensor range plot in the light and dark ambiance gives the same plot.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/sensor_range_plot.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Sensor Range Plot - Measured Distance vs Actual Distance</figcaption>
+                                </figure>
+                                <h4>Accuracy Discussion</h4>
+                                <p>Similarly to the plot above, the accuracy plot is represented in the difference between the measured and the actual distances against the actual distances recorded from the ToF sensor to the wall. It can be observed that the accuracy is slightly worse as we increase the distance, which is to be expected considering the proposed sensor range in the datasheet. Once the 130 cm range line is passed, the accuracy of our ToF sensor visibly deteriorates.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/accuracy_plot.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Accuracy Plot - Difference in Measurement vs Actual Distance</figcaption>
+                                </figure>
+                                <h4>Repeatability Discussion</h4>
+                                <p>Repeatability is computed by calculating the standard deviation by utilizing <code>statistics.stdev()</code> on our recorded distance data, and afterwards computing it against the actual distance. Standard deviation is below 0.3 cm until the 130 cm range line indicated in orange, after which it significantly increases and reaches almost 1 cm at the distance of 150 cm, which is as expected considering the proposed graphs for accuracy and sensor range.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/repeatability_plot.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Repeatability Plot - Standard Deviation vs Actual Distance</figcaption>
+                                </figure>
+                                <h4>Ranging Time</h4>
+                                <p>As presented in the graph below, the ranging time of the samples taken at different distances was consistently under 35 ms with the aforementioned Arduino code. The loop time it takes to record the data samples ought to be optimized later in this lab report.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/rangingtime_plot.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Ranging Time Plot - Time vs Number of Samples</figcaption>
+                                </figure>
+
                     
                               
                                   
