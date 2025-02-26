@@ -123,10 +123,6 @@
 
                                 <h3>Lab tasks</h3>
                                 <h4>Testing the Time of Flight provided examples </h4>
-                                <figure style="margin: 0; text-align: center;">
-                                    <img src="images/IMG_0295.jpg" alt="Lab 1 Setup" width="400" style="display: block; margin: 0 auto;">
-                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px;">ToF sensor testing setup</figcaption>
-                                </figure>
                                 <p>The <code>XSHUT</code> connection is not necessary for the initial ToF sensor testing. The first test was performed by using Example1_Wire_I2C under the Apollo3 library for scanning the I2C bus in order to verify the address of the sensor. The proposed output is as the following: </p>
                                 <figure style="margin: 0; text-align: center;">
                                     <img src="images/i2c_output.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
@@ -197,6 +193,89 @@
                                     <img src="images/rangingtime_plot.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF Ranging Time Plot - Time vs Number of Samples</figcaption>
                                 </figure>
+
+                                <h4>Two ToF Sensors Integrated</h4>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/IMG_0299 (1).jpg" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">2 ToF Sensors Setup</figcaption>
+                                </figure>
+                                <p>The initialization of 2 sensors requires for the second to be introduced as <code>SFEVL53L1X distanceSensor2(Wire, XSHUT);</code> and hence the code implemented in order to test that we wired the sensors propery and they can each detect accurate distances is shown below.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/sensor12_initialization.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
+                                </figure>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/sensor12_serialmonitor_output.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">2 ToF Sensors detected</figcaption>
+                                </figure>
+                                <p>As can be seen in the figure above, the initialization displays that both of the sensors are correctly initialized with different non-conflicting addresses. The first ToF sensor now has to be written to a new address, that is <code>0x30</code>, while the address of the newly initialized ToF sensor is <code>0x52</code>.</p>
+                                <p>Hence, we can run the code which allows for both of the sensor to output the distance data.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/code_for_2tof_disatnces.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Arduino code for detecting both ToF sensor distances</figcaption>
+                                </figure>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/testing_2tof_loopfunction.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Serial Monitor output for both ToF sensors<figcaption>
+                                </figure>
+                                <p>As can be concluded from the screenshot above, I varied the distances by simultaneously having both of my hands close to both ToF sensors, and then away from both ToF sensors, as can be reflected in sudden change of distances from very close to both sensors, to very distant from both sensors. </p>
+                                <h4>ToF Sensor Speed Optimization</h4>
+                                <p>As proposed in the lab handout, the optimized execution of the code may be implemented by incorporating the <code>distanceSensor.checkForDataReady()</code> routine in order to determine when new data is available. This can be performed by implementing the following code in the <code>loop()</code> function.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/optimization_arduino_code.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Optimized Arduino code for data acquisition placed in the loop() function<figcaption>
+                                </figure>
+                                <p>Such optimization enabled data collection at a much faster rate, which ought to be detected in the following outputs. The first output showcases the loop at a slower rate, and the second screenshot showcases the optimized loop time output.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/slowdata_1.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Slower data acquisition for ToF sensor 1 and 2<figcaption>
+                                </figure>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/spedupdata_2.png" alt="Lab 3" width="200" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Optimized data acquisition for ToF sensor 1 and 2<figcaption>
+                                </figure>
+                                <p>Hence, it can be concluded that the loop executes much faster with the implemented optimization, with loop time averaging to about 2-3 ms. The current limiting factor for this is not on our end, but purely the ability of the ToF sensors to acquire data.</p>
+
+                                <h4>ToF Sensors Data and IMU Data</h4>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/IMG_0284.jpg" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">2 ToF Sensors Setup</figcaption>
+                                </figure>
+
+                                <p></p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/imu_and_tof_acquisition.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto 20px auto;">
+                                    <img src="images/collect_IMU_DATA_ACC_.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto 20px auto;">
+                                    <img src="images/collect_2tofdata.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Code for sending IMU and 2 ToF Sensors Data from Arduino</figcaption>
+                                  </figure>
+
+                                <p>As can be seen from the provided code, the <code>collectIMUData()</code> code was adapted from Lab 2 code for the IMU. The case of <code>GATHER_2ToF_AND_IMU_DATA</code> was created in order to send the data as data packets to Arduino for easier plotting and analysis. In order to confirm that my 2 ToF sensor data was sending well, I printed them in the Serial Monitor and tested their distance recordings by varying the positions of my hands relative to the ToF sensors.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/2tof_serialmonitor.png" alt="Lab 3" width="" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">2 ToF Sensors Serial Monitor Output</figcaption>
+                                </figure>
+                                <p>As can be seen in the Serial Monitor output above, it can be seen that distances recorded from ToF sensor 1 as opposed to ToF sensor 2 are opposite, and that is due to the fact that I varied my hand movement for one hand to be close to a ToF sensor while the other is away from the other ToF sensor, and vice versa. After determining that the ToF sensor distances are accurately measured, the data could be sent over Bluetooth, and thus plotted.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/graph2tof.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">2 ToF in Parallel - Distance vs Time</figcaption>
+                                </figure>
+                                <p>As can be seen from the aforementioned description of alternating the distances between the 2 ToF, when the first ToF sensor's distance is near the hand, the other's is far away, and vice versa, which matches the 2 ToF sensors' output at the Serial Monitor. On the other hand, the IMU data graph indicating the angle versus time may be plotted.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/imu_data_updated.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">IMU Data - Angle vs Time</figcaption>
+                                </figure>
+                                <p>As can be inferred from the graph above, the pitch and roll data was varied so that the IMU is rotated in pitch direction first, and the in roll direction, and so on.</p>
+
+                                <h4>Additional tasks for 5000-level students</h4>
+                                <>
+
+
+                                  
+
+
+
+
+
 
                     
                               

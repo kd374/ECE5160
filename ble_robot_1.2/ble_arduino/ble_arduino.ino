@@ -570,7 +570,7 @@ void handle_command()
         case TIME_OF_FLIGHT:
             Serial.println("VL53L1X Qwiic Test");
             distanceSensor1.setDistanceModeShort();
-            Serial.println("Sensor 1 is online!");
+            Serial.println("Sensor is online!");
 
             float distance[10], dt[10];
 
@@ -585,6 +585,7 @@ void handle_command()
                   }
                 }
                 distance[i] = (distanceSensor1.getDistance())/10.0;
+
                 distanceSensor1.clearInterrupt();
                 distanceSensor1.stopRanging();
                 dt[i] = millis() - starting_time;
@@ -592,6 +593,7 @@ void handle_command()
               Serial.println("Sending data...");
               for (int i = 0; i<10; i++) {
                 tx_estring_value.clear();
+                // tx_estring_value.append("Time: ");
                 tx_estring_value.append(dt[i]);
                 tx_estring_value.append("|");
                 tx_estring_value.append(distance[i]);
@@ -667,7 +669,7 @@ void handle_command()
             Serial.println("Collecting IMU Accelerator data... ");
             while (IMU_entries_gathered_acc < ARRAY_LENGTH) {
               collectIMUData_ACC();
-              // collect2TOFData();
+              collect2TOFData();
             }
             Serial.println("Colleting IMU Accelerator data complete! Now sending...");
             if (IMU_entries_gathered_acc == 0) {
@@ -681,14 +683,13 @@ void handle_command()
               tx_estring_value.append(pitch_a[i]);
               tx_estring_value.append("|");
               tx_estring_value.append(roll_a[i]);
-              // tx_estring_value.append("|");
-              // tx_estring_value.append(time_data_2tof[i]);
-              // tx_estring_value.append("|");
-              // tx_estring_value.append(distance_data1[i]);
-              // tx_estring_value.append("|");
-              // tx_estring_value.append(distance_data2[i]);
+              tx_estring_value.append("|");
+              tx_estring_value.append(time_data_2tof[i]);
+              tx_estring_value.append("|");
+              tx_estring_value.append(distance_data1[i]);
+              tx_estring_value.append("|");
+              tx_estring_value.append(distance_data2[i]);
               Serial.println(tx_estring_value.c_str());
-              Serial.print("Sending BLE data:");
               tx_characteristic_string.writeValue(tx_estring_value.c_str());
             } 
             IMU_entries_gathered_acc = 0;
@@ -852,33 +853,34 @@ void loop(void) {
     }
 }
 
-// void collect2TOFData() {
-//     // 2 TOF sensors data
-//       time_data_2tof[i] = (int)millis();
-//       // Distance Sensor 1
-//       distanceSensor1.startRanging();
-//       while (!distanceSensor1.checkForDataReady()) {
-//         delay(0);
-//       }
-//       distance_data1[i] = distanceSensor1.getDistance();  // Get the result of the measurement from the sensor
-//       distanceSensor1.clearInterrupt();
-//       distanceSensor1.stopRanging();
-//       // Distance Sensor 2
-//       distanceSensor2.startRanging();
-//       while (!distanceSensor2.checkForDataReady()) {
-//         delay(0);
-//       }
-//       distance_data2[i] = distanceSensor2.getDistance();  // Get the result of the measurement from the sensor
-//       distanceSensor2.clearInterrupt();
-//       distanceSensor2.stopRanging();
-//       Serial.print("TOF Data - Time: ");
-//       Serial.print(time_data_2tof[i]);
-//       Serial.print(" TOF1: ");
-//       Serial.print(distance_data1[i]);
-//       Serial.print(" TOF2: ");
-//       Serial.println(distance_data2[i]);
-  
-// }
+void collect2TOFData() {
+    // 2 TOF sensors data
+    for (int i = 0; i < ARRAY_LENGTH; i++) {
+      time_data_2tof[i] = (int)millis();
+      // Distance Sensor 1
+      distanceSensor1.startRanging();
+      while (!distanceSensor1.checkForDataReady()) {
+        delay(0);
+      }
+      distance_data1[i] = distanceSensor1.getDistance(); 
+      distanceSensor1.clearInterrupt();
+      distanceSensor1.stopRanging();
+      // Distance Sensor 2
+      distanceSensor2.startRanging();
+      while (!distanceSensor2.checkForDataReady()) {
+        delay(0);
+      }
+      distance_data2[i] = distanceSensor2.getDistance(); 
+      distanceSensor2.clearInterrupt();
+      distanceSensor2.stopRanging();
+      Serial.print("TOF Data - Time: ");
+      Serial.print(time_data_2tof[i]);
+      Serial.print(" TOF1: ");
+      Serial.print(distance_data1[i]);
+      Serial.print(" TOF2: ");
+      Serial.println(distance_data2[i]);
+    }
+}
 
 void collectIMUData_GYRO() {
     if (IMU_entries_gathered_gyro >= ARRAY_LENGTH2) {
