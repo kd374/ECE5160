@@ -7,6 +7,9 @@
 #include <ICM_20948.h>
 #include <Wire.h>
 #define AD0_VAL   1
+#define XSHUT 8
+#define ADDRESS 0x30
+#include "SparkFun_VL53L1X.h"
 
 //////////// BLE UUIDs ////////////
 #define BLE_UUID_TEST_SERVICE "03cee772-2e79-410b-8846-ce32c73d3bfd"
@@ -23,6 +26,7 @@
 #define ARRAY_LENGTH 1000
 #define ARRAY_LENGTH2 1000
 ICM_20948_I2C myICM;
+
 
 
 //////////// Global Variables ////////////
@@ -66,12 +70,29 @@ float yaw_g = 0;
 float roll_g_array[ARRAY_LENGTH2];
 float pitch_g_array[ARRAY_LENGTH2];
 float yaw_g_array[ARRAY_LENGTH2];
+float distance[ARRAY_LENGTH];
 float dt = 0;
 bool send_IMU_data = false;
 bool send_IMU_data2 = false;
 int IMU_entries_gathered_acc = 0;
 int IMU_entries_gathered_gyro = 0;
 bool RECORD_IMU = false;
+
+/////////////LAB 3//////////////
+#define SHUTDOWN_PIN 2
+#define INTERRUPT_PIN 3
+SFEVL53L1X distanceSensor1;
+SFEVL53L1X distanceSensor2(Wire, XSHUT);
+unsigned long starting_time;
+unsigned long e_time;
+float time_data_2tof[ARRAY_LENGTH];
+float distance_data1[ARRAY_LENGTH];
+float distance_data2[ARRAY_LENGTH];
+void collectIMUData_ACC();
+void collectIMUData_GYRO();
+void collect2TOFData();
+
+
 
 
 
@@ -99,11 +120,14 @@ enum CommandTypes
     SEND_TIME_DATA, 
     GET_TEMP_READINGS,
     CALCULATE_DATA_RATE,
-    COLLECT_IMU_DATA,
+    COLLECT_IMU_DATA_ACC,
     SEND_IMU_DATA_ACC,
     SEND_IMU_DATA_GYRO, 
     START_IMU_DATA,
-    STOP_IMU_DATA
+    STOP_IMU_DATA,
+    TIME_OF_FLIGHT,
+    GATHER_2TOF_AND_IMU_DATA
+
 };
 
 // Lab 2 - Accelerometer
@@ -111,8 +135,10 @@ enum CommandTypes
 //Return a float in degrees
 
 void setup() {
-    Serial.begin(115200);
+    //digitalWrite(XSHUT, LOW);
     BLE.begin();
+    Wire.begin();
+    Serial.begin(115200);
     // Set advertised local name and service
     BLE.setDeviceName("Artemis BLE");
     BLE.setLocalName("Artemis BLE");
@@ -144,7 +170,6 @@ void setup() {
     Serial.println(BLE.address());
     BLE.advertise();
 
-    Wire.begin();
     Wire.setClock(400000);
     bool initialized = false;
     while( !initialized ) {
@@ -152,12 +177,32 @@ void setup() {
       Serial.print( F("Initialization of the sensor returned: ") );
       Serial.println( myICM.statusString() );
       if( myICM.status != ICM_20948_Stat_Ok ){
+        Serial.print("My ICM status:");
+        Serial.print(myICM.status);
         Serial.println( "Trying again.." );
         delay(500);
       } else{
         initialized = true;
       }
     }
+    Serial.println("VL53L1X Qwiic Test");
+    distanceSensor1.setI2CAddress(ADDRESS);
+    Serial.print("The new distance for sensor 1 address: 0x");
+    Serial.println(distanceSensor1.getI2CAddress(), HEX);
+    if (distanceSensor1.begin() != 0) //Begin returns 0 on a good init
+    {
+      Serial.println("Sensor 1 online!");
+      while (1);
+    }
+    digitalWrite(XSHUT, HIGH);
+    Serial.print("The distance sensor 2 address: 0x");
+    Serial.println(distanceSensor2.getI2CAddress(), HEX);
+     if (distanceSensor2.begin() != 0) //Begin returns 0 on a good init
+    {
+      Serial.println("Sensor 2 failed to begin. Please check wiring. Freezing...");
+      while (1);
+    }
+    Serial.println("Sensors 1 and 2 are online!");
 }
 
 void printFormattedFloat(float val, uint8_t leading, uint8_t decimals) {
@@ -437,24 +482,24 @@ void handle_command()
             break;
         }
         // case COLLECT_IMU_DATA:
-        //     if (IMU_entries_gathered >= ARRAY_LENGTH) {
+        //     if (IMU_entries_gathered_acc >= ARRAY_LENGTH) {
         //       send_IMU_data = true;
         //       return;
         //     }
         //     if (myICM.dataReady()) {
         //       myICM.getAGMT();
 
-        //       time_array[IMU_entries_gathered] = millis();
-        //       pitch_a[IMU_entries_gathered] = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
-        //       roll_a[IMU_entries_gathered] = atan2(myICM.accY(),myICM.accZ())*180/M_PI; 
-        //       IMU_entries_gathered++;
+        //       time_array_acc[IMU_entries_gathered_acc] = millis();
+        //       pitch_a[IMU_entries_gathered_acc] = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
+        //       roll_a[IMU_entries_gathered_acc] = atan2(myICM.accY(),myICM.accZ())*180/M_PI; 
+        //       IMU_entries_gathered_acc++;
         //     }
         //     break;
         case SEND_IMU_DATA_ACC:
             Serial.println("Collecting IMU Accelerator data... ");
             while (IMU_entries_gathered_acc < ARRAY_LENGTH) {
               collectIMUData_ACC();
-              filterIMUData_ACC();
+              //filterIMUData_ACC();
             }
             Serial.println("Colleting IMU Accelerator data complete! Now sending...");
             if (IMU_entries_gathered_acc == 0) {
@@ -483,7 +528,7 @@ void handle_command()
             Serial.println("Collecting IMU Gyroscope data... ");
             while (IMU_entries_gathered_gyro < ARRAY_LENGTH2) {
               collectIMUData_GYRO();
-              filterIMUData_ACC();
+              //filterIMUData_ACC();
             }
             Serial.println("Colleting IMU Gyroscope data complete! Now sending...");
             if (IMU_entries_gathered_gyro == 0) {
@@ -521,7 +566,137 @@ void handle_command()
             digitalWrite(LED_BUILTIN, LOW);
             Serial.println("Stopped recording IMU data");
             break;
+
+        case TIME_OF_FLIGHT:
+            Serial.println("VL53L1X Qwiic Test");
+            distanceSensor1.setDistanceModeShort();
+            Serial.println("Sensor is online!");
+
+            float distance[10], dt[10];
+
+              for (int i = 0; i < 10; i++) {
+                distanceSensor1.startRanging();
+                starting_time = millis();
+                unsigned long timeout = millis();
+                while (!distanceSensor1.checkForDataReady()) {
+                  if (millis() - timeout > 500) {
+                    Serial.println("Sensor timeout!");
+                    break;
+                  }
+                }
+                distance[i] = (distanceSensor1.getDistance())/10.0;
+
+                distanceSensor1.clearInterrupt();
+                distanceSensor1.stopRanging();
+                dt[i] = millis() - starting_time;
+              }
+              Serial.println("Sending data...");
+              for (int i = 0; i<10; i++) {
+                tx_estring_value.clear();
+                // tx_estring_value.append("Time: ");
+                tx_estring_value.append(dt[i]);
+                tx_estring_value.append("|");
+                tx_estring_value.append(distance[i]);
+                tx_characteristic_string.writeValue(tx_estring_value.c_str());
+                Serial.print("Time: ");
+                Serial.print(dt[i]);
+                Serial.print("Distance: ");
+                Serial.println(distance[i]);
+              }
+              Serial.print("Sensor done!");
+              break;
+
+        // case 2_TOF_AND_IMU_DATA_SEND:
+        //      //in here, collect data
+        //     start_time = millis();
+        //     // if(myICM.dataReady()){
+        //     i = 0;
+        //     Serial.print("Start execution");
+        //     while((i < ARRAY_LENGTH) and ((millis()-start_time) < 90000 )){
+           
+
+        //     // collect CF pitch and roll
+        //       myICM.getAGMT();
+        //       dt = (micros() - last_time) / 1000000.0; // Time difference in seconds
+        //       last_time = micros();
+
+        //     ////////CF Pitch//////////
+        //       dt = (micros() - last_time) / 1000000.0; // Time difference in seconds
+        //       last_time = micros();
+              
+        //     // Calculate the gyroscope-based angle (integrated from angular velocity)
+        //       pitch_g = myICM.gyrX();
+        //     // Calculate the accelerometer-based pitch angle
+        //       pitch_a = atan2(myICM.accX(), myICM.accZ()) * 180 / M_PI;
+        //       if (x == 0) {
+        //         cf_pitch[i] = pitch_g * (1 - alpha_cf_pitch) + pitch_a * alpha_cf_pitch;
+        //       } else {
+        //         cf_pitch[i] = cf_pitch[i-1] * (1 - alpha_cf_pitch) + pitch_a * alpha_cf_pitch;
+        //       }
+
+        //       roll_g = myICM.gyrY();
+        //     // Calculate the accelerometer-based roll angle
+        //       roll_a = atan2(myICM.accY(), myICM.accZ()) * 180 / M_PI;
+        //     // Apply the complementary filter
+        //       if (x == 0) {
+        //         cf_roll[i] = roll_g * (1 - alpha_cf_roll) + roll_a * alpha_cf_roll;
+        //       } else {
+        //         cf_roll[i] = cf_roll[i-1] * (1 - alpha_cf_roll) + roll_a * alpha_cf_roll;
+        //       }
+
+        //     //ToF1 and ToF2 data 
+        //       distanceSensor1.startRanging(); // Write configuration bytes to initiate measurement
+        //       tof1[i] = distanceSensor1.getDistance();
+        //       distanceSensor1.clearInterrupt();
+        //       distanceSensor1.stopRanging();
+        //       distanceSensor2.startRanging(); // Write configuration bytes to initiate measurement
+        //       tof2[i] = distanceSensor2.getDistance();
+        //       distanceSensor2.clearInterrupt();
+        //       distanceSensor2.stopRanging();
+
+        //     //record the time
+        //       time_imu_data[i] = (unsigned int) millis();
+        //       i++;
+
+        //     }
+
+        //     Serial.print("Finished collecting data");
+
+        //     break;
+
+        case GATHER_2TOF_AND_IMU_DATA:
+            //IMU data from Lab 2
+            Serial.println("Collecting IMU Accelerator data... ");
+            while (IMU_entries_gathered_acc < ARRAY_LENGTH) {
+              collectIMUData_ACC();
+              // collect2TOFData();
             }
+            Serial.println("Colleting IMU Accelerator data complete! Now sending...");
+            if (IMU_entries_gathered_acc == 0) {
+              Serial.println("No IMU data to send.");
+              break;
+            }
+            for (int i = 0; i < ARRAY_LENGTH; i++) {
+              tx_estring_value.clear();
+              tx_estring_value.append(time_array_acc[i]);
+              tx_estring_value.append("|");
+              tx_estring_value.append(pitch_a[i]);
+              tx_estring_value.append("|");
+              tx_estring_value.append(roll_a[i]);
+              // tx_estring_value.append("|");
+              // tx_estring_value.append(time_data_2tof[i]);
+              // tx_estring_value.append("|");
+              // tx_estring_value.append(distance_data1[i]);
+              // tx_estring_value.append("|");
+              // tx_estring_value.append(distance_data2[i]);
+              Serial.println(tx_estring_value.c_str());
+              Serial.print("Sending BLE data:");
+              tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            } 
+            IMU_entries_gathered_acc = 0;
+            send_IMU_data = false;
+            break;
+    }
 }
 
 void write_data() {
@@ -535,6 +710,7 @@ void write_data() {
         }
         previousMillis = currentMillis;
     }
+
 }
 
 void read_data() {
@@ -544,7 +720,7 @@ void read_data() {
     }
 }
 
-void loop() {
+void loop(void) {
     // Listen for connections
     BLEDevice central = BLE.central();
 
@@ -595,17 +771,77 @@ void loop() {
       //     Serial.print(", roll_a:");
       //     Serial.print(roll_a); //FOR THE THIRD DEMO, COMMENT OUT LINE FOR SECOND DEMO
       // }
+    // currentMillis = millis();
+    // if (currentMillis - previousMillis > interval) {
+    //     tx_float_value = tx_float_value + 0.5;
+    //     tx_characteristic_float.writeValue(tx_float_value);
+    //     if (tx_float_value > 10000) {
+    //         tx_float_value = 0;
+           
+    //     }
+    //     previousMillis = currentMillis;
+    // }
+    // distanceSensor1.startRanging(); //Write configuration bytes to initiate measurement
+    // while (!distanceSensor1.checkForDataReady())
+    // {
+    //   delay(0);
+    // }
+    // int distance1 = distanceSensor1.getDistance(); //Get the result of the measurement from the sensor
+    // distanceSensor1.clearInterrupt();
+    // distanceSensor1.stopRanging();
+    // distanceSensor2.startRanging(); //Write configuration bytes to initiate measurement
+    // while (!distanceSensor2.checkForDataReady())
+    // {
+    //   delay(0);
+    // }
+    // int distance2 = distanceSensor2.getDistance(); //Get the result of the measurement from the sensor
+    // distanceSensor2.clearInterrupt();
+    // distanceSensor2.stopRanging();
+    // Serial.print("Current time (ms): ");
+    // Serial.print(currentMillis);
+    // Serial.print(";");
+    // Serial.print(" Distance of sensor 1 (mm): ");
+    // Serial.print(distance1);
+    // Serial.print(";");
+    // Serial.print(" Distance of sensor 2 (mm): ");
+    // Serial.print(distance2);
+    // Serial.println();
+  //   distanceSensor1.startRanging();
+  //   distanceSensor2.startRanging();
+  
+  //  // Get current time in milliseconds
+  //   int start_time = millis();
+
+  // // Check the first distance sensor
+  // if (distanceSensor1.checkForDataReady()) {
+  //   int distance_1 = distanceSensor1.getDistance();
+  //   distanceSensor1.clearInterrupt();
+  //   Serial.print("Distance of Sensor 1 (mm): ");
+  //   Serial.println(distance_1);
+  // }
+
+  // // Check the second distance sensor
+  // if (distanceSensor2.checkForDataReady()) {
+  //   int distance_2 = distanceSensor2.getDistance();
+  //   distanceSensor2.clearInterrupt();
+  //   Serial.print("Distance of Sensor 2 (mm): ");
+  //   Serial.println(distance_2);
+  // }
+
+  // // Print the time
+  // int end_time = millis();
+  // Serial.print("The loop time (ms): ");
+  // Serial.println(end_time - start_time);
+    
 }
 
-void collectIMUData_ACC() {
+ void collectIMUData_ACC() {
     if (IMU_entries_gathered_acc >= ARRAY_LENGTH) {
       send_IMU_data = true;
       return;
     }
     if (myICM.dataReady()) {
       myICM.getAGMT();
-
-
       Serial.print("Time: ");
       time_array_acc[IMU_entries_gathered_acc] = millis();
       pitch_a[IMU_entries_gathered_acc] = atan2(myICM.accX(),myICM.accZ())*180/M_PI;
@@ -618,6 +854,34 @@ void collectIMUData_ACC() {
     }
 }
 
+// void collect2TOFData() {
+//     // 2 TOF sensors data
+//       time_data_2tof[i] = (int)millis();
+//       // Distance Sensor 1
+//       distanceSensor1.startRanging();
+//       while (!distanceSensor1.checkForDataReady()) {
+//         delay(0);
+//       }
+//       distance_data1[i] = distanceSensor1.getDistance();  // Get the result of the measurement from the sensor
+//       distanceSensor1.clearInterrupt();
+//       distanceSensor1.stopRanging();
+//       // Distance Sensor 2
+//       distanceSensor2.startRanging();
+//       while (!distanceSensor2.checkForDataReady()) {
+//         delay(0);
+//       }
+//       distance_data2[i] = distanceSensor2.getDistance();  // Get the result of the measurement from the sensor
+//       distanceSensor2.clearInterrupt();
+//       distanceSensor2.stopRanging();
+//       Serial.print("TOF Data - Time: ");
+//       Serial.print(time_data_2tof[i]);
+//       Serial.print(" TOF1: ");
+//       Serial.print(distance_data1[i]);
+//       Serial.print(" TOF2: ");
+//       Serial.println(distance_data2[i]);
+  
+// }
+
 void collectIMUData_GYRO() {
     if (IMU_entries_gathered_gyro >= ARRAY_LENGTH2) {
       send_IMU_data2 = true;
@@ -626,16 +890,16 @@ void collectIMUData_GYRO() {
     while (IMU_entries_gathered_gyro < ARRAY_LENGTH2) {
       if (myICM.dataReady()) {
         myICM.getAGMT();
-        dt = (micros()-last_time)/1000000.0;
+        // dt = (micros()-last_time)/1000000.0;
         last_time = micros();
         time_array_gyro[IMU_entries_gathered_gyro] = last_time;
         Serial.print("IMU_entries_gathered_gyro: ");
         Serial.print(IMU_entries_gathered_gyro);
-        pitch_g = pitch_g + myICM.gyrX()*dt;
+        // pitch_g = pitch_g + myICM.gyrX()*dt;
         pitch_g_array[IMU_entries_gathered_gyro] = pitch_g;
-        roll_g = roll_g + myICM.gyrY()*dt;
+        // roll_g = roll_g + myICM.gyrY()*dt;
         roll_g_array[IMU_entries_gathered_gyro] = roll_g;
-        yaw_g = yaw_g + myICM.gyrZ()*dt;
+        // yaw_g = yaw_g + myICM.gyrZ()*dt;
         yaw_g_array[IMU_entries_gathered_gyro] = yaw_g;
         Serial.print(", pitch_g:");
         Serial.print(pitch_g_array[IMU_entries_gathered_gyro]);
@@ -649,38 +913,38 @@ void collectIMUData_GYRO() {
     }
 }
 
-void filterIMUData_ACC() {
-  float alpha = 0.95;
-  pitch_a_acc_lpf[0] = pitch_a[0];
-  roll_a_acc_lpf[0] = roll_a[0];
-  for (int n = 1; n < ARRAY_LENGTH; n++) {
-    const float acc_alpha = 0.2;
-    pitch_a_acc_lpf[n] = acc_alpha*pitch_a[n] + (1-acc_alpha)*pitch_a_acc_lpf[n-1];
-    pitch_a_acc_lpf[n-1] = pitch_a_acc_lpf[n];
-    roll_a_acc_lpf[n] = acc_alpha*roll_a[n] + (1-acc_alpha)*roll_a_acc_lpf[n-1];
-    roll_a_acc_lpf[n-1] = roll_a_acc_lpf[n];
+// void filterIMUData_ACC() {
+//   float alpha = 0.95;
+//   pitch_a_acc_lpf[0] = pitch_a[0];
+//   roll_a_acc_lpf[0] = roll_a[0];
+//   for (int n = 1; n < ARRAY_LENGTH; n++) {
+//     const float acc_alpha = 0.2;
+//     pitch_a_acc_lpf[n] = acc_alpha*pitch_a[n] + (1-acc_alpha)*pitch_a_acc_lpf[n-1];
+//     pitch_a_acc_lpf[n-1] = pitch_a_acc_lpf[n];
+//     roll_a_acc_lpf[n] = acc_alpha*roll_a[n] + (1-acc_alpha)*roll_a_acc_lpf[n-1];
+//     roll_a_acc_lpf[n-1] = roll_a_acc_lpf[n];
 
-    complementary_pitch[n] = 0.2 * pitch_g_array[n] + 0.8* pitch_a_acc_lpf[n];
-    complementary_roll[n] = 0.2 * roll_g_array[n] + 0.8 * roll_a_acc_lpf[n];
-    // complementary_pitch[n] = 0.18*pitch_a[n] + (1-0.18)*pitch_a_acc_lpf[n-1];
-    // complementary_pitch[n-1] = complementary_pitch[n];
-    // complementary_roll[n] = 0.18*roll_a[n] + (1-0.18)*roll_a_acc_lpf[n-1];
-    // complementary_roll[n-1] = complementary_roll[n];
-  }
-}
+//     complementary_pitch[n] = 0.2 * pitch_g_array[n] + 0.8* pitch_a_acc_lpf[n];
+//     complementary_roll[n] = 0.2 * roll_g_array[n] + 0.8 * roll_a_acc_lpf[n];
+//     complementary_pitch[n] = 0.18*pitch_a[n] + (1-0.18)*pitch_a_acc_lpf[n-1];
+//     complementary_pitch[n-1] = complementary_pitch[n];
+//     complementary_roll[n] = 0.18*roll_a[n] + (1-0.18)*roll_a_acc_lpf[n-1];
+//     complementary_roll[n-1] = complementary_roll[n];
+//   }
+// }
 
-void filterIMUData_GYRO() {
-  pitch_a_gyro_lpf[0] = pitch_a[0];
-  roll_a_gyro_lpf[0] = roll_a[0];
+// void filterIMUData_GYRO() {
+//   pitch_a_gyro_lpf[0] = pitch_a[0];
+//   roll_a_gyro_lpf[0] = roll_a[0];
 
-  for (int n = 1; n < ARRAY_LENGTH2; n++) {
-    const float alpha = 0.2;
-    pitch_a_gyro_lpf[n] = alpha*pitch_a[n] + (1-alpha)*pitch_a_gyro_lpf[n-1];
-    pitch_a_gyro_lpf[n-1] = pitch_a_gyro_lpf[n];
-    roll_a_gyro_lpf[n] = alpha*roll_a[n] + (1-alpha)*roll_a_gyro_lpf[n-1];
-    roll_a_gyro_lpf[n-1] = roll_a_gyro_lpf[n];
-  }
-}
+//   for (int n = 1; n < ARRAY_LENGTH2; n++) {
+//     const float alpha = 0.2;
+//     pitch_a_gyro_lpf[n] = alpha*pitch_a[n] + (1-alpha)*pitch_a_gyro_lpf[n-1];
+//     pitch_a_gyro_lpf[n-1] = pitch_a_gyro_lpf[n];
+//     roll_a_gyro_lpf[n] = alpha*roll_a[n] + (1-alpha)*roll_a_gyro_lpf[n-1];
+//     roll_a_gyro_lpf[n-1] = roll_a_gyro_lpf[n];
+//   }
+// }
 
 
 void printPaddedInt16b( int16_t val ){
