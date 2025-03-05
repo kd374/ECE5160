@@ -93,6 +93,13 @@ void collectIMUData_GYRO();
 void collect2TOFData();
 
 
+//////////////LAB 4//////////////////
+#define PIN0 0 //A1 IN / B1 IN
+#define PIN1 1 //A2 IN / B2 IN
+#define PIN2 2 //A1 IN / B1 IN
+#define PIN3 3 //A2 IN / B2 IN
+
+
 
 
 
@@ -126,8 +133,8 @@ enum CommandTypes
     START_IMU_DATA,
     STOP_IMU_DATA,
     TIME_OF_FLIGHT,
-    GATHER_2TOF_AND_IMU_DATA
-
+    GATHER_2TOF_AND_IMU_DATA, 
+    CALIBRATION
 };
 
 // Lab 2 - Accelerometer
@@ -136,6 +143,10 @@ enum CommandTypes
 
 void setup() {
     //digitalWrite(XSHUT, LOW);
+    pinMode(PIN0, OUTPUT);
+    pinMode(PIN1, OUTPUT);
+    pinMode(PIN2, OUTPUT);
+    pinMode(PIN3, OUTPUT);
     BLE.begin();
     Wire.begin();
     Serial.begin(115200);
@@ -694,6 +705,46 @@ void handle_command()
             } 
             IMU_entries_gathered_acc = 0;
             send_IMU_data = false;
+            break;
+
+        case CALIBRATION:
+            int PIN0_Output, PIN1_Output, PIN2_Output, PIN3_Output;
+            success = robot_cmd.get_next_value(PIN0_Output);
+            if (!success)
+                return;
+            success = robot_cmd.get_next_value(PIN1_Output);
+            if (!success)
+                return;
+            success = robot_cmd.get_next_value(PIN2_Output);
+            if (!success)
+                return;
+            success = robot_cmd.get_next_value(PIN3_Output);
+            if (!success)
+                return;
+
+            Serial.print("Pins output: ");
+            Serial.print(PIN0_Output);
+            Serial.print(", ");
+            Serial.println(PIN1_Output);
+            Serial.print(", ");
+            Serial.print(PIN2_Output);
+            Serial.print(", ");
+            Serial.println(PIN3_Output);
+
+            analogWrite(PIN0, 0);
+            analogWrite(PIN1, 80);
+            analogWrite(PIN2, 0);
+            analogWrite(PIN3, 70);
+            delay(2000);
+            analogWrite(PIN0, PIN0_Output);
+            analogWrite(PIN1, PIN1_Output);
+            analogWrite(PIN2, PIN2_Output);
+            analogWrite(PIN3, PIN3_Output);
+            delay(1500);
+            analogWrite(PIN0, 0);
+            analogWrite(PIN1, 0);
+            analogWrite(PIN2, 0);
+            analogWrite(PIN3, 0);
             break;
     }
 }
