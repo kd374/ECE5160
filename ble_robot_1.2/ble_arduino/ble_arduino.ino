@@ -732,7 +732,7 @@ void handle_command()
             Serial.println(PIN3_Output);
 
             analogWrite(PIN0, 0);
-            analogWrite(PIN1, 80);
+            analogWrite(PIN1, 78);
             analogWrite(PIN2, 0);
             analogWrite(PIN3, 70);
             delay(2000);
