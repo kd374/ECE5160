@@ -190,8 +190,77 @@
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Both Wheels Spinning in Both Directions Code Snippet</figcaption>
                             </figure>
                             <p>Furthermore, this leads to the conclusion that the motor driver installation was successful and hence soldering the drivers to the aforementioned 850 mAh battery was now a possible step towards full circuitry integration.</p>
+                            <h4>Installation of all components </h4>
+                            <p>After the successful soldering and testing, the full integration of our electronics looks like the following on the labeled image:</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/labeled_integration.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Full Electronics Integration</figcaption>
+                            </figure>
+                            <p>Compared to lab 3, I have implemented a few changes. I changed my motor drivers to be close together, so that I could secure the electronics better in a larger compartment, considering that they require the most wiring. What is more, the motor drivers are isolated from other electronics except the battery, so that EMI is not created. Furthermore, I spaced out my ToF sensors, where one is in the front, and one is in the back of the car for more accurate collection of sensor data. Furthermore, as per my discussion with TA Harry, I placed the IMU on the flat surface created by the 850 mAh battery compartment, so that I could have as accurate of position readings as possible.</p>
+                            <p>Finally, the car is tested with a stop timer as follows with the complementary code:</p>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/rIx1A4hX0EY"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/task7code.png" alt="Lab 3" width="220" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Car Testing with a Timer</figcaption>
+                            </figure>
+                            <h4>Lower Limit PWM value discussion</h4>
+                            <p>In order to experimentally explore the lowest value of PWM, I wrote Arduino code, which I sent over through Bluetooth. This allowed for me to manipulate the values of every individual drivers' output pins by running a <code>ble.send_command()</code> on the Python side. The implemented case <code>CALIBRATION</code> was adapted from case <code>SEND_TWO_INTS</code> from lab 1. Furthermore, <code>analogWrite()</code> statements were added to control the values of the output pins in Python.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/determining_pmw_task8_code.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
+                                <img src="images/python_code_calibration.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PWM Lower Limit and Calibration Code Snippet - Arduino and Python</figcaption>
+                            </figure>
+                            <p>Through experimentation with the values, it was determined that the lower limit in PWM value for which the robotis able to move forward for both of the wheels is 39 for both of the wheels from the state of rest. Considering that the wheels do not spin at the same rate, I was able to determine that the lower PWM limit for the individual wheels was somewhat different due to different friction contributions and spinning speeds, thus determining the joined PWM value for both was crucial. With the PWM value of 39 for the car to run straight, which corresponds to the duty cycle of 0.153, with any value less than the given, the car will not be able to achieve the movement in a straight line.</p>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/z65j68FwzWM"  
+                            title="Lab 4" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <p></p>
+                            <p></p>
+                            <h4>Calibration Discussion</h4>
+                            <p>Considering that the motors can move at different speeds and are differently impacted by the surface friction, a calibration factor was impleented to the left motor's output pins. Particularly, through experimentation, I was able to determine that the calibration factor added to the left motor is 1.1 for the 2 meter line. Particularly, I observed a slightly increased speed of the right motor, which is why I experimented with decreasing the PWM signal which is sent to the right motor initially, and further experimented with the calibration factor once I had the car running in almost a straight line for the given distance. Therefore, I ultimately calculated the calibration coefficient of 1.1 applied to the left motor. </p>
+
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/calibration_code_updated_t9.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Calibration Code Snippet</figcaption>
+                            </figure>
+                            <p>Considering the code above, I was able to achieve for my car to stay in the straight line by applying the delay of 200 in the section where the motors are powered off due to the pins 1 and 3 directing the forward motion of the car being set to 0.</p>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/v0lyjrkaZ_M"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <h4> Open Loop Demonstration </h4>
+                            <p>Following the calibration, our car is able to perform different movements through open loop control. In the demonstration attached below, the car moves forward, then turns to the left, moves backward and stops, and lastly spins both counterclockwise and clockwise (inspired by TA Mikayla Lahr's code).</p>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/MPvXwtk84Es"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+
+                            <h3>Additional ECE 5160 Tasks</h4>
+                            <h4>The frequency</h4>
+
+
+             
+                           
+
+
+
                             
-                    
                             <!-- Image Centered -->
                             <section class="content-section">
                             
