@@ -60,7 +60,7 @@
                                 
                                 border-bottom: 1px solid #ddd;  /* Adds a light gray line */
                                 padding-bottom: 15px;
-                                 margin-bottom: 20px;
+                                margin-bottom: 20px;
 
                             }
                     
@@ -101,10 +101,105 @@
                     
                             <!-- Introduction -->
                             <section class="content-section">
-                                <h3>Introduction:</h3>
-                                <p>The aim of this lab was to control the car through implementing open loop control, instead of controlling it with the provided controller. It was implemented through integrating two dual motor drivers which navigate the car conrol, and are connected to the car motors and the Artemis board.</p>
+                            <h3>Introduction</h3>
+                            <p>The aim of this lab was to control the car through implementing open loop control, instead of controlling it with the provided controller. It was implemented through integrating two dual motor drivers which navigate the car conrol, and are connected to the car motors and the Artemis board.</p>
                             </section>
-                            <section>
-                                <h3>Prelab 4</h3>
+                            <section class="content-section">
+                            <h3>Prelab 4</h3>
+                            <p>The prelab involved developing a plan to integrate the motor drivers, along with the sensors integrated in the previous two labs. Furthermore, the provided a reading about using the oscilloscope as well.  </p>
+                            <h4>Connections diagram</h4>
+                            <p>This lab required us to implement two DRV8833 motor drivers in order to control the car motors. Ultimately, the motor drivers ought to connect to the provided 850 mAh battery. From the proposed diagram below, it can be concluded that the used Artemis board analog pins which connect to the motor drivers in order to establish the PWM output are pins A0 to A3, as labeled.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/diagram_lab4.png" alt="Lab 3" width="700" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Lab 4 Implementation Diagram</figcaption>
+                            </figure>
+                            <h4>The external battery</h4>
+                           <p>It ought to be noted that the motors as well as the motor drivers, are powered on the 850 mAh battery, compared to the rest of the hardware including the Artemis board, which are powered on a separate provided battery. Thus is due to the fact that the high-speed switching, as well as the considerable power can lead to EMI ripples in the power supply. Hence, in order to avoid such outcome as well as the interference with electronics which are delicate and fragile, the  batteries are independent.</p>
                             </section>
-                            <p>The prelab involved developing a plan to integrate the motor drivers, along with the sensors  </p>
+                            <h3>Lab Tasks</h3>
+                            <h4>Testing the Motor Drivers using the oscilloscope</h4>
+                            <p>As proposed by the lab manual, I initially soldered the pins of a single motor driver onto the Artemis analog pins shown in the implementation diagram above. Furthermore, in order to read out the motor driver's outputs on the oscilloscope.</p>
+
+        
+                
+        
+
+        
+                            <!-- Image Centered -->
+                            <section class="content-section">
+                            
+
+
+                    
+                            </section>
+                            <p>*This lab page is inspired by TA Mikayla Lahr's Lab 4 page from Spring 2024. Special thank you to TAs Harry Gao and Cheney Zhang for all their help with this lab!</p>
+
+                        
+                        <!-- </article> -->
+                    
+                    </body>
+ 
+                    
+
+                    
+
+                    
+                    
+
+                    <!-- Posts -->
+
+
+                    <!-- Footer -->
+                </div>
+                </div>
+            <!-- Footer -->
+            <footer id="footer">
+                    <!-- <section>
+                        <form method="post" action="#">
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" />
+                                </div>
+                                <div class="field">
+                                    <label for="email">Email</label>
+                                    <input type="text" name="email" id="email" />
+                                </div>
+                                <div class="field">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <ul class="actions">
+                                <li><input type="submit" value="Send Message" /></li>
+                            </ul>
+                        </form>
+                    </section>
+                    <section class="split contact"> -->
+                        <section>
+                            <h3>EMAIL @ </h3>
+                            <p><a href="#">kd374@cornell.edu</a></p>
+                        </section>
+                </footer> 
+
+            <!-- Copyright -->
+                <div id="copyright">
+                    <ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+                </div>
+
+        </div>
+
+    <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+
+</body>
+</html>
+                    
+
+                        
