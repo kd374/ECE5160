@@ -107,13 +107,13 @@
                             <section class="content-section">
                             <h3>Prelab 4</h3>
                             <p>The prelab involved developing a plan to integrate the motor drivers, along with the sensors integrated in the previous two labs. Furthermore, the provided a reading about using the oscilloscope as well.  </p>
-                            <h4>Connections diagram</h4>
+                            <h4>Implementation diagram</h4>
                             <p>This lab required us to implement two DRV8833 motor drivers in order to control the car motors. Ultimately, the motor drivers ought to connect to the provided 850 mAh battery. From the proposed diagram below, it can be concluded that the used Artemis board analog pins which connect to the motor drivers in order to establish the PWM output are pins A0 to A3, as labeled.</p>
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/diagram_lab4_updated.png" alt="Lab 3" width="700" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Lab 4 Implementation Diagram</figcaption>
                             </figure>
-                            <h4>The external battery</h4>
+                            <h4>The battery discussion</h4>
                            <p>It ought to be noted that the motors as well as the motor drivers, are powered on the 850 mAh battery, compared to the rest of the hardware including the Artemis board, which are powered on a separate provided battery. Thus is due to the fact that the high-speed switching, as well as the considerable power can lead to EMI ripples in the power supply. Hence, in order to avoid such outcome as well as the interference with electronics which are delicate and fragile, the  batteries are independent.</p>
                             </section>
                             <h3>Lab Tasks</h3>
@@ -225,6 +225,14 @@
                             allowfullscreen>
                             </iframe>
                             <p></p>
+                            <p>Furthermore, I explored the lower PWM value in the case of spinning, which I determined to be 78. In order to perform the spinning, I set my PIN1 and PIN2 values to 78 over Python, while others are set to 0, as can be observed in the video below. The video shows slight spinning in the counterclockwise direction, and represents lowest spinning PWM value from the initially stationary position of the car.</p>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/PNMZTavdw-g"  
+                            title="Lab 4" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
                             <p></p>
                             <h4>Calibration Discussion</h4>
                             <p>Considering that the motors can move at different speeds and are differently impacted by the surface friction, a calibration factor was impleented to the left motor's output pins. Particularly, through experimentation, I was able to determine that the calibration factor added to the left motor is 1.1 for the 2 meter line. Particularly, I observed a slightly increased speed of the right motor, which is why I experimented with decreasing the PWM signal which is sent to the right motor initially, and further experimented with the calibration factor once I had the car running in almost a straight line for the given distance. Therefore, I ultimately calculated the calibration coefficient of 1.1 applied to the left motor. </p>
@@ -250,6 +258,13 @@
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             allowfullscreen>
                             </iframe>
+                            <p>The presented video was based on the code attached below.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/t10_pt1.png" alt="Lab 3" width="280" style="display: block; margin: 0 auto;">
+                                <img src="images/t10_part2.png" alt="Lab 3" width="284" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Open Loop Code Snippet</figcaption>
+                            </figure>
+
 
                             <h3>Additional ECE 5160 Tasks</h4>
                             <h4>Frequency Analysis</h4>
@@ -261,14 +276,16 @@
                                     <mi>ms</mi>
                                   </mrow>
                                 </mfrac>
-                              </math>  which is equivalent to about 184 Hz. Hence, the frequency generated by analogWrite() is about 184 Hz. This corresponds to the frequency denoted on the attached image as well. Considering that the implemented motor drivers sample at about 50 kHz, which corresponds to 20 &mu;s, the frequency that analogWrite() generates is fast enough for our motors to run analogWrite() tests and for ToF sensor data (considering the estimation from lab 2 about the sampling frequency). However, in theory, if we were to generate a faster PWM signal our motor driver could potentially make the car movements more controlled and streamlined.  </p>
+                              </math>  which is equivalent to about 184 Hz. Hence, the frequency generated by analogWrite() is about 184 Hz. This corresponds to the frequency denoted on the attached image as well. Considering that the implemented motor drivers sample at about 50 kHz, which corresponds to 20 &mu;s, the frequency that analogWrite() generates is fast enough for our motors to run analogWrite() tests and for ToF sensor data (considering the estimation from lab 2 about the sampling frequency). However, in theory, if we were to generate a faster PWM signal our motor driver could potentially make the car movements more controlled and streamlined. The code implemented for this part is attached below along with the complementary oscilloscope reading.  </p>
 
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/freq_analysis.png" alt="Lab 3" width="500" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Frequency generated by analogWrite()</figcaption>
+                                <img src="images/2driver-code-oscillo.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Frequency Analysis Code Snippet</figcaption>
                             </figure>
 
-                            <h4>PWM exploration continued</h4>
+                            <h4>Lowest PWM Value Speed Discussion</h4>
                             <p>The value obtained in the previous PWM task was 39 as the minimal value for the car to move forward. Hence, my thought process was to experiment with the values lower than 39 for all wheels, as that the car ought to already be in motion in this situation. Through repeating the process discussed in Lower Limit PWM Value Discussion section, I was able to manipulate the outputs values through Python in order for the car to already be in motion before determining the lowest PWM value. Hence, through experimentation, I was able to determine that the PWM value of 26 as the lowest PWM value when the car is already moving. With the duty cycle of ~101 (where 101 = <math xmlns="http://www.w3.org/1998/Math/MathML">
                                 <mfrac>
                                   <mn>26</mn>
