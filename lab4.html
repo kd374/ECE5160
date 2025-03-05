@@ -110,7 +110,7 @@
                             <h4>Connections diagram</h4>
                             <p>This lab required us to implement two DRV8833 motor drivers in order to control the car motors. Ultimately, the motor drivers ought to connect to the provided 850 mAh battery. From the proposed diagram below, it can be concluded that the used Artemis board analog pins which connect to the motor drivers in order to establish the PWM output are pins A0 to A3, as labeled.</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/diagram_lab4.png" alt="Lab 3" width="700" style="display: block; margin: 0 auto;">
+                                <img src="images/diagram_lab4_updated.png" alt="Lab 3" width="700" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Lab 4 Implementation Diagram</figcaption>
                             </figure>
                             <h4>The external battery</h4>
@@ -118,13 +118,80 @@
                             </section>
                             <h3>Lab Tasks</h3>
                             <h4>Testing the Motor Drivers using the oscilloscope</h4>
-                            <p>As proposed by the lab manual, I initially soldered the pins of a single motor driver onto the Artemis analog pins shown in the implementation diagram above. Furthermore, in order to read out the motor driver's outputs on the oscilloscope.</p>
+                            <p>As proposed by the lab manual, I initially soldered the pins of a single motor driver onto the Artemis analog pins shown in the implementation diagram above. Furthermore, the outputs of the motor drivers are thus probed using the oscilloscope for easier analysis, while the inputs of the motor driver represent the generated PWM signals. Furthermore, the VIN signal labeled on the diagram above, as well as the GND signal (which was also connected to the Artemis board) were thus connected to the power supply. The visualization of the setup is represented in the image below. </p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/IMG_0369.jpg" alt="Lab 3" width="550" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Setup with the Power Supply and the Oscilloscope</figcaption>
+                            </figure>
+                            <p> The attached image shows the battery supply's set voltage of 3.7 V, its probes on VIN and GND signals, as well as the oscilloscope reading of the motor driver's outputs. Analyzing the datasheet of the provided moto drivers, it is proposed that the notor voltage ought to be within the range of 2.7 V - 10.8 V. The voltage of the 850 mAh battery is 3.7 V, hence, the power supply was set to be of the same voltage to simulate the battery voltage used for the remaining parts of the lab. </p>
+                            <p>The implemented code for testing the motor drivers showcases the functionality of PWM by implementing the analogWrite signal, where PIN1 representing A2 IN and B2 IN is set to high (in this case 200), while PIN0 representing A1 IN and B2 IN is set to low, or 0 (inspired by TA Mikayla Lahr's code).</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/1driver-code.png" alt="Lab 3" width="300" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">1 Driver Testing Code Snippet</figcaption>
+                            </figure>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/Yqan6-6ZB5Y"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <p>The oscilloscope image is thus as the following:
+                            <figure style="margin: 0; text-align: center;">
+                                    <img src="images/IMG_0353.jpg" alt="Lab 3" width="550" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">The image of the Oscilloscope</figcaption>
+                             </figure>
+                             <p>After verifying that a single motor driver showcases correct outputs on the oscilloscope, a similar methodology was followed to account for the second driver in the code post its soldering. In the proposed Arduino code below, pins PIN0 and PIN2 were individually set to the value of 200 in the <code>analogWrite()</code> function while other pins were set to the output of 0. Such, 4 different combinations of high and low values were tested on the 2 motor driver pins. Analyzing the oscilloscope readings, it can be inferred that it correctly illustrates the positive 3.7 V to the motor which are set by the power supply, and hence, has a constant voltage value. Hence, it can be concluded that the PWM values allow for the power to be regulated on the motor driver output.</p>
+                             <p>Below is the code implemented for both the motor drivers testing on the oscilloscope.</p>
+                             <figure style="margin: 0; text-align: center;">
+                                <img src="images/2driver-code-oscillo.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">2 Drivers Testing Code Snippet</figcaption>
+                            </figure>
 
-        
-                
-        
+                            <h4>Motor Driver Wheels</h4>
+                            <p>After the confirmation from the oscilloscope readings that our motor driver outputs behave as expected, the next step of the open loop control development is to connect our drivers to the provided wheels. For incremental purposes, I connected a single motor driver to one side of the wheels, and tested by using similar code to the one provided above. The video of the wheels spinning in both directions, alongside the complementary code, can be found below.</p>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/s4FVJbivlOY"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/nsXjYTrxvjE"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/1driver-wheels.png" alt="Lab 4" width="250" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">1 Side of Wheels Spinning in Both Directions Code Snippet</figcaption>
+                            </figure>
+                            </iframe>
 
-        
+                            <p>As can be analyzed, I incrementally tested the driver integration with one side of the wheels by getting the power through through the power supply, and battery, spinning in both directions. Afterwards, I tested both drivers with two sets of wheels, first with the power supply, and then with the battery, spinning in both directions.</p>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/g5NbY3O4BvY"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/rdtguDJKyZI"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/2drivers-2 directions.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Both Wheels Spinning in Both Directions Code Snippet</figcaption>
+                            </figure>
+                            <p>Furthermore, this leads to the conclusion that the motor driver installation was successful and hence soldering the drivers to the aforementioned 850 mAh battery was now a possible step towards full circuitry integration.</p>
+                            
+                    
                             <!-- Image Centered -->
                             <section class="content-section">
                             
