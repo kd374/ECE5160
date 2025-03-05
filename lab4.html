@@ -102,7 +102,7 @@
                             <!-- Introduction -->
                             <section class="content-section">
                             <h3>Introduction</h3>
-                            <p>The aim of this lab was to control the car through implementing open loop control, instead of controlling it with the provided controller. It was implemented through integrating two dual motor drivers which navigate the car conrol, and are connected to the car motors and the Artemis board.</p>
+                            <p>The aim of this lab was to navigate the car through implementing open loop control, instead of navigating it with the provided controller. It was implemented through integrating two dual motor drivers which navigate the car conrol, and are connected to the car motors and the Artemis board.</p>
                             </section>
                             <section class="content-section">
                             <h3>Prelab 4</h3>
@@ -110,21 +110,21 @@
                             <h4>Implementation diagram</h4>
                             <p>This lab required us to implement two DRV8833 motor drivers in order to control the car motors. Ultimately, the motor drivers ought to connect to the provided 850 mAh battery. From the proposed diagram below, it can be concluded that the used Artemis board analog pins which connect to the motor drivers in order to establish the PWM output are pins A0 to A3, as labeled.</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/diagram_lab4_updated.png" alt="Lab 3" width="700" style="display: block; margin: 0 auto;">
+                                <img src="images/diagram_lab4_updated.png" alt="Lab 3" width="1000" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Lab 4 Implementation Diagram</figcaption>
                             </figure>
                             <h4>The battery discussion</h4>
-                           <p>It ought to be noted that the motors as well as the motor drivers, are powered on the 850 mAh battery, compared to the rest of the hardware including the Artemis board, which are powered on a separate provided battery. Thus is due to the fact that the high-speed switching, as well as the considerable power can lead to EMI ripples in the power supply. Hence, in order to avoid such outcome as well as the interference with electronics which are delicate and fragile, the  batteries are independent.</p>
+                           <p>It ought to be noted that the motors as well as the motor drivers, are powered on the 850 mAh battery, compared to the rest of the hardware including the Artemis board, which are powered on a separate provided battery. This is due to the fact that the high-speed switching, as well as the considerable power can lead to EMI ripples in the power supply. Hence, in order to avoid such outcome as well as the interference with electronics which are delicate and fragile, the  batteries are independent of each other.</p>
                             </section>
                             <h3>Lab Tasks</h3>
                             <h4>Testing the Motor Drivers using the oscilloscope</h4>
-                            <p>As proposed by the lab manual, I initially soldered the pins of a single motor driver onto the Artemis analog pins shown in the implementation diagram above. Furthermore, the outputs of the motor drivers are thus probed using the oscilloscope for easier analysis, while the inputs of the motor driver represent the generated PWM signals. Furthermore, the VIN signal labeled on the diagram above, as well as the GND signal (which was also connected to the Artemis board) were thus connected to the power supply. The visualization of the setup is represented in the image below. </p>
+                            <p>As proposed by the lab manual, I initially soldered the pins of a single motor driver onto the Artemis analog pins shown in the implementation diagram above. Furthermore, the outputs of the motor drivers are thus probed using the oscilloscope for easier analysis, while the inputs of the motor driver represent the generated PWM signals. Furthermore, the VIN signal labeled on the diagram above, as well as the GND signal (which was also connected to the Artemis board) were connected to the power supply. The visualization of the setup is represented in the image below. </p>
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/IMG_0369.jpg" alt="Lab 3" width="550" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Setup with the Power Supply and the Oscilloscope</figcaption>
                             </figure>
                             <p> The attached image shows the battery supply's set voltage of 3.7 V, its probes on VIN and GND signals, as well as the oscilloscope reading of the motor driver's outputs. Analyzing the datasheet of the provided moto drivers, it is proposed that the notor voltage ought to be within the range of 2.7 V - 10.8 V. The voltage of the 850 mAh battery is 3.7 V, hence, the power supply was set to be of the same voltage to simulate the battery voltage used for the remaining parts of the lab. </p>
-                            <p>The implemented code for testing the motor drivers showcases the functionality of PWM by implementing the analogWrite signal, where PIN1 representing A2 IN and B2 IN is set to high (in this case 200), while PIN0 representing A1 IN and B2 IN is set to low, or 0 (inspired by TA Mikayla Lahr's code).</p>
+                            <p>The implemented code for testing the motor drivers showcases the functionality of PWM by implementing the analogWrite() function, where PIN1 representing A2 IN and B2 IN is set to high (in this case 200), while PIN0 representing A1 IN and B2 IN is set to low, or 0.</p>
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/1driver-code.png" alt="Lab 3" width="300" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">1 Driver Testing Code Snippet</figcaption>
@@ -136,12 +136,12 @@
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             allowfullscreen>
                             </iframe>
-                            <p>The oscilloscope image is thus as the following:
+                            <p>The oscilloscope image is as the following:
                             <figure style="margin: 0; text-align: center;">
                                     <img src="images/IMG_0353.jpg" alt="Lab 3" width="550" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">The image of the Oscilloscope</figcaption>
                              </figure>
-                             <p>After verifying that a single motor driver showcases correct outputs on the oscilloscope, a similar methodology was followed to account for the second driver in the code post its soldering. In the proposed Arduino code below, pins PIN0 and PIN2 were individually set to the value of 200 in the <code>analogWrite()</code> function while other pins were set to the output of 0. Such, 4 different combinations of high and low values were tested on the 2 motor driver pins. Analyzing the oscilloscope readings, it can be inferred that it correctly illustrates the positive 3.7 V to the motor which are set by the power supply, and hence, has a constant voltage value. Hence, it can be concluded that the PWM values allow for the power to be regulated on the motor driver output.</p>
+                             <p>After verifying that a single motor driver showcases correct outputs on the oscilloscope, a similar methodology was followed to account for the second driver in the code post its soldering. In the proposed Arduino code below, pins PIN0 and PIN2 were individually set to the value of 200 in the <code>analogWrite()</code> function while other pins were set to the output of 0. As such, 4 different combinations of high and low values were tested on the 2 motor driver pins. Analyzing the oscilloscope readings, it can be inferred that it correctly illustrates the positive 3.7 V to the motor which are set by the power supply, and hence, has a constant voltage value. Hence, it can be concluded that the PWM values allow for the power to be regulated on the motor driver output.</p>
                              <p>Below is the code implemented for both the motor drivers testing on the oscilloscope.</p>
                              <figure style="margin: 0; text-align: center;">
                                 <img src="images/2driver-code-oscillo.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
