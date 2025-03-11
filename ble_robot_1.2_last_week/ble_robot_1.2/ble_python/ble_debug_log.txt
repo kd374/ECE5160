@@ -1,0 +1,28 @@
+ BLE Device Connected!
+ Available BLE UUID keys: dict_keys(['TX_CMD_STRING', 'RX_FLOAT', 'RX_STRING'])
+ Using RX_STRING UUID: f235a225-6735-4d73-94cb-ee5dfce9ba83
+ Checking if BLE notifications are active...
+ Stopping previous notifications...
+ KeyError: 14 - RX_STRING might not be accessible. Skipping stop_notify().
+
+ Starting 5-second data collection...
+ Collecting data... Time elapsed: 0.0s
+ Collecting data... Time elapsed: 0.5s
+ Collecting data... Time elapsed: 1.0s
+ Collecting data... Time elapsed: 1.5s
+ Collecting data... Time elapsed: 2.0s
+ Collecting data... Time elapsed: 2.5s
+ Collecting data... Time elapsed: 3.01s
+ Collecting data... Time elapsed: 3.51s
+ Collecting data... Time elapsed: 4.01s
+ Collecting data... Time elapsed: 4.51s
+
+ Error stopping BLE notifications: 14
+
+ Collected 0 data points in 5 seconds.
+
+ Full IMU Data Collected:
+Time (s)     Pitch     Roll     Pitch Filtered     Roll Filtered
+============================================================
+
+ Data collection complete!

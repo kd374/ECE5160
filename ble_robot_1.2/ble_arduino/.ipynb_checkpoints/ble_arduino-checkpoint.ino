@@ -23,8 +23,8 @@
 
 /////////// Lab 2 ////////////
 #define SERIAL_PORT Serial
-#define ARRAY_LENGTH 1000
-#define ARRAY_LENGTH2 1000
+#define ARRAY_LENGTH 500
+#define ARRAY_LENGTH2 500
 ICM_20948_I2C myICM;
 
 
@@ -44,7 +44,7 @@ RobotCommand robot_cmd(":|");
 EString tx_estring_value;
 float tx_float_value = 0.0;
 
-unsigned long start_time = millis();
+//////LAB 2///////
 long interval = 500;
 static long previousMillis = 0;
 unsigned long currentMillis = 0;
@@ -61,11 +61,8 @@ float complementary_pitch[ARRAY_LENGTH];
 float complementary_roll[ARRAY_LENGTH];
 int time_array_acc[ARRAY_LENGTH];
 unsigned long time_array_gyro[ARRAY_LENGTH2];
-// unsigned long last_time[ARRAY_LENGTH2];
 int last_time = 0;
-// float roll_g[ARRAY_LENGTH2] = {0.0};
 float pitch_g = 0;
-// float yaw_g[ARRAY_LENGTH2] = {0.0};
 float roll_g = 0;
 float yaw_g = 0;
 float roll_g_array[ARRAY_LENGTH2];
@@ -100,46 +97,39 @@ void collect2TOFData();
 #define PIN2 2 //A1 IN / B1 IN
 #define PIN3 3 //A2 IN / B2 IN
 
-//////////////LAB 5///////////////
-//PID Control
-// int start_pid; //do we start the cmd for pid ctrl?
-// //gain vals for PID controller
-// float Kp_val;
-// float Kd_val;
-// float Ki_val;
-// //target distance
-// float target_dist;
-// //collect PID data
-// float kp_pwm[500];
-// float ki_pwm[500];
-// float error_val[500];
-// //PWM Signal
-// float pwm;
-// const int n =1;
-// int m = 0;
 
-// float tof_1[1700];
-// float tof_2[1700];
-// unsigned int time_imu_data[1700];
-
-//////////////LAB 5 UPDATED//////////////////
-float current_pos;
-float target_pos;
-float Kd, Kp, Ki;
-float err, err_d, integral_err;
-float pid_p[ARRAY_LENGTH];
-float pid_i[ARRAY_LENGTH];
-float pid_d[ARRAY_LENGTH];
-float pid_tof[ARRAY_LENGTH];
-float pid_time[ARRAY_LENGTH];
-float pid_speed[ARRAY_LENGTH];
-int pid_data_num;
-float dt_time, prev_time, prev_err;
-float target_tof;
-unsigned long current_time;
-int max_speed, speed_control;
+///////////////LAB 5////////////////
+// int run_case_PID;
+// float PID_distance[ARRAY_LENGTH]; 
+// float Kp, Ki, Kd;
+// float time_PID[ARRAY_LENGTH];
+// float distance_PID[ARRAY_LENGTH];
+// float error_PID[ARRAY_LENGTH];
+// unsigned long previous_time;
+// unsigned long previous_error;
+// float integral, derivative;
+// float PID_control;
+// float P[ARRAY_LENGTH];
+// float I[ARRAY_LENGTH];
+// float D[ARRAY_LENGTH];
+// float PID[ARRAY_LENGTH];
+// float setpoint;
+// float dist_1;
+// unsigned long dt_time;
+// float data;
+// float maxnew;
+// time tof, kp, erorr, disatnce, kp_pwm
 
 
+//////////// Global Variables ////////////
+
+// // const int DATA_POINTS = 50; 
+// float pitch[ARRAY_LENGTH]; 
+// float roll[ARRAY_LENGTH]; 
+// float acc_x[ARRAY_LENGTH]; 
+// float acc_y[ARRAY_LENGTH]; 
+// float acc_z[ARRAY_LENGTH]; 
+// int ind = 0;
 
 enum CommandTypes
 {
@@ -157,19 +147,13 @@ enum CommandTypes
     COLLECT_IMU_DATA_ACC,
     SEND_IMU_DATA_ACC,
     SEND_IMU_DATA_GYRO, 
-    START_IMU_DATA,
-    STOP_IMU_DATA,
     TIME_OF_FLIGHT,
     GATHER_2TOF_AND_IMU_DATA, 
-    CALIBRATION, 
-    // START_PID,
-    // SEND_PID_CONTROL_DATA 
-    PID_POSITION_CONTROL
+    CALIBRATION,
+    INITIAL_PID_DATA, 
+    SEND_PID_DATA
 };
 
-// Lab 2 - Accelerometer
-//Convert to pitch data (pitch = theta = y rotation)
-//Return a float in degrees
 
 void setup() {
     //digitalWrite(XSHUT, LOW);
@@ -227,14 +211,12 @@ void setup() {
       }
     }
     Serial.println("VL53L1X Qwiic Test");
-    pinMode(8, OUTPUT);
-    digitalWrite(8, LOW);
     distanceSensor1.setI2CAddress(ADDRESS);
     Serial.print("The new distance for sensor 1 address: 0x");
     Serial.println(distanceSensor1.getI2CAddress(), HEX);
     if (distanceSensor1.begin() != 0) //Begin returns 0 on a good init
     {
-      Serial.println("Sensor 1 failed to begin. Please check wiring. Freezing...");
+      Serial.println("Sensor 1 online!");
       while (1);
     }
     digitalWrite(XSHUT, HIGH);
@@ -416,7 +398,7 @@ void handle_command()
             break;
         
         case GET_TIME_MILLIS: 
-        
+        {
             int new_millis;
             new_millis = (int) millis();
             tx_estring_value.clear();
@@ -425,6 +407,7 @@ void handle_command()
             tx_characteristic_string.writeValue(tx_estring_value.c_str());
             Serial.print("Sent back: ");
             Serial.println(new_millis);
+        }
   
             break;
 
@@ -597,24 +580,12 @@ void handle_command()
             send_IMU_data2 = false;
             break; 
 
-        case START_IMU_DATA:
-            Serial.println("Recording IMU data...");
-            digitalWrite(LED_BUILTIN, HIGH);
-            RECORD_IMU = true;
-            break;
-
-        case STOP_IMU_DATA:
-            RECORD_IMU = false;
-            digitalWrite(LED_BUILTIN, LOW);
-            Serial.println("Stopped recording IMU data");
-            break;
-
         case TIME_OF_FLIGHT:
             Serial.println("VL53L1X Qwiic Test");
             distanceSensor1.setDistanceModeShort();
             Serial.println("Sensor is online!");
 
-            float distance[10], dt[10];
+            float distance[1000], dt[1000];
 
               for (int i = 0; i < 10; i++) {
                 distanceSensor1.startRanging();
@@ -778,262 +749,91 @@ void handle_command()
             analogWrite(PIN3, 0);
             break;
 
-        // case START_PID:
-        //   Serial.println("Got into start_pid case");
-        //   // success = robot_cmd.get_next_value(start_pid);
-        //   // if(!success) return;
+        // case INITIAL_PID_DATA:
+        //     success = robot_cmd.get_next_value(run_case_PID);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(dist_1);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(Kp);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(Ki);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(Kd);
+        //     if (!success)
+        //         return;
+        //     if (run_case_PID == 0) {
+        //       Serial.print("The robot is stopped");
+        //     }
+        //     Serial.print("The PID case: ");
+        //     Serial.print(run_case_PID);
+        //     Serial.print(" Distance: ");
+        //     Serial.print(dist_1);
+        //     Serial.print(" Kp: ");
+        //     Serial.print(Kp);
+        //     Serial.print(" Ki: ");
+        //     Serial.print(Ki);
+        //     Serial.print(" Kd: ");
+        //     Serial.print(Kd);
+        //     break;
 
-        //   //Kp value
-        //   success = robot_cmd.get_next_value(Kp_val);
-        //   if (!success) return;
-          
-        //   // // //Kd value
-        //   // // success = robot_cmd.get_next_value(Kd_val);
-        //   // // if (!success) return;
+        // case SEND_PID_DATA:
+        //     success = robot_cmd.get_next_value(run_case_PID);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(dist_1);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(Kp);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(Ki);
+        //     if (!success)
+        //         return;
+        //     success = robot_cmd.get_next_value(Kd);
+        //     if (!success)
+        //         return;
+        //     if (run_case_PID == 0) {
+        //       Serial.print("The robot is stopped");
+        //     }
+        //     Serial.print("The PID case: ");
+        //     Serial.print(run_case_PID);
+        //     Serial.print(" Distance: ");
+        //     Serial.print(dist_1);
+        //     Serial.print(" Kp: ");
+        //     Serial.print(Kp);
+        //     Serial.print(" Ki: ");
+        //     Serial.print(Ki);
+        //     Serial.print(" Kd: ");
+        //     Serial.print(Kd);
 
-        //   // // //Ki value
-        //   // // success = robot_cmd.get_next_value(Ki_val);
-        //   // // if (!success) return;
+        //     distanceSensor1.startRanging();  
+        //     setpoint = 304.0;
+        //     ////PID control////
+        //     while (millis() - starting_time <= 5000) {
+        //       if (distanceSensor1.checkForDataReady()) {
+        //         for (int i = 0; i < ARRAY_LENGTH; i++) {
+        //           distance_PID[i] = distanceSensor1.getDistance();
+        //           dt_time = millis() - previous_time;
+        //           error_PID[i] = distance_PID[i] - setpoint;
+        //           integral = integral + (error_PID[i] * dt_time);
+        //           derivative = (error_PID[i] - previous_error) / dt_time;
+        //           PID_control = Kp * error_PID[i] + Ki * integral + Kd * derivative;
+        //           P[i] = Kp * error_PID[i];
+        //           I[i] = Ki * integral;
+        //           D[i] = Kd * derivative;
+        //           PID[i] = PID_control;
+        //           previous_error = error_PID[i];
+        //           previous_time = millis();
+        //         }
+        //     }
 
-        //   //Target Distance
-        //   success = robot_cmd.get_next_value(target_dist);
-        //   if (!success) return;
-
-        //   // Serial.print("Got Kp_val: ");
-        //   // Serial.println(Kp_val, 5);//second argument tells how decimal places to print out
-
-        //   // if(Kp_val != 0){
-        //   //   Serial.println("Started PID control");
-        //   //   Serial.print("Got Kp_val: ");
-        //   //   Serial.println(Kp_val, 5);//second argument tells how decimal places to print out
-        //   // }
-
-        //   // Serial.print("start_pid: ");
-        //   // Serial.println(start_pid);
-        //   Serial.print("Kp: ");
-        //   Serial.println(Kp_val);
-        //   // // Serial.print("Kd: ");
-        //   // // Serial.println(Kd_val);
-        //   // // Serial.print("Ki: ");
-        //   // // Serial.println(Ki_val);
-        //   Serial.print("Target Distance: ");
-        //   Serial.println(target_dist);
-
-        //   m = 0;
-        //   // Serial.print("Start execution");
-        //   // // for proportional control
-
-        //   //reset start_time each time you run the cmd
-        //   start_time = millis();
-
-        //   //reset the arrays so it will be set to 0 at start
-        //   memset(tof_1, 0, sizeof(tof_1));
-        //   memset(error_val, 0, sizeof(error_val));
-        //   memset(kp_pwm, 0, sizeof(kp_pwm));
-        //   memset(time_imu_data, 0, sizeof(time_imu_data));
-
-        //   while((m < 500) and ((millis()-start_time) < 30000 )){
-
-        //     distanceSensor1.startRanging();
-        //     tof_1[m] = distanceSensor1.getDistance();
-        //     // Serial.print("Distance: ");
-        //     // Serial.println(tof_1[m]);
-
-
-        //     // //look at difference btwn target distance and measured dist
-        //     error_val[m] = tof_1[m] - target_dist ;
-        //     // Serial.print("Error: ");
-        //     // // Serial.println(error_val[m]);
-
-        //     // //duty cycle to give to the motors
-        //     kp_pwm[m] = Kp_val * error_val[m]; //make a factor so get value between 0 and 255
+        // }
             
-        //     if(m == 250){
-        //       Serial.print("PWM: ");
-        //       Serial.println(kp_pwm[m]);
-
-        //     }
-
-        //     if(error_val[m]>= 0){
-        //       forward_motion(kp_pwm[m]);
-        //     }
-        //     else{
-        //       backwards_motion(kp_pwm[m]);
-        //     }
-           
-        //     // // //   // dt = millis() - start_time;
-        //     // // //   // // for integral control
-        //     // // //   // ki_pwm[m] = Ki_val * (error_val[m] * dt);
-
-        //     //   //////Forward////
-        //     //   //Motor A
-        //     //   //Right Wheels
-        //     //   analogWrite(0, kp_pwm[m]);
-        //     //   analogWrite(3, 0);
-        //     //   //Motor B
-        //     //   //Left Wheels
-        //     //   analogWrite(1, kp_pwm[m] * 1.45);
-        //     //   analogWrite(5, 0);
-
-
-        //     //record the time
-        //     time_imu_data[m] = (unsigned int) millis();
-        //     m++;
-        //     start_time = millis();
-
-            
-        //   }
-
-          //once PID controller is done, stop the car
-
-          //Right Wheels
-          // analogWrite(0, 0);
-          // analogWrite(3, 0);
-          // // Left Wheels
-          // analogWrite(1, 0);
-          // analogWrite(5, 0);
-          // Serial.println("Done");
-          // break;
-
-        case PID_POSITION_CONTROL:
-          start_time = millis();
-          // initialization for Kp, Ki, Kd, Target distance
-          success = robot_cmd.get_next_value(Kp);
-          if (!success) return;
-          success = robot_cmd.get_next_value(Ki);
-          if (!success) return;
-          success = robot_cmd.get_next_value(Kd);
-          if (!success) return;
-          success = robot_cmd.get_next_value(target_tof);
-          if (!success) return;
-          tx_estring_value.clear();
-          // Recording the data
-          for (int i = 0; i < pid_data_num; i++) {
-            distanceSensor2.startRanging();
-            pid_time[i] = millis() - start_time;
-            pid_tof[i] = distanceSensor2.getDistance();
-            distanceSensor2.clearInterrupt();
-            distanceSensor2.stopRanging();
-            pid_speed[i] = pid_position_tof(Kp, Ki, Kd, pid_tof[i], target_tof);
-            pid_p[i] = Kp * err;
-            pid_i[i] = Ki * integral_err;
-            pid_d[i] = Kd * err_d;
-          }
-          stop(); // Stop the motor and begin to send data
-          // Data for time
-          tx_estring_value.clear();
-          tx_estring_value.append("T");
-          tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          for (int i = 0; i < pid_data_num; i ++) {
-            tx_estring_value.clear();
-            tx_estring_value.append(pid_time[i]);
-            tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          }
-          // Data for distance
-          tx_estring_value.clear();
-          tx_estring_value.append("S");
-          tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          for (int i = 0; i < pid_data_num; i ++) {
-            tx_estring_value.clear();
-            tx_estring_value.append(pid_tof[i]);
-            tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          }
-          // Data for pid signal
-          tx_estring_value.clear();
-          tx_estring_value.append("C");
-          tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          for (int i = 0; i < pid_data_num; i ++) {
-            tx_estring_value.clear();
-            tx_estring_value.append(pid_speed[i]);
-            tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          }
-          // Data for pid p propotion
-          tx_estring_value.clear();
-          tx_estring_value.append("P");
-          tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          for (int i = 0; i < pid_data_num; i ++) {
-            tx_estring_value.clear();
-            tx_estring_value.append(pid_p[i]);
-            tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          }
-          // Data for pid i propotion
-          tx_estring_value.clear();
-          tx_estring_value.append("I");
-          tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          for (int i = 0; i < pid_data_num; i ++) {
-            tx_estring_value.clear();
-            tx_estring_value.append(pid_i[i]);
-            tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          }
-          // Data for pid d propotion
-          tx_estring_value.clear();
-          tx_estring_value.append("D");
-          tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          for (int i = 0; i < pid_data_num; i ++) {
-            tx_estring_value.clear();
-            tx_estring_value.append(pid_d[i]);
-            tx_characteristic_string.writeValue(tx_estring_value.c_str());
-          }
-          break;    
     }
-}
-
-
-int pid_position_tof (float Kp, float Ki, float Kd, float current_pos, float target_pos) {
-  current_time = millis();
-  dt_time = current_time - prev_time; // in ms
-  prev_time = current_time;
-  err = current_pos - target_pos;
-  err_d = (err - prev_err) / dt_time;
-  
-  // Wind-up protection
-  if (abs(err)<0.01) {
-    integral_err = 0;
-  }
-  else {
-    integral_err = integral_err + (err * dt_time);
-  }
-  if (integral_err > 200) {
-    integral_err = 200;
-  }
-  else if (integral_err < -200) {
-    integral_err = -200;
-  }
-  
-  // Calculate speed control signal
-  speed_control = (int)(Kp * err + Ki * integral_err + Kd * err_d);
-  if (speed_control > max_speed) {
-    speed_control = max_speed;
-  }
-  if (speed_control < (-1 * max_speed)) {
-    speed_control = -1 * max_speed;
-  }
-  if (speed_control > 0) {
-    forward(speed_control);
-  }
-  else if (speed_control < 0) {
-    backward(-1 * speed_control);
-  }
-  prev_err = err;
-  return speed_control;
-}
-void forward(int speed) {
-  analogWrite(PIN2,0);  ///AB1IN_LEFT
-  analogWrite(PIN3,speed*1.8);  ///AB2IN_LEFT
-  analogWrite(PIN0,0);  ///AB1IN_RIGHT
-  analogWrite(PIN1,speed);  ///AB2IN_RIGHT
-}
-void backward(int speed) {
-  analogWrite(PIN2,speed*1.8); ///AB1IN_LEFT
-  analogWrite(PIN3,0);  ///AB2IN_LEFT
-  analogWrite(PIN0,speed); ///AB1IN_RIGHT
-  analogWrite(PIN1,0);  ///AB2IN_RIGHT
-}
-void stop() {
-  analogWrite(PIN2,0); 
-  analogWrite(PIN3,0);
-  analogWrite(PIN0,0); 
-  analogWrite(PIN1,0);
 }
 
 void write_data() {
@@ -1068,13 +868,35 @@ void loop(void) {
         while (central.connected()) {
             // Send data
             write_data();
+            // 
+            //Turn On the Robot with PID
+            //ADD CODE
 
-            // collectIMUData_GYRO();
+            //Stop the robot if maximum of data is reached
+            // if (data > maxnew) {
+            //   analogWrite(PIN0, 0);
+            //   analogWrite(PIN1, 0);
+            //   analogWrite(PIN2, 0);
+            //   analogWrite(PIN3, 0);
+            //   Serial.println("The maximum size of the array is reached!");
+            // }
 
-
+            //Turn of the Robot - Hard Stop
+            // if (run_case_PID == 0) {
+            //   analogWrite(PIN0, 0);
+            //   analogWrite(PIN1, 0);
+            //   analogWrite(PIN2, 0);
+            //   analogWrite(PIN3, 0);
+            //   Serial.println("The robot is turned off!");
+            // }
             // Read data
             read_data();
         }
+        //Stop the robot if disconnected
+        // analogWrite(PIN0, 0);
+        // analogWrite(PIN1, 0);
+        // analogWrite(PIN2, 0);
+        // analogWrite(PIN3, 0);
         Serial.println("Disconnected");
     }
     /* Computation variables */
@@ -1284,25 +1106,37 @@ void collectIMUData_GYRO() {
 //   }
 // }
 
-//////////////////PREVIOUS CODE////////////////////
 
-// void forward_motion(float PWM){
-//     //Right Wheels
-//     analogWrite(0, PWM);
-//     analogWrite(1, 0);
-//     // //Motor B
-//     // //Left Wheels
-//     analogWrite(2, PWM);
-//     analogWrite(3, 0);
-// }
+void printPaddedInt16b( int16_t val ){
+  if(val > 0){
+    SERIAL_PORT.print(" ");
+    if(val < 10000){ SERIAL_PORT.print("0"); }
+    if(val < 1000 ){ SERIAL_PORT.print("0"); }
+    if(val < 100  ){ SERIAL_PORT.print("0"); }
+    if(val < 10   ){ SERIAL_PORT.print("0"); }
+  }else{
+    SERIAL_PORT.print("-");
+    if(abs(val) < 10000){ SERIAL_PORT.print("0"); }
+    if(abs(val) < 1000 ){ SERIAL_PORT.print("0"); }
+    if(abs(val) < 100  ){ SERIAL_PORT.print("0"); }
+    if(abs(val) < 10   ){ SERIAL_PORT.print("0"); }
+  }
+  SERIAL_PORT.print(abs(val));
+}
 
-// //backwards motion
-// void backwards_motion(float PWM){
-//     //Right Wheels
-//     analogWrite(0, abs(PWM));  ///right
-//     analogWrite(1, 0);  ///right 
-//     // //Motor B
-//     // //Left Wheels
-//     analogWrite(2, abs(PWM));  ///left backwards
-//     analogWrite(3, 0);  ///left forwards 
-// }
+void printRawAGMT( ICM_20948_AGMT_t agmt){
+  SERIAL_PORT.print("RAW. Acc [ ");
+  printPaddedInt16b( agmt.acc.axes.x );
+  SERIAL_PORT.print(", ");
+  printPaddedInt16b( agmt.acc.axes.y );
+  SERIAL_PORT.print(", ");
+}
+
+void printScaledAGMT( ICM_20948_AGMT_t agmt){
+  SERIAL_PORT.print("Scaled. Acc (mg) [ ");
+  printFormattedFloat( myICM.accX(), 5, 2 );
+  SERIAL_PORT.print(", ");
+  printFormattedFloat( myICM.accY(), 5, 2 );
+  SERIAL_PORT.print(", ");
+  printFormattedFloat( myICM.accZ(), 5, 2 );
+  }
