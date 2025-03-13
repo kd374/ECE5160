@@ -13,8 +13,8 @@
 
 				<!-- Intro -->
                 <div id="intro">
-                    <h1>LAB 4</h1>
-                    <p>Motors and Open Loop Control</p>
+                    <h1>LAB 5</h1>
+                    <p>PID Control and Linear Interpolation</p>
                     <ul class="actions">
                         <li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
                     </ul>
@@ -22,7 +22,7 @@
 
             <!-- Header -->
             <header id="header">
-                    <a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 4</a>
+                    <a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 5</a>
                 </header>
 
                 
@@ -30,7 +30,7 @@
             <!-- Nav -->
                 <nav id="nav">
                     <ul class="links">
-                        <li class="active"><a href="index.html">LAB 4</a></li>
+                        <li class="active"><a href="index.html">LAB 5</a></li>
                     </ul>
                     <ul class="icons">
                         <li><a href="https://www.linkedin.com/in/katarina-duric/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li> 
@@ -44,7 +44,7 @@
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>LAB 4</title>
+                        <title>LAB 5</title>
                     
                         <!-- Inline CSS for this page only -->
                         <style>
@@ -89,255 +89,207 @@
                                 font-family: monospace;
                             }
                         </style>
+                        
                     </head>
                     <body>
+
                     
                         <!-- Featured Post -->
                         <article class="post featured">
                             <header class="major">
-                                <span class="date">March 5th, 2025</span>
-                                <h2>LAB 4 - Motors and Open Loop Control</h2>
+                                <span class="date">March 12th, 2025</span>
+                                <h2>LAB 5 - PID Control and Linear Interpolation</h2>
                             </header>
                     
                             <!-- Introduction -->
                             <section class="content-section">
                             <h3>Introduction</h3>
-                            <p>The aim of this lab was to navigate the car through implementing open loop control, instead of navigating it with the provided controller. It was implemented through integrating two dual motor drivers which navigate the car conrol, and are connected to the car motors and the Artemis board.</p>
+                            <p>The aim of this lab was to implement closed loop control and through the implementation of PID control. ToF sensors integrated in the third lab represented a crucial role in this lab as they ensured our robot stops at the target distance from the wall. PID control is consisted of proportional (P), integral (I), and derivative (D) control, where each of the terms evaluates the error between the desired position and the current position and adjusts the PWM signal of the motor accordingly.</p>
                             </section>
                             <section class="content-section">
-                            <h3>Prelab 4</h3>
-                            <p>The prelab involved developing a plan to integrate the motor drivers, along with the sensors integrated in the previous two labs. Furthermore, the provided a reading about using the oscilloscope as well.  </p>
-                            <h4>Implementation diagram</h4>
-                            <p>This lab required us to implement two DRV8833 motor drivers in order to control the car motors. Ultimately, the motor drivers ought to connect to the provided 850 mAh battery. From the proposed diagram below, it can be concluded that the used Artemis board analog pins which connect to the motor drivers in order to establish the PWM output are pins A0 to A3, as labeled.</p>
+                            <h3>Prelab 5</h3>
+                            <h4>Sending and receiving data over Bluetooth</h4>
+                            <p>Considering that this lab is very dependent on value tuning for our implementation of the PID Control, as well as considering the fact that our robot is fundamtentally operating on the battery power throughout the lab, it was vital to establish a functional way of effective sending and receiving data. My solution to this consists of developing two cases in ble_arduino.ino, one named <code>PID_START</code>, which is responsible for collecting the data with the control loop implemneted, which allows collection while controling the car. The second case <code>CHANGE_GAIN</code> is responsible for transmitting the data through Bluetooth once the data collection is completed.</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/diagram_lab4_updated.png" alt="Lab 3" width="1000" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Lab 4 Implementation Diagram</figcaption>
+                                <img src="images/prelab2.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID_START case for implementing the PID Control</figcaption>
+                                <img src="images/prelab1.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">CHANGE_GAIN case for transmitting the data through Bluetooth</figcaption>
                             </figure>
-                            <h4>The battery discussion</h4>
-                           <p>It ought to be noted that the motors as well as the motor drivers, are powered on the 850 mAh battery, compared to the rest of the hardware including the Artemis board, which are powered on a separate provided battery. This is due to the fact that the high-speed switching, as well as the considerable power can lead to EMI ripples in the power supply. Hence, in order to avoid such outcome as well as the interference with electronics which are delicate and fragile, the  batteries are independent of each other.</p>
-                            </section>
-                            <h3>Lab Tasks</h3>
-                            <h4>Testing the Motor Drivers using the oscilloscope</h4>
-                            <p>As proposed by the lab manual, I initially soldered the pins of a single motor driver onto the Artemis analog pins shown in the implementation diagram above. Furthermore, the outputs of the motor drivers are thus probed using the oscilloscope for easier analysis, while the inputs of the motor driver represent the generated PWM signals. Furthermore, the VIN signal labeled on the diagram above, as well as the GND signal (which was also connected to the Artemis board) were connected to the power supply. The visualization of the setup is represented in the image below. </p>
+                            <p>The proposed arrays sent over to Python side are thus separated and grouped into separate arrays for the purposes of plotting and analyzing the data. The Python script follows the same structure as the ones I wrote for notification handlers in previous labs. Furthermore, I call <code>send_command</code> in order to manipulate the values of Kp, Ki, Kd, and maxSpeed, as can be inferred from the comment in the image below.</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/IMG_0369.jpg" alt="Lab 3" width="550" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Setup with the Power Supply and the Oscilloscope</figcaption>
+                                <img src="images/prelab5.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Python script receiving the successfully transmitted data</figcaption>
                             </figure>
-                            <p> The attached image shows the battery supply's set voltage of 3.7 V, its probes on VIN and GND signals, as well as the oscilloscope reading of the motor driver's outputs. Analyzing the datasheet of the provided moto drivers, it is proposed that the notor voltage ought to be within the range of 2.7 V - 10.8 V. The voltage of the 850 mAh battery is 3.7 V, hence, the power supply was set to be of the same voltage to simulate the battery voltage used for the remaining parts of the lab. </p>
-                            <p>The implemented code for testing the motor drivers showcases the functionality of PWM by implementing the analogWrite() function, where PIN1 representing A2 IN and B2 IN is set to high (in this case 200), while PIN0 representing A1 IN and B2 IN is set to low, or 0.</p>
+                            <p>Another vital part of the prelab was ensuring that a hard stop is incorporated even in the cases of Bluetooth connection failing. I implemented this in the <code>loop()</code> function, as well as in the PID_START upon the completed data collection.</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/1driver-code.png" alt="Lab 3" width="300" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">1 Driver Testing Code Snippet</figcaption>
+                                <img src="images/prelab4.png" alt="Lab 5" width="350" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Hard stop implementation in the loop() function</figcaption>
                             </figure>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/Yqan6-6ZB5Y"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <p>The oscilloscope image is as the following:
-                            <figure style="margin: 0; text-align: center;">
-                                    <img src="images/IMG_0353.jpg" alt="Lab 3" width="550" style="display: block; margin: 0 auto;">
-                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">The image of the Oscilloscope</figcaption>
-                             </figure>
-                             <p>After verifying that a single motor driver showcases correct outputs on the oscilloscope, a similar methodology was followed to account for the second driver in the code post its soldering. In the proposed Arduino code below, pins PIN0 and PIN2 were individually set to the value of 200 in the <code>analogWrite()</code> function while other pins were set to the output of 0. As such, 4 different combinations of high and low values were tested on the 2 motor driver pins. Analyzing the oscilloscope readings, it can be inferred that it correctly illustrates the positive 3.7 V to the motors which are set by the power supply, and hence, maintains a constant voltage value.</p>
-                             <p>Below is the code implemented for both the motor drivers testing on the oscilloscope.</p>
-                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/2driver-code-oscillo.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">2 Drivers Testing Code Snippet</figcaption>
-                            </figure>
+                            <h3>Lab 5 Tasks</h3>
+                            <h4>PID Control Implementation </h4>
+                            <p>Finally, the PID </p>
+                            <pre><code>
+case START_PID:
+{
+    int i = 0;
+    int k = 0;
+    const float alpha = 0.2;
+    float target_dist = 304;
+    int distance1 = 0;
+    float current_dist;
+    float error1;
+    float pwm;
+    float error_sum;
+    float p_term, i_term, d_term;
+    float old_error;
+    float dt_extrapolate;
+    float distance_before_last;
+    float distance_last;
+    float time_before_last;
+    float time_last;
+    float slope;
+    float time_current;
+    float b, m, x;
 
-                            <h4>Motor Driver Wheels</h4>
-                            <p>After the confirmation from the oscilloscope readings that our motor driver outputs behave as expected, the next step of the open loop control development is to connect our drivers to the provided wheels. For incremental purposes, I connected a single motor driver to one side of the wheels, and tested by using similar code to the one provided above. The video of the wheels spinning in both directions, alongside the complementary code, can be found below.</p>
+    distanceSensor1.startRanging();  
+    Serial.println("PID is starting!");
+    int t_0 = millis();
+    // This is used to calculate dt
+    int prev_time = t_0;
+    while ((i < ARRAY_LENGTH) && (millis() - t_0 < 10000)) {
+        if (distanceSensor1.checkForDataReady()) {
+            distance1 = distanceSensor1.getDistance();  
+            distanceSensor1.stopRanging();
+            distanceSensor1.clearInterrupt();
+            distanceSensor1.startRanging();
+            i++
+        }
+        // Start of Control Loop Calculations - PID
+        distance_data[i] = distance1;
+        current_dist = distance1;
+        old_error = error1;
+        dt = millis() - prev_time;
+        error1 = target_dist - current_dist;
+        prev_time = millis();
+        time_data[i] = prev_time;
+        error_sum = error_sum + (error1 * dt / 1000);
+        p_term = Kp * error1;
+        i_term = Ki * error_sum;
+        //d_term = 0;
+        d_term = Kd * (error1 - old_error)/dt;
+        pwm = p_term + i_term + d_term;
+        Serial.println(pwm);
+
+        // Movement Saturation and Control
+        if (pwm > maxSpeed) pwm = maxSpeed;
+        if (pwm < -maxSpeed) pwm = -maxSpeed;
+        pwm_data[i] = pwm;
+        if (pwm > 0) { //forward movement
+            analogWrite(MotorRightBackward, 0);
+            analogWrite(MotorRightForward, pwm + 5);
+            analogWrite(MotorLeftForward, pwm * 2.0 + 12);
+            analogWrite(MotorLeftBackward, 0);
+        } else if (pwm < 0) { //backward movement
+            analogWrite(MotorRightBackward, abs(pwm) + 5);
+            analogWrite(MotorRightForward, 0);
+            analogWrite(MotorLeftForward, 0);
+            analogWrite(MotorLeftBackward, abs(pwm) * 2.0 + 12);
+        } else { //stopping the robot
+            analogWrite(MotorRightBackward, 0);
+            analogWrite(MotorRightForward, 0);
+            analogWrite(MotorLeftForward, 0);
+            analogWrite(MotorLeftBackward, 0);
+        }
+    } //implementing hard stop
+    analogWrite(MotorRightBackward, 0);
+    analogWrite(MotorRightForward, 0);
+    analogWrite(MotorLeftForward, 0);
+    analogWrite(MotorLeftBackward, 0);
+    
+    for (int k = 0; k < ARRAY_LENGTH; k++) {
+        tx_estring_value.clear();
+        tx_estring_value.append(distance_data[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(pwm_data[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(time_data[j]);
+        tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    }
+    Serial.println("Successful sending");
+    break;
+} // case end
+</code></pre>
+                            <h4>Linear Extrapolation</h4>
+                            <p>The following task of the lab was to implement linear extrapolation, which can be comprehended as a prediction mechanism in case our ToF sensor's values are not available for collection, that is, when <code>distanceSensor1.checkForDataReady()</code> is not available. Hence, in case of obtaining 2 ToF values, the data points in-between measurements are used to determine the location of the robot. This was performed through adding an <code>else if ()</code> statement to  my PID control code, integrated into the while loop for whenever distanceSensor1 data is not available. This way, the collected data arrays are supposed to have more frequent and accurate data collection due to the fact we are able to frequently loop in the else statement and speed up the controller execution.</p>
+
+                            <pre><code>    while ((i < ARRAY_LENGTH) && (millis() - t_0 < 10000)) {
+        if (distanceSensor1.checkForDataReady()) {
+            distance1 = distanceSensor1.getDistance();  
+            distanceSensor1.stopRanging();
+            distanceSensor1.clearInterrupt();
+            distanceSensor1.startRanging();
+        } else if (i > 1) {
+            time_current = millis();
+            distance_last = distance_data[i - 1];
+            distance_before_last = distance_data[i - 2];
+            time_last = time_data[i - 1];
+            time_before_last = time_data[i - 2];
+            slope = (distance_last - distance_before_last) / (time_last - time_before_last);
+            b = distance_last;
+            m = slope;
+            x = time_current - time_last;
+            distance1 = b + m * x;
+        }
+        // Start of Control Loop Calculations - PID </code></pre>
+
+    
+
+
+                            <p>Implementing the proposed code, in the START_PID case and integrating it before executed PID control resulted in producing the following video below (thanks to TA Cameron for filming the video!).</p>
+
                             <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/s4FVJbivlOY"  
+                            src="https://youtube.com/embed/N8DONyYhiGc"  
                             title="Lab 3: Red Colour Test" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             allowfullscreen>
-                            </iframe>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/nsXjYTrxvjE"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/1driver-wheels.png" alt="Lab 4" width="250" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">1 Side of Wheels Spinning in Both Directions Code Snippet</figcaption>
-                            </figure>
                             </iframe>
 
-                            <p>As can be analyzed, I incrementally tested the driver integration with one side of the wheels by getting the power through through the power supply, and battery, spinning in both directions. Afterwards, I tested both drivers with two sets of wheels, first with the power supply, and then with the battery, spinning in both directions.</p>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/g5NbY3O4BvY"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/rdtguDJKyZI"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/2drivers-2 directions.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Both Wheels Spinning in Both Directions Code Snippet</figcaption>
-                            </figure>
-                            <p>Furthermore, this leads to the conclusion that the motor driver installation was successful and hence soldering the drivers to the aforementioned 850 mAh battery was now a possible step towards full circuitry integration.</p>
-                            <h4>Installation of all components </h4>
-                            <p>After the successful soldering and testing, the full integration of our electronics looks like the following on the labeled image:</p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/labeled_integration.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Full Electronics Integration</figcaption>
-                            </figure>
-                            <p>Compared to lab 3, I have implemented a few changes. I changed my motor drivers to be close together, so that I could secure the electronics better in a larger compartment, considering that they require the most wiring. What is more, the motor drivers are isolated from other electronics except the battery, so that EMI is not created. Furthermore, I spaced out my ToF sensors, where one is in the front, and one is in the back of the car for more accurate collection of sensor data. As per my discussion with TA Harry, I placed the IMU on the flat surface created by the 850 mAh battery compartment, so that I could have as accurate of position readings as possible.</p>
-                            <p>Finally, the car is tested with a stop timer as follows with the complementary code:</p>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/rIx1A4hX0EY"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/task7code.png" alt="Lab 3" width="220" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Car Testing with a Timer</figcaption>
-                            </figure>
-                            <h4>Lower Limit PWM value discussion</h4>
-                            <p>In order to experimentally explore the lowest value of PWM, I wrote Arduino code, which I sent over through Bluetooth. This allowed for me to manipulate the values of every individual drivers' output pins by running a <code>ble.send_command()</code> on the Python side. The implemented case <code>CALIBRATION</code> was adapted from case <code>SEND_TWO_INTS</code> from lab 1. Furthermore, <code>analogWrite()</code> statements were added to control the values of the output pins in Python.</p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/determining_pmw_task8_code.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
-                                <img src="images/python_code_calibration.png" alt="Lab 3" width="450" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PWM Lower Limit and Calibration Code Snippet - Arduino and Python</figcaption>
-                            </figure>
-                            <p>Through experimentation with the values, it was determined that the lower limit in PWM value for which the robot is able to move forward for both of the wheels is 39 for both of the wheels from the state of rest. Considering that the wheels do not spin at the same rate, I was able to determine that the lower PWM limit for the individual wheels was somewhat different due to different friction contributions and spinning speeds, thus determining the joined PWM value for both was crucial. With the PWM value of 39 for the car to run straight, which corresponds to the duty cycle of 0.153, if we have any value less than the given, the car will not be able to achieve the movement in a straight line.</p>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/z65j68FwzWM"  
-                            title="Lab 4" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
+
+
+
+
+
                             <p></p>
-                            <p>Furthermore, I explored the lower PWM value in the case of spinning, which I determined to be 78. In order to perform the spinning, I set my PIN1 and PIN2 values to 78 over Python, while others are set to 0, as can be observed in the video below. The video shows slight spinning in the counterclockwise direction, and represents lowest spinning PWM value from the initially stationary position of the car.</p>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/PNMZTavdw-g"  
-                            title="Lab 4" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <p></p>
-                            <h4>Calibration Discussion</h4>
-                            <p>Considering that the motors can move at different speeds and are differently impacted by the surface friction, a calibration factor was implemented to the left motor's output pins. Particularly, through experimentation, I was able to determine that the calibration factor added to the left motor is 1.1 for the 2 meter line. Particularly, I observed a slightly increased speed of the right motor, which is why I experimented with decreasing the PWM signal which is sent to the right motor initially, and further experimented with the calibration factor once I had the car running in almost a straight line for the given distance. Therefore, I ultimately calculated the calibration coefficient of 1.1 applied to the left motor. </p>
-
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/calibration_code_updated_t9.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Calibration Code Snippet</figcaption>
-                            </figure>
-                            <p>Considering the code above, I was able to achieve for my car to stay in the straight line by applying the delay of 200 in the section where the motors are powered off due to the pins PIN1 and PIN3 (which are directing the forward motion of the car) being set to 0.</p>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/v0lyjrkaZ_M"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <h4> Open Loop Demonstration </h4>
-                            <p>Following the calibration, our car is able to perform different movements through open loop control. In the demonstration attached below, the car moves forward, then turns to the left, moves backward and stops, and lastly spins both counterclockwise and clockwise (inspired by TA Mikayla Lahr's code).</p>
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/pEB2BFSM-O4"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <p>The presented video was based on the code attached below.</p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/t10_pt1.png" alt="Lab 3" width="280" style="display: block; margin: 0 auto;">
-                                <img src="images/t10_part2.png" alt="Lab 3" width="284" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Open Loop Code Snippet</figcaption>
-                            </figure>
-
 
                             <h3>Additional ECE 5160 Tasks</h4>
-                            <h4>Frequency Analysis</h4>
-                            <p>As the continuation to the performed oscilloscope testing, the PWM signal peak was estimated to occur at the frequency of <math xmlns="http://www.w3.org/1998/Math/MathML">
-                                <mfrac>
-                                  <mn>1</mn>
-                                  <mrow>
-                                    <mn>5.41</mn>
-                                    <mi>ms</mi>
-                                  </mrow>
-                                </mfrac>
-                              </math>  which is equivalent to about 184 Hz. This corresponds to the frequency denoted on the attached image as well. Considering that the implemented motor drivers sample at about 50 kHz, which corresponds to 20 &mu;s, the frequency that analogWrite() generates is fast enough for our motors to run analogWrite() tests and for ToF sensor data (considering the estimation from lab 2 about the sampling frequency). However, in theory, if we were to generate a faster PWM signal our motor driver could potentially make the car movements more controlled and streamlined. The code implemented for this part is attached below along with the complementary oscilloscope reading.  </p>
-
+                            <h4>Wind-up</h4>
+                            <p>Lastly, wind-up protection for the integrator term of the PID Controller can be introduced, as it represents the vital feature for robust PID Control. I implemented the wind-up protection through clamping the integrator term in order to prevent any further error from accumulating for a longer period beyond the set limit. Otherwise, the integrator term can accumulate the excessive error, which can lead the robot to overshoot in positionality, thus making it harder and longer for the robot to stabilize. Hence, wind-up protection may be implemented as the following:</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/freq_analysis.png" alt="Lab 3" width="500" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Frequency generated by analogWrite()</figcaption>
-                                <img src="images/2driver-code-oscillo.png" alt="Lab 3" width="250" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Frequency Analysis Code Snippet</figcaption>
+                                <img src="images/windup.png" alt="Lab 5" width="350" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Wind-Up Protection for the robot</figcaption>
                             </figure>
-
-                            <h4>Lowest PWM Value Speed Discussion</h4>
-                            <p>The value obtained in the previous PWM task was 39 as the minimal value for the car to move forward. Hence, my thought process was to experiment with the values lower than 39 for all wheels, as that the car ought to already be in motion in this situation. Through repeating the process discussed in Lower Limit PWM Value Discussion section, I was able to manipulate the outputs values through Python in order for the car to already be in motion before determining the lowest PWM value. Hence, through experimentation, I was able to determine that the PWM value of 26 as the lowest PWM value when the car is already moving. With the duty cycle of ~101 (where 101 = <math xmlns="http://www.w3.org/1998/Math/MathML">
-                                <mfrac>
-                                  <mn>26</mn>
-                                  <mrow>
-                                    <mn>255</mn>
-                                    <mi></mi>
-                                  </mrow>
-                                </mfrac>
-                              </math>) would imply that we ought to have at least a car movement of 1.01 second as the initial motion of the car.</p>
-                              <p></p>
-
-                              <figure style="margin: 0; text-align: center;">
-                                <img src="images/task12_code.png" alt="Lab 3" width="420" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;"> Lowest PWM Value Speed Code Snippet </figcaption>
-                            </figure>
-
-                            <p> As can be inferred from the attached code snippet, the values are initially set to 78 for PIN1 and 70 for PIN3 as per the calibration factor, while other two pins are set to 0. After 2 seconds of being powered on to those values (as per the delay), values inserted through the Python <code>ble.send_command()</code> function are thus updated for another 2 seconds before all of the output pin values being set to 0. Due to the fact that the performed experimentation led to the lowest PWM value of 26, PIN1 and PIN3 are set to those values, as can be seen in the video below.</p>
-
-                            
+                            <p>By tuning and manipulating the values of the limit, I decided that the limit of +/= 100 seemed fitting. Furthermore, I tested the wind-up implementation by varying Ki values on the Python side in order to evaluate the respose of the system. I found that even with larger Ki values of 0.001 or 0.0001 magnitude, the car could reach stability in front of the target distance, which normally was not the case with such large integrator term input. The wind-up performance on the system can be inferred in the video below.</p>
                             <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/f8AGCmBo1oI"  
+                            src="https://youtube.com/embed/SJXrchFes4o"  
                             title="Lab 3: Red Colour Test" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             allowfullscreen>
                             </iframe>
-
-                            <p>For comparison purposes, at PWM value of 25 set through Python, it was determined that the car cannot maintain the movement, and hence stops more quickly than in the previous video. This can also be confirmed by the number of tiles the car moved on in the video below. </p>
-
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/WuY4IlysrtQ"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
+                            <p>What is more, with the linear extrapolation implemented, as well as the wind-up protection, the graphs generated below represent the final results of ToF versus Time as well as Motor Input versus Time graphs with the linear extrapolation and wind-up protection implemented on the PID Controller.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/pwm_vs_time_windup.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Motor Input vs Time (PWM vs Time) Graph with Linear Extrapolation and Wind-Up Protection</figcaption>
+                                <img src="images/dist_vs_time_windup.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF vs Time (Distance vs Time) Graph with Linear Extrapolation and Wind-Up Protection</figcaption>
+                            </figure>
 
                             <h3>Discussion</h3>
-                            <p>This lab was crucial in gaining a better understanding of our overall car system, as well as provided us with much more hardware debugging tasks compared to the previous tasks, which I found very enjoyable.</p>
-
-                            <h4>Debigging issue</h4>
-                            <p>A unique issue that I encountered was the breaking of GND pin on the Artemis board's external connector. TA Harry was able to figure out the issue and help me with this, due to which a GND connection from the outside of the connector to the QWIIC connector was established. Images below show the missing pin of GND, as well as the new GND connection through a very thin blue wire from Artemis port to QWIIC connector port. </p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/IMG_0441.jpg" alt="Lab 3" width="280" style="display: block; margin: 0 auto;">
-                                <img src="images/IMG_0416.jpg" alt="Lab 3" width="280" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;"> Solution to the Hardware Issue</figcaption>
-                            </figure>
+                            <p>This lab was crucial in gaining a better understanding of closed loop control and experimenting with PI and PID Control implementation. Furthermore, it enabled me great exprience in debugging, tuning values, and evaluating the best solution for the robot with its open-endedness.</p>
 
 
-
-                        
-             
                            
 
 
@@ -350,7 +302,7 @@
 
                     
                             </section>
-                            <p>*This lab page is inspired by TA Mikayla Lahr's Lab 4 page from Spring 2024. Special thank you to TAs Harry Gao and Cheney Zhang for all their help with this lab!</p>
+                            <p>*This lab page is inspired by Nila Narayan's Page (2024). I worked with Kelvin Resch, and Paul Judge on this lab. I shared ideas with Becky Le and Sabian Grier as well. The videos were filmed on Kelvin Resch's car due to my car's hardware breaking upon the lab deadline.</p>
 
                         
                         <!-- </article> -->
