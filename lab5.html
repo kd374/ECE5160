@@ -216,7 +216,7 @@ while ((i < ARRAY_LENGTH & millis()) - (t_0 < 5000)) {
 
                             
                             <h4>PID Controller Implementation </h4>
-                            <p>Finally, the PID controller ought to be implemented by accounting for the derivative <code>d_term</code> in our code. Below is the full implementation of PID controller. The derivative term is obtained by determining the change in error between the previous step and the current step and thus dividing by <code>dt</code>. </p>
+                            <p>Finally, the PID controller ought to be implemented by accounting for the derivative <code>d_term</code> in our code. Below is the full implementation of PID controller. The derivative term is obtained by determining the change in error between the previous step and the current step and thus dividing by <code>dt</code>. I chose to implement PID controller instead of PI, as I wanted to create a more robust mechanism, and introduce the damping term into the equation in order to reduce oscillations and overshooting, as well as to achieve a more stable system response through counteracting changes in proposed error.</p>
                             <pre><code>
 case START_PID:
 {
