@@ -44,7 +44,7 @@
                     <head>
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>LAB 5</title>
+                        <title>LAB 6</title>
                     
                         <!-- Inline CSS for this page only -->
                         <style>
@@ -98,294 +98,377 @@
                         <article class="post featured">
                             <header class="major">
                                 <span class="date">March 12th, 2025</span>
-                                <h2>LAB 5 - PID Control and Linear Interpolation</h2>
+                                <h2>LAB 6 - ORIENTATION CONTROL</h2>
                             </header>
                     
                             <!-- Introduction -->
                             <section class="content-section">
                             <h3>Introduction</h3>
-                            <p>The aim of this lab was to implement closed loop control and through the implementation of PID control. ToF sensors integrated in the third lab represented a crucial role in this lab as they ensured our robot stops at the target distance from the wall. PID control is consisted of proportional (P), integral (I), and derivative (D) control, where each of the terms evaluates the error between the desired position and the current position and adjusts the PWM signal of the motor accordingly.</p>
+                            <p>The aim of this lab was to build up on the demonstrated PID control with lateral movement from lab 5, by developing the mechanism to control the orientation angle of our motor. More particularly, yaw measurements of the IMU were utilized in order to implement a PID controller that is able to point the car towards a particular target yaw angle, as well as maintain the orientation.</p>
                             </section>
                             <section class="content-section">
-                            <h3>Prelab 5</h3>
+                            <h3>Prelab 6</h3>
                             <h4>Sending and receiving data over Bluetooth</h4>
-                            <p>Considering that this lab is very dependent on value tuning for our implementation of the PID Control, as well as considering the fact that our robot is fundamtentally operating on the battery power throughout the lab, it was vital to establish a functional way of effective sending and receiving data. My solution to this consists of developing two cases in ble_arduino.ino, one named <code>PID_START</code>, which is responsible for collecting the data with the control loop implemneted, which allows collection while controling the car. The second case <code>CHANGE_GAIN</code> is responsible for transmitting the data through Bluetooth once the data collection is completed.</p>
+                            <p>Considering that this lab is very dependent on value tuning for our implementation of the orientation angle and PID parameters, as well as considering the fact that our robot is fundamtentally operating on the battery power throughout the lab, it was vital to establish a functional way of effective sending and receiving data. My solution to this is influenced by my Prelab 5 code, where I developed the case <code>PID_ON</code>, which is responsible for collecting the different pieces of data for, which will be relevant for testing and controlling the orientation of our car. Similarly, there is a flag <code>pid_starting</code> incorporated in the code attached below, and the boolean is thus set to true once the data arrays are cleared . Similarly, there is another case <code>PID_OFF</code>, which ends the control loop and thus implements a hard stop on the robot's wheels, after which it sends the populated arrays from Arduino over Bluetooth.</p>
+                            <p>The code for both of the cases can be seen below:</p>
+
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/prelab2.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID_START case for implementing the PID Control</figcaption>
-                                <img src="images/prelab1.png" alt="Lab 3" width="350" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">CHANGE_GAIN case for transmitting the data through Bluetooth</figcaption>
+                                <img src="images/prelab1_lab6.png" alt="Lab 6" width="300" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID_ON case for implementing the PID Control</figcaption>
+                                <img src="images/prelab2_lab6.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID_OFF case for transmitting the data through Bluetooth</figcaption>
                             </figure>
-                            <p>The proposed arrays sent over to Python side are thus separated and grouped into separate arrays for the purposes of plotting and analyzing the data. The Python script follows the same structure as the ones I wrote for notification handlers in previous labs. Furthermore, I call <code>send_command</code> in order to manipulate the values of Kp, Ki, Kd, and maxSpeed, as can be inferred from the comment in the image below.</p>
+
+                            <p>The proposed arrays sent over to Python side are thus grouped into separate arrays for the purposes of plotting and analyzing the data. The Python script follows the same structure as the ones I wrote for notification handlers in Lab 5.</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/prelab5.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
+                                <img src="images/prelab4_lab6.png" alt="Lab 6" width="400" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Python script receiving the successfully transmitted data</figcaption>
                             </figure>
-                            <p>Another vital part of the prelab was ensuring that a hard stop is incorporated even in the cases of Bluetooth connection failing. I implemented this in the <code>loop()</code> function, as well as in the PID_START upon the completed data collection.</p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/prelab4.png" alt="Lab 5" width="350" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Hard stop implementation in the loop() function</figcaption>
-                            </figure>
-                            <h3>Lab 5 Tasks</h3>
-                            <h4>PID Control Overview</h4>
-                            <p>Initially, I analyzed the formula for the motor input function <code>u(t)</code>, which helped grasp the fundamentals of PID control. The PID controller, as aforementioned, is consisted of the proportional, integral, and derivative control portions, which form the motor input function u(t) as the following:</p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/pid-control-eq.png" alt="Lab 5" width="350" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID Control Equation</figcaption>
-                            </figure>
-                            <p>where e(t) is the error between the current position, measured by the ToF sensor, and the desired target position. Hence, P control seemed like a solid start point, considering that it has a fixed variable represented in the target distance. However, P controller is reflected in a considerable steady state error, due to the fact that it only responds to the present error, thus is not able to eradicate the persistent offset. Thus, implementing a PI controller is able to help this issue through providing the motors with a larger push until the error is diminished. The PID controller hence builds up on the established system through providing damping on the motor input due to fast changes in ToF sensor readings.</p>
-                            <h4>P Controller Implementation </h4>
-                            <p>With the provided analysis of my understanding of the formula, I started with the implementation of P controller. My implementation for the P controller can be found in the attached code below.</p>
 
+                            <h3>Lab 6 Tasks</h3>
+                            <h4>Digital Motion Processing (DMP)</h4>
+                            <p>The fundamental purpose of Digital Motion Processing (DMP) is to incorporate different sensor readings obtained through using the IMU data, which ultimately and ideally ought to decrease noise levels from the accelerometer, as well as the drift from the gyroscope, which was experienced in Lab 2. Digital Motion Processing enables low-power calibration of the accelerometer, gyroscope, and compass, while maintaining optimal performance of the sensor data. DMP is integrated into the Artemis Board, and through the quick uncommenting of line 29 in the <code >ICM_20948_C.h</code> header file, as suggested by the Lab 6 website documentation, we may test its functionality through the Arduino example sketch: <code>Examples > SparkFun 9DoF IMU Breakout > Arduino > Example7_DMP_Quat6_EulerAngles</code>. The test proved the functionality, by displaying the expected behaviour of pitch, roll, and yaw angles in real-time. </p>
+
+                            <p>Furthermore, I was able to recall the gyroscope readings and the experienced drift in Lab 2, and thought about how I ought to mitigate such drift throughout this lab. While collecting IMU data, I determined that smaller inaccuracies build up the drift, resulting in a larger measured angle as the error accumulates over time. In order to minimize the drift, the gyroscope bias ought to be subtracted from the gyroscope readings. Therefore, utilizing DMP can correct the drift due to it incorporating gyroscope, accelerometer, and magnetometer measurements.
+                            <p>I started analyzing the DMP behaviour by testing the Arduino example sketch: <code>Examples > ICM 20948 > Arduino > Example6_DMP_Quat9_Orientation</code>, which helped me determine how to read orientation data in quarternion form. The sketch helped me further realise how the gyroscope readings are combined with the accelerometer data, contributing to the DMP correcting its initial exhibited drift. By utilizing the tutorial code on DMP, as well as the code provided on the attached Wikipedia page in the tutorial, I was able to adapt my <code>setup()</code> function to account for the following:</p>
                             <pre><code>
-int t_0 = millis();
-while ((i < ARRAY_LENGTH & millis()) - (t_0 < 5000)) {
-    if(distanceSensor1.checkForDataReady())
-    {
-        distance1 =  distanceSensor1.getDistance(); 
-        distanceSensor1.stopRanging();
-        distanceSensor1.clearInterrupt();
-        distanceSensor1.startRanging();
-        i++;
-    }
-    // Start of Control Loop Calculations - P Control
-    distance_data1[i] = distance1;
-    current_distance = distance1;
-    old_error = error1;
-    error1 = target_dist - current_dist;
-    dt = millis() - prev_time;
-    prev_time = millis();
-    p_term = Kp * error1;
-    i_term = 0;
-    d_term = 0;
-    pwm = p_term + i_term + d_term
+bool success = true; // In order to confirm that the DMP configuration was successful
+// Initialize the DMP. initializeDMP is a weak function. You can overwrite it if you want to e.g. to change the sample rate
+success &= (myICM.initializeDMP() == ICM_20948_Stat_Ok);
+// Enable the DMP Game Rotation Vector sensor
+success &= (myICM.enableDMPSensor(INV_ICM20948_SENSOR_GAME_ROTATION_VECTOR) == ICM_20948_Stat_Ok);
+success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 4) == ICM_20948_Stat_Ok); // Set to the maximum
 
-                            </code></pre>
-                            <p>Furthermore, the forward and backward movement control is implemented similarly to Lab 4, by using <code>analogWrite()</code> statements for when different values of PWM. The code for wheels movemment is attached in the PID Control Implementation code below (*considering that I tested my code on Kelvin's car as mentioned in References below), I had to change my naming convention for wheel's pin outputs to adapt to his hardware.</p>
-                            <p>When testing the P controller, I varied different values of <code>Kp</code>, while keeping my Ki and Kd equal to 0. Furthermore, I varied the values of <code>maxSpeed</code> as well to observe the behaviour of the controller. Depending on the speed, the ranges of my Kp values varied from 0.03 to 0.07 when testing, and these values experimentally proved to have the most accurate results of detecting the distance target, but also moving in a straight line  without noticeable jittering. Furthermore, with the optimal value of Kp being 0.05, an error of 100 mm would only yield about 5% of speed, which is a sensible achievement for a large distance up to 4 meters of long range mode.</p>
-                            <p>The video representing the P controller ought to be found below. Through experimentation and tuning, I concluded that the Kp value that contributes to the achievable distance of 1 ft from the target is Kp = 0.028. </p>
+// Enable the FIFO
+success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);
 
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/sUWc0vo8yJ0"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
+// Enable the DMP
+success &= (myICM.enableDMP() == ICM_20948_Stat_Ok);
 
-                            <h4>PI Controller Implementation</h4>
-                            <p>In order to introduce the integrator term, I subtract previous time instance from millis() in order to obtain <code>dt</code>, which I multiply with the calculated error between the target distance and the current distance. Hence, keeping track of the previous loop time allows me to calculate dt and sum the error over time. The more we loop, the more impactful integrator portion of the equation becomes, thus the more we divide by dt, the larger the error.</p>
-                            <p>The video representing the PI controller ought to be found below. Tuning the values, I chose Kp = 0.025, Ki = 0.001, and maxSpeed = 100, while keeping Kd = 0.</p>
+// Reset DMP
+success &= (myICM.resetDMP() == ICM_20948_Stat_Ok);
 
-                            
-                            <pre><code>
-...//while loop
-    }
-    // Start of Control Loop Calculations - PI Control
-    distance_data1[i] = distance1;
-    current_distance = distance1;
-    old_error = error1;
-    error1 = target_dist - current_dist;
-    dt = millis() - prev_time;
-    prev_time = millis();
-    error_sum = error_sum + (error1*dt/1000);
-    p_term = Kp * error1;
-    i_term = Ki * error_sum;
-    d_term = 0;
-    pwm = p_term + i_term + d_term;
-    ...//pwm values control
-                                                            </code></pre>
+// Reset FIFO
+success &= (myICM.resetFIFO() == ICM_20948_Stat_Ok);
 
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/3mFQNAIOeJ8"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-
-                            <p>Upon tuning the values, I observed that in the instances where PI controller overshoots and hits the wall, it is able to recover the robot to the desired distance, which effectively makes sense with the integrator error equation. Such example can be found in the video below.</p>
-                            
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/cWtbXSGOmP4"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-
-                            
-                            <h4>PID Controller Implementation </h4>
-                            <p>Finally, the PID controller ought to be implemented by accounting for the derivative <code>d_term</code> in our code. Below is the full implementation of PID controller. The derivative term is obtained by determining the change in error between the previous step and the current step and thus dividing by <code>dt</code>. I chose to implement PID controller instead of PI, as I wanted to create a more robust mechanism, and introduce the damping term into the equation in order to reduce oscillations and overshooting, as well as to achieve a more stable system response through counteracting changes in proposed error.</p>
-                            <pre><code>
-case START_PID:
+// Check success
+if (success)
 {
-    int i = 0;
-    int k = 0;
-    float target_dist = 304;
-    int distance1 = 0;
-    float current_dist;
-    float error1;
-    float pwm;
-    float error_sum;
-    float p_term, i_term, d_term;
-    float old_error;
-    float dt_extrapolate;
-    float distance_before_last;
-    float distance_last;
-    float time_before_last;
-    float time_last;
-    float slope;
-    float time_current;
-    float b, m, x;
+    Serial.println("DMP success!");
+}
+else
+{
+    Serial.println(F("Enable DMP failed!"));
+    Serial.println(F("Please check that you have uncommented line 29 (#define ICM_20948_USE_DMP) in ICM_20948_C.h..."));
+    while (1); // Do nothing more
+}
+                            </code></pre>
+                            <p>Furthermore, by following the documentation, I learned how to take DMP orientation measurements as quarternions and convert them into an Euler angle for rotation about the z-axis, which is represented in yaw angle. This is performed by incorporating the following  code snippet into my main code for obtaining the pitch, roll, and yaw data.</p>
 
-    distanceSensor1.startRanging();  
-    Serial.println("PID is starting!");
-    int t_0 = millis();
-    // This is used to calculate dt
-    int prev_time = t_0;
-    while ((i < ARRAY_LENGTH) && (millis() - t_0 < 10000)) {
-        if (distanceSensor1.checkForDataReady()) {
-            distance1 = distanceSensor1.getDistance();  
-            distanceSensor1.stopRanging();
-            distanceSensor1.clearInterrupt();
-            distanceSensor1.startRanging();
-            i++
-        }
-        // Start of Control Loop Calculations - PID
-        distance_data[i] = distance1;
-        current_dist = distance1;
-        old_error = error1;
-        dt = millis() - prev_time;
-        error1 = target_dist - current_dist;
-        prev_time = millis();
-        time_data[i] = prev_time;
-        error_sum = error_sum + (error1 * dt / 1000);
-        p_term = Kp * error1;
-        i_term = Ki * error_sum;
-        //d_term = 0;
-        d_term = Kd * (error1 - old_error)/dt;
-        pwm = p_term + i_term + d_term;
-        Serial.println(pwm);
+                            <pre><code>
+icm_20948_DMP_data_t data;
+myICM.readDMPdataFromFIFO(&data);
+if((myICM.status == ICM_20948_Stat_Ok) || (myICM.status == ICM_20948_Stat_FIFOMoreDataAvail))
+{
+    if ((data.header & DMP_header_bitmap_Quat6) > 0) 
+    { 
 
-        // Movement Saturation and Control
-        if (pwm > maxSpeed) pwm = maxSpeed;
-        if (pwm < -maxSpeed) pwm = -maxSpeed;
-        pwm_data[i] = pwm;
-        if (pwm > 0) { //forward movement
-            analogWrite(MotorRightBackward, 0);
-            analogWrite(MotorRightForward, pwm + 5);
-            analogWrite(MotorLeftForward, pwm * 2.0 + 12);
-            analogWrite(MotorLeftBackward, 0);
-        } else if (pwm < 0) { //backward movement
-            analogWrite(MotorRightBackward, abs(pwm) + 5);
-            analogWrite(MotorRightForward, 0);
-            analogWrite(MotorLeftForward, 0);
-            analogWrite(MotorLeftBackward, abs(pwm) * 2.0 + 12);
-        } else { //stopping the robot
-            analogWrite(MotorRightBackward, 0);
-            analogWrite(MotorRightForward, 0);
-            analogWrite(MotorLeftForward, 0);
-            analogWrite(MotorLeftBackward, 0);
-        }
-    } //implementing hard stop
-    analogWrite(MotorRightBackward, 0);
-    analogWrite(MotorRightForward, 0);
-    analogWrite(MotorLeftForward, 0);
-    analogWrite(MotorLeftBackward, 0);
-    
-    for (int k = 0; k < ARRAY_LENGTH; k++) {
-        tx_estring_value.clear();
-        tx_estring_value.append(distance_data[k]);
-        tx_estring_value.append("|");
-        tx_estring_value.append(pwm_data[k]);
-        tx_estring_value.append("|");
-        tx_estring_value.append(time_data[k]);
-        tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0; // Convert to double. Divide by 2^30
+    double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0; // Convert to double. Divide by 2^30
+    double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0; // Convert to double. Divide by 2^30
+    double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+
+    double qw = q0; 
+    double qx = q2;
+    double qy = q1;
+    double qz = -q3;
+
+    // roll (x-axis rotation)
+    double t0 = +2.0 * (qw * qx + qy * qz);
+    double t1 = +1.0 - 2.0 * (qx * qx + qy * qy);
+    double roll = atan2(t0, t1) * 180.0 / PI;
+    roll_data[i] = roll;
+
+    // pitch (y-axis rotation)
+    double t2 = +2.0 * (qw * qy - qx * qz);
+    t2 = t2 > 1.0 ? 1.0 : t2;
+    t2 = t2 < -1.0 ? -1.0 : t2;
+    double pitch = asin(t2) * 180.0 / PI;
+    pitch_data[i] = pitch;
+
+    // yaw (z-axis rotation)
+    double t3 = +2.0 * (qw * qz + qx * qy);
+    double t4 = +1.0 - 2.0 * (qy * qy + qz * qz);
+    double yaw = atan2(t3, t4) * 180.0 / PI;
+    yaw_data[i] = yaw;
+    time_data[i] = millis();
+    i++;
+                                  </code></pre>
+                                  <p>As can be seen, I am storing my pitch, roll, and yaw values into arrays, which I ought to transmit to Python for easier analysis. An important thing to note, is that the aforementioned Example6_DMP_Quat9_Orientation helped me investigate the correct the orientation of my robot depending on the outputted yaw angles. Hence, through experimenting, I determined that when my PWM value is negative, and there is a negative difference between my target and my current yaw value, the motion of my car ought to be clockwise. This was incredibly useful when configuring the motion for my car to orient towards the desired angle.</p>
+
+                                  <p>For testing purposes, I plotted the the transmitted pitch, roll, and yaw data to investigate the initial behaviour by only rotating yaw in the cases of stationary robot, and robot with motors rotating.</p>
+                                  <figure style="margin: 0; text-align: center;">
+                                    <img src="images/DMP_initial_without_motors.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Initial DMP testing - DMP Angle vs Time without motor noise</figcaption>
+                                    <img src="images/dmp_initial_with_motors.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Initial DMP testing - DMP Angle vs Time with motor noise</figcaption>
+                                </figure>
+
+                                <h4>P Controller Implementation</h4>
+                                <p>Similarly to how I implemented P Controller in Lab 5, I incorporated the following code after performing the DMP quarternion orientation measurements and obtaining pitch, roll and yaw arrays, and created a <code>PID_DMP_TURN</code> case for sending my angle arrays, as well as my PWM and time data arrays. The code placed in the case can be found below:</p>
+                                <pre><code>
+//the following variables are set globally
+int i = 0;
+unsigned long last_time = millis();
+double target_yaw = -30;
+double current_yaw = 0;
+float dt = 0;
+float error_pid;
+float pwm;
+float error_sum = 0.0;
+float p_term = 0.0;
+float i_term = 0.0;
+float d_term = 0.0;
+float old_error;
+//end of global variable definitions
+
+case PID_DMP TURN: {
+
+//DMP quarternion code snippet attached above which stores roll_data[i], pitch_data[i], yaw_data[i], and time_data[i] values
+...
+// yaw (z-axis rotation)
+double t3 = +2.0 * (qw * qz + qx * qy);
+double t4 = +1.0 - 2.0 * (qy * qy + qz * qz);
+double yaw = atan2(t3, t4) * 180.0 / PI;
+yaw_data[i] = yaw;
+...
+// end of DMP code snippet
+
+dt = (millis()-last_time);
+last_time = millis();
+current_yaw = yaw;
+old_error = error1;
+error1 = current_yaw-target_yaw;
+//P Control
+error_sum = error_sum + error1*dt;
+p_term = Kp * error1;
+i_term = 0;
+d_term = 0;
+pwm = p_term + i_term + d_term;
+p_term_data[i] = p_term;
+
+if(pwm > 0)
+{
+    if(pwm > maxSpeed)
+    pwm = maxSpeed;
+}
+else if(pwm < 0)
+{
+    if(pwm < -maxSpeed)
+    pwm = -maxSpeed;
+}
+pwm_data[i] = pwm;
+    if(pwm < -80) { // needs to be clockwise motion because yaw difference is negative
+        analogWrite(PIN0,abs(pwm)); //right backward
+        analogWrite(PIN1,0); // right foward
+        analogWrite(PIN3,abs(pwm)); //left forward 
+        analogWrite(PIN2,0); // left backward
     }
-    Serial.println("Successful sending");
-    break;
-} // case end
-</code></pre>
+    else if(pwm > 80) // 80 was determined to be the minimum spinning PWM in Lab 4
+        { 
+        analogWrite(PIN0,0);
+        analogWrite(PIN1,abs(pwm));
+        analogWrite(PIN3,0);
+        analogWrite(PIN2,abs(pwm));
+    else{
+        analogWrite(PIN0,0);
+        analogWrite(PIN1,0);
+        analogWrite(PIN3,0);
+        analogWrite(PIN2,0);
+    }
+}
+if (myICM.status != ICM_20948_Stat_FIFOMoreDataAvail) // if more data is available then we should read it right away - and not delay
+{
+delay(10);
+}
 
+for (int j = 0; j < i; j++) {
+    tx_estring_value.clear();
+    tx_estring_value.append(pitch_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(roll_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(yaw_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(time_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(pwm_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(p_term_data[j]);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+  }
+Serial.println("PID turning data sent!");
+break;
+}
+                                </code></pre>
+                                <p>As can be seen from the P Controller code provided above, the code largely adapts the Lab 5 code for P Controller. The commented code for DMP quarternion orientation calculations is displayed in the code snippet attached in the Digital Motion Processing (DMP) subsection of this webpage. As can be seen from the code, arrays storing PWM data, time data, roll data, pitch data, yaw data, and P term data are sent over to Python for analysis. The notable difference in the P Controller form the previous lab is the fact that we set our current yaw to be the yaw computed in the DMP quarternion snippet, after which the error for P term is computed by taking the difference between the current yaw and the target yaw we would like to achieve. Furthermore, as can be inferred from the global definitions, the target yaw in this case was set to -30 degrees.</p>
+                                <p>Another update from Lab 5 code for P Controller was the spinning of the wheels depending on the PWM value. It was determined that with the negative PWM value, as aforementioned, we ought to move clockwise as determined via experimentation, due to the negative difference between the current yaw value and the target yaw value. Since I am only focusing on the P term for now, I term and D term may be set to 0 on the Arduino side, as well as when running the <code>CHANGE_GAIN</code> case on the Python side, which, similarly to Lab 5, looks as the following attached snippet. CHANGE_GAIN enables manipulating Kp, Ki, Kd, and the speed of the rotating wheels, or maxSpeed value.</p>
+                                <p></p>
+                                <p></p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/change_gain.png" alt="Lab 6" width="400" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Changing the gain of variables over Python, currently only setting Kp to a non-zero term</figcaption>
+                                </figure>
+                                <p>Initially, when testing only the P Controller, I was able to set my Kp value to be Kp = 3, while keeping Ki and Kd terms equal to 0. Below is the video of my tuned P Controller. In initial stages of testing, I had the car plugged into my Artemis while adjusting its movement to reach the desired angle, due to the fact that I wanted to print out my angles while the robot was moving in order to determine that the target yaw was reached. This can be seen in the video as well. The target yaw is set to -30 degrees in the video.</p>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/CIYMrsHBj3I"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
 
-                            <p>Here are the instances of testing the implemented PID controller. It can be observed that Ki value is set to the smallest value due to its augmenting nature, while Kd term is set to be the highest value in magnitude compared to Kp or Ki due to the fact that it can help with the provided damping on the robot so that it does not overshoot.</p>
+                                <p>Furthermore, I wanted to experiment with performing the P Controller kick in order to observe the behaviour of my implemented system. Below are the videos trying to achieve the same target yaw of -30 degrees.</p>
 
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/H9Qn45amfjY"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/gOSdrnGXT8c"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/IZ9q1T73oKs"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
 
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/EPh8cIpprPA"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
+                                <p>As can be inferred from the videos, the first P Controller kick example shows that the controller still overshoots a bit, after which it readjusts to orient itself towards the desired angle. The second video represents a similar behaviour, where overshooting is followed up by undershooting until the robot balances itself to the desired angle value.</p>
 
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/jw9FslqR50Q"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
+                                <p>Through experimentation I was able to plot graphs from the collected data arrays, which can be found below. The graphs represent my experimentation with -50 as my target yaw for the plots.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/pcontrol_yawvstime.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">P Control - Yaw DMP vs Time</figcaption>
+                                    <img src="images/pcontrol_pwmvstime.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">P Control - PWM vs Time</figcaption>
+                                    <img src="images/pcontrol_ptermvstime.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">P Control - PID Terms vs Time</figcaption>
+                                </figure>
 
-                            <p>The data collected from the proposed videos was generated to obtain the motor input versus time as well as ToF versus time graphs. Such graphs can be observed below.</p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/interpolation-graph.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Motor Input vs Time (PWM vs Time) Graph for PID Controller</figcaption>
-                                <img src="images/interpolation-distance.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF vs Time (Distance vs Time) Graph for PID Controller</figcaption>
-                            </figure>
+                                <h4>PI COntroller Implementation</h4>
+                                <p>Afterwards, I incorporated the integral term into my code. While the proportional term has, as demonstrated, got me fairly close to the desired target angle, the system is still quite unstable. Furthermore, in the case of a distinctly large or small Kp value, we could experience overshooting or undershooting to the setpoint. Therefore, we ought to incorporate the integral term in order to account for this, thus achieving a higher stability of the system and getting closer to the setpoint. As can be inferred from the attached code snippet below, the only addition to our PI Controller as opposed to the P Controller is that the integral term is consisted of adding up the error based on the difference in time which is thus multiplied by the desired Ki value. Hence, every such summation is added to the new error_sum value, as can be seen below.</p>
+                                <pre><code>
+//...DMP code snippet
+dt = (millis()-last_time);
+last_time = millis();
+current_yaw = yaw;
+old_error = error1;
+error1 = current_yaw-target_yaw;
+//PI Control
+error_sum = error_sum + error1*dt;  
+i_term = Ki * error_sum;
+pwm = p_term + i_term + d_term;
+p_term_data[i] = p_term;
+i_term_data[i] = i_term;
+//... PWM code, the same as in P Controller code snippet above
+                                </code></pre>
+                                <p>The final Kp and Ki terms that I have tuned to be the most optimal for my robot's PI Controller were Kp = 2.8, Ki = 0.00001, and Kd = 0, since the derivative term is not incorporated yet.</p>
+                                <p>Below are the videos representing the initial tuning of the PI Controller, the PI Controller kick, as well as the tuned PI Controller. The desired yaw value for all of the instances is -30 degrees relative to the starting position of the car, where the wheels are lined up with the edge of the tiles to represent starting position of the robot on the 2D space.</p>
 
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/drkmJgDciYI"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/48pqxNk8ExU"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/mrmsbnQviwQ"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <p>Through experimentation, I was able to obtain the following plots representing the PI Controller. The fourth attached graph was rescaled for I term for easier analysis of the term's behaviour. As can be inferred from the graphs below, the target yaw is -30 degrees, and the car initially overshot, only to undershoot until it stabilized into the desired angle value. Furthermore, we can see how the I term impacted the behaviour of our plots, the static error accumulates, which is why the trend goes up for I term when overshooting, and after the desired yaw value is achieved, the I term slowly deteriorates.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/pi_control_yawvstime.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PI Control - Yaw DMP vs Time</figcaption>
+                                    <img src="images/picontrol_pwmvstime.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PI Control - PWM vs Time</figcaption>
+                                    <img src="images/picontrol_iterm2.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PI Control - PID Terms vs Time</figcaption>
+                                    <img src="images/picontrol_iterm.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PI Control - PID Terms vs Time, Rescaled</figcaption>
+                                </figure>
 
+                                <h4>PID Controller Implementation</h4>
+                                <p>Lastly, the derivative D term was incorporated into the code. The code is updated from the previous PI Controller to account for D term.</p>
+                                <pre><code>
+//...DMP code snippet
+dt = (millis()-last_time);
+last_time = millis();
+current_yaw = yaw;
+old_error = error1;
+error1 = current_yaw-target_yaw;
+//PID Control
+error_sum = error_sum + error1*dt;
+p_term = Kp * error1;
+i_term = Ki * error_sum;
+d_term = Kd * (error1 - old_error)/dt;
+pwm = p_term + i_term + d_term;
+p_term_data[i] = p_term;
+i_term_data[i] = i_term;
+d_term_data[i] = d_term;
+//... PWM code, the same as in P Controller code snippet above
+                                </code></pre>
+                                <p>Normally, it is not efficient to take the derivative of yaw integrated over time from gyroscope's angular velocity data, however, due to the fact that discrete angle readings are provided by DMP, derivative ought to be performed.</p>
+                                <p>Performing a derivative of an integrated signal may be problematic in the context of utilizing DMP. Considering that integration accumulates errors, differentation may amplify the noise, thus if derivative of yaw from the DMP ought to result in small fluctuations or noise amplifications, which may lead to instability of PID Controller. Hence, derivative might not reflect meaningful physical changes except the dominant drift/noise, which ought to be the reason why filtering is applied. However, considering that with good tuning my system was resilient to noise and was able to perform well, filtering was not applied to the derivative term.</p>
+                                <p>Another significant point of discussion with PID orientation control is suddent change of the setpoint, which ought to create instantaneous error accumulating into a spike in the control output. Ultimately, this may cause more aggressive and sudden movements, which are not desirable in systems such as PID orientation where robot stability is crucial. Therefore, in order for the error to be minimized, we ought to implement the wind-up of the integral term, which will be covered in the subsection below.</p>
+                                <p>Below are the videos representing the tuning of the PID Controller, the PID Controller kicks.  The desired yaw value for all of the instances is -30 degrees relative to the starting position of the car, where the wheels are lined up with the edge of the tiles to represent starting position of the robot on the 2D space.</p>
 
-                            <h4>Linear Extrapolation</h4>
-                            <p>The following task of the lab was to implement linear extrapolation, which can be comprehended as a prediction mechanism in case our ToF sensor's values are not available for collection, that is, when <code>distanceSensor1.checkForDataReady()</code> is not available. Hence, in case of obtaining 2 ToF values, the data points in-between measurements are used to determine the location of the robot. This was performed through adding an <code>else if ()</code> statement to  my PID control code, integrated into the while loop for whenever distanceSensor1 data is not available. This way, the collected data arrays are supposed to have more frequent and accurate data collection due to the fact we are able to frequently loop in the else statement and speed up the controller execution.</p>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/Pn-M9xFWqUM"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/MDMyMiO4whM"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/YF4GYSf_sgo"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <p>The final Kp and Ki terms that I have tuned to be the most optimal for my robot's PI Controller were Kp = 2.2, Ki = 0.00001, and Kd = 2. As can be seen, the system is more resilient to overshooting, and is able to more accurately predict future errors by measuring how fast the error is changing, which effectively is the property of the derivative term. Ultimately, tuning the values led me to obtaining the following graphs, which represent the PID Controller.</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/pidcontrol_yawvstime.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID Control - Yaw DMP vs Time</figcaption>
+                                    <img src="images/pidcontrol_yawvstime.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID Control - PWM vs Time</figcaption>
+                                    <img src="images/pid_unscaled.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID Control - PID Terms vs Time</figcaption>
+                                    <img src="images/pid_scaled2.png" alt="Lab 6" width="350" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID Control - PID Terms vs Time, Rescaled</figcaption>
+                                </figure>
 
-                            <pre><code>    while ((i < ARRAY_LENGTH) && (millis() - t_0 < 10000)) {
-        if (distanceSensor1.checkForDataReady()) {
-            distance1 = distanceSensor1.getDistance();  
-            distanceSensor1.stopRanging();
-            distanceSensor1.clearInterrupt();
-            distanceSensor1.startRanging();
-        } else if (i > 1) {
-            time_current = millis();
-            distance_last = distance_data[i - 1];
-            distance_before_last = distance_data[i - 2];
-            time_last = time_data[i - 1];
-            time_before_last = time_data[i - 2];
-            slope = (distance_last - distance_before_last) / (time_last - time_before_last);
-            b = distance_last;
-            m = slope;
-            x = time_current - time_last;
-            distance1 = b + m * x;
-        }
-        // Start of Control Loop Calculations - PID </code></pre>
-
-    
-
-
-                            <p>Implementing the proposed code, in the START_PID case and integrating it before executed PID control resulted in producing the following video below (thanks to TA Cameron for filming the video!).</p>
-
-                            <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/N8DONyYhiGc"  
-                            title="Lab 3: Red Colour Test" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                            </iframe>
-                            <p></p>
-
-
-
-
-
+                            
 
                             <h4>Speed and Sampling Time discussion</h4>
                             <p>When it comes to the range of ToF sensors, in previous lab 3 we have determined that even though the ToF sensor's datasheet describes the range of the long mode to be about 1.3 meters, the control signal is saturated regardless, even if the distance is above 1.3 m. Hence, the acceleration towards the wall even in the range up to 2 meters or so. On the other hand, with precision, short range mode would probably be more precise, but only a small increment, especially with a large derivative portion of the control.</p>
@@ -399,12 +482,12 @@ case START_PID:
                             <h3>Additional ECE 5160 Tasks</h4>
                             
                             <h4>Wind-up</h4>
-                            <p>Lastly, wind-up protection for the integrator term of the PID Controller can be introduced, as it represents the vital feature for robust PID Control. I implemented the wind-up protection through clamping the integrator term in order to prevent any further error from accumulating for a longer period beyond the set limit. Otherwise, the integrator term can accumulate the excessive error, which can lead the robot to overshoot in positionality, thus making it harder and longer for the robot to stabilize. Hence, wind-up protection may be implemented as the following:</p>
+                            <p>Lastly, as aformenetioned in PID Controller Implementation, the wind-up protection for the integrator term can be introduced, as it represents the crucial feature for robust PID Control. I implemented the wind-up protection through clamping the integrator term, similarly to Lab 5, in order to prevent any further error from accumulating for a longer period beyond the set limit. Otherwise, our integrator term can accumulate the excessive error, which can lead the robot to overshoot in positionality, thus making it harder and longer for the robot to stabilize. Hence, wind-up protection may be implemented as the following:</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/windup.png" alt="Lab 5" width="350" style="display: block; margin: 0 auto;">
+                                <img src="images/windup_lab6.png" alt="Lab 5" width="350" style="display: block; margin: 0 auto;">
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Wind-Up Protection for the robot</figcaption>
                             </figure>
-                            <p>By tuning and manipulating the values of the limit, I decided that the limit of +/- 100 seemed fitting. Furthermore, I tested the wind-up implementation by varying Ki values on the Python side in order to evaluate the respose of the system. I found that even with larger Ki values of 0.001 or 0.0001 magnitude, the car could reach stability in front of the target distance, which normally was not the case with such large integrator term input. The wind-up performance on the system can be inferred in the video below.</p>
+                            <p>By tuning and manipulating the values of the limit, I decided that the limit of +/- 150 seemed fitting. Furthermore, I tested the wind-up implementation by varying Ki values on the Python side in order to evaluate the respose of the system. I found that even with larger Ki values of 0.001 or 0.0001 magnitude, the car could reach stability in front of the target yaw angle, which was generally not the case with such large integrator term input. The wind-up performance on the system can be inferred in the video below.</p>
                             <iframe width="300" height ="400"
                             src="https://youtube.com/embed/SJXrchFes4o"  
                             title="Lab 3: Red Colour Test" 
@@ -421,7 +504,7 @@ case START_PID:
                             </figure>
 
                             <h3>Discussion</h3>
-                            <p>This lab was crucial in gaining a better understanding of closed loop control and experimenting with PI and PID Control implementation. Furthermore, it enabled me great exprience in debugging, tuning values, and evaluating the best solution for the robot with its open-endedness.</p>
+                            <p>This lab was crucial in gaining a better understanding the benefits of Digital Motion Processing, as well as gaining experience with Orientation Control. Furthermore, it enabled me great exprience in debugging, tuning values, and evaluating the best solution for the robot with its open-endedness.</p>
 
 
                            
