@@ -488,19 +488,45 @@ d_term_data[i] = d_term;
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Wind-Up Protection for the robot</figcaption>
                             </figure>
                             <p>By tuning and manipulating the values of the limit, I decided that the limit of +/- 150 seemed fitting. Furthermore, I tested the wind-up implementation by varying Ki values on the Python side in order to evaluate the respose of the system. I found that even with larger Ki values of 0.001 or 0.0001 magnitude, the car could reach stability in front of the target yaw angle, which was generally not the case with such large integrator term input. The wind-up performance on the system can be inferred in the video below.</p>
+                            <p>Here is my PID without wind-up. As can be seen, the orientation control tends to spin in circles until reaching the target yaw angle of -30 relative to the starting position. This is due to the fact that the yaw error is large for an extended period, which results in the growing integral term. Hence, there is an increasing control output, which can cause overcorrection and thus overshooting of the target, as represented in the PID without Windup video below.</p>
                             <iframe width="300" height ="400"
-                            src="https://youtube.com/embed/SJXrchFes4o"  
+                            src="https://youtube.com/embed/kUVWkHTZRHI"  
                             title="Lab 3: Red Colour Test" 
                             frameborder="0" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             allowfullscreen>
                             </iframe>
-                            <p>What is more, with the linear extrapolation implemented, as well as the wind-up protection, the graphs generated below represent the final results of ToF versus Time as well as with the linear extrapolation and wind-up protection implemented on the PID Controller.</p>
+
+                            <p>Thus, integral wind-up can be implemented as in the code above, which limits error values larger than 150 to the value of 150, and error values smaller than -150 to the value of -150. The improved PID Control with wind-up can be seen in the video below. </p>
+
+                            <iframe width="300" height ="400"
+                            src="https://youtube.com/embed/mZVr182a8CQ"  
+                            title="Lab 3: Red Colour Test" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                            </iframe>
+
+
+                            <p>What is more, we can plot the graphs with and without the implemented wind-up protection. As can be seen, the graphs with wind-up protection display several instances of picking up the robot and placing it at random positions on the ground for it to recalibrate and determine the same exact target yaw angle of -30 degrees. </p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/pwm_vs_time_windup.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Motor Input vs Time (PWM vs Time) Graph with Linear Extrapolation and Wind-Up Protection</figcaption>
-                                <img src="images/dist_vs_time_windup.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">ToF vs Time (Distance vs Time) Graph with Linear Extrapolation and Wind-Up Protection</figcaption>
+                                <img src="images/yaw_withwindup.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Yaw vs Time with Wind-Up Protection</figcaption>
+                                <img src="images/pwm_withwindup.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PWM vs Time with Wind-Up Protection</figcaption>
+                                <img src="images/terms_withwindup.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID Terms vs Time with Wind-Up Protection</figcaption>
+                            </figure>
+
+                            <p>On the other hand, with the graphs of PID Control without wind-up protection, we can detect consecutive spinning until the value stabilizes and reaches the targeted yaw angle. </p>
+
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/yaw_withoutwindup.png" alt="Lab 5" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Yaw vs Time without Wind-Up Protection</figcaption>
+                                <img src="images/pwm_withoutwindup.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PWM vs Time without Wind-Up Protection</figcaption>
+                                <img src="images/terms_withoutwindup.png" alt="Lab 3" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">PID Terms vs Time without Wind-Up Protection</figcaption>
                             </figure>
 
                             <h3>Discussion</h3>
@@ -588,6 +614,4 @@ d_term_data[i] = d_term;
 
 </body>
 </html>
-                    
-
-                      
+                
