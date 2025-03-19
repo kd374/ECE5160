@@ -232,7 +232,7 @@ float d_term = 0.0;
 float old_error;
 //end of global variable definitions
 
-case PID_DMP TURN: {
+case PID_DMP_TURN: {
 
 //DMP quarternion code snippet attached above which stores roll_data[i], pitch_data[i], yaw_data[i], and time_data[i] values
 ...
@@ -319,7 +319,7 @@ break;
                                     <img src="images/change_gain.png" alt="Lab 6" width="400" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Changing the gain of variables over Python, currently only setting Kp to a non-zero term</figcaption>
                                 </figure>
-                                <p>Initially, when testing only the P Controller, I was able to set my Kp value to be Kp = 3, while keeping Ki and Kd terms equal to 0. Below is the video of my tuned P Controller. In initial stages of testing, I had the car plugged into my Artemis while adjusting its movement to reach the desired angle, due to the fact that I wanted to print out my angles while the robot was moving in order to determine that the target yaw was reached. This can be seen in the video as well. The target yaw is set to -30 degrees in the video.</p>
+                                <p>Initially, when testing only the P Controller, I was able to set my Kp value to be Kp = 3, while keeping Ki and Kd terms equal to 0. Below is the video of my tuned P Controller. In initial stages of testing, I had the car plugged into my Artemis while adjusting its movement to reach the desired angle, due to the fact that I wanted to print out my angles while the robot was moving in order to determine that the target yaw was reached. This can be seen in the video as well. The target yaw is set to -30 degrees from the starting point in the video.</p>
                                 <iframe width="300" height ="400"
                                 src="https://youtube.com/embed/CIYMrsHBj3I"  
                                 title="Lab 6: P Controller Tuned" 
