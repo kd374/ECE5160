@@ -428,7 +428,35 @@ pwm = p_term + i_term + d_term;
 p_term_data[i] = p_term;
 i_term_data[i] = i_term;
 d_term_data[i] = d_term;
-//... PWM code, the same as in P Controller code snippet above
+//... PWM code, the same as in PI Controller code snippet above
+//
+...
+///
+for (int j = 0; j < i; j++) {
+    // if(time_data[j] == 0)
+    // break;
+
+    tx_estring_value.clear();
+    tx_estring_value.append(pitch_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(roll_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(yaw_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(time_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(pwm_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(p_term_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(i_term_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(d_term_data[j]);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+  }
+
+
                                 </code></pre>
                                 <p>Normally, it is not efficient to take the derivative of yaw integrated over time from gyroscope's angular velocity data, however, due to the fact that discrete angle readings are provided by DMP, derivative ought to be performed.</p>
                                 <p>Performing a derivative of an integrated signal may be problematic in the context of utilizing DMP. Considering that integration accumulates errors, differentation may amplify the noise, thus if derivative of yaw from the DMP ought to result in small fluctuations or noise amplifications, which may lead to instability of PID Controller. Hence, derivative might not reflect meaningful physical changes except the dominant drift/noise, which ought to be the reason why filtering is applied. However, considering that with good tuning my system was resilient to noise and was able to perform well, filtering was not applied to the derivative term.</p>
@@ -614,3 +642,4 @@ d_term_data[i] = d_term;
 
 </body>
 </html>
+                    
