@@ -1,1 +1,328 @@
 
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<title>ECE5160 Portfolio</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+<body class="is-preload">
+		<!-- Wrapper -->
+		<!--	<div id="wrapper" class="fade-in"> -->
+
+				<!-- Intro -->
+                <div id="intro">
+                    <h1>LAB 7</h1>
+                    <p>Kalman Filter</p>
+                    <ul class="actions">
+                        <li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+                    </ul>
+                </div>
+
+            <!-- Header -->
+            <header id="header">
+                    <a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 7</a>
+                </header>
+
+                
+
+            <!-- Nav -->
+                <nav id="nav">
+                    <ul class="links">
+                        <li class="active"><a href="index.html">LAB 7</a></li>
+                    </ul>
+                    <ul class="icons">
+                        <li><a href="https://www.linkedin.com/in/katarina-duric/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li> 
+                        <li><a href="https://github.com/kd374" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+                </nav>
+
+				<!-- Main -->
+                <div id="main">
+
+                    <!-- Featured Post -->
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>LAB 7</title>
+                    
+                        <!-- Inline CSS for this page only -->
+                        <style>
+                            /* Reduce spacing between paragraphs, sections, and images */
+                            p, h3, h2, pre, img {
+                                margin-bottom: 10px; /* Less space between rows */
+                            }
+                    
+                            /* Reduce spacing between sections */
+                            .content-section {
+                                margin-bottom: 15px; /* Less space between sections */
+                                padding-bottom: 5px;
+                                
+                                border-bottom: 1px solid #ddd;  /* Adds a light gray line */
+                                padding-bottom: 15px;
+                                margin-bottom: 20px;
+
+                            }
+                    
+                            /* Make subtitles (h3) left-aligned */
+                            h3 {
+                                text-align: left;
+                                font-size: 20px; /* Adjust subtitle font size */
+                                margin-left: 5px;
+                            }
+                    
+                            /* Center images */
+                            .center-content img {
+                                display: block;
+                                margin: 0 auto;
+                                width: 500px; /* Adjust width */
+                                height: auto;
+                            }
+
+                            .math-equation {
+                                font-size: 18px;
+                                display:inline-block;
+                            }
+                    
+                            /* Center code blocks */
+                            pre {
+                                background-color: #f4f4f4;
+                                padding: 10px;
+                                border-radius: 5px;
+                                overflow-x: auto;
+                                text-align: left;
+                                font-family: monospace;
+                            }
+                        </style>
+                          <!-- MathJax for LaTeX rendering -->
+                        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+                        <script id="MathJax-script" async
+                        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+                        </script>
+
+                        
+                    </head>
+                    <body>
+
+                    
+                        <!-- Featured Post -->
+                        <article class="post featured">
+                            <header class="major">
+                                <span class="date">March 26th, 2025</span>
+                                <h2>LAB 7 - Kalman Filter</h2>
+                            </header>
+                    
+                            <!-- Introduction -->
+                            <section class="content-section">
+                            <h3>Introduction</h3>
+                            <p>The aim of this lab was to gain a more profound understanding of the Kalman Filter through implementing it in Python, as well as implementing it on our robot. The addition of the Kalman FIlter onto the collected Lab 5 data results in a faster executional behaviour compared to Lab 5. Kalman Filter is specifically designed to handle state estimations in the presence of noisy sensor measurements and disturbances. Furthermore, Kalman Filtering is extremely useful as it produces a predictive model for state estimations even in the cases of missing or delayed sensor measurements, as well as continuously updating the estimate with the newly measured data, which makes it effective in dynamically changing environments. However, unlike linear extrapolation performed in Lab 5, which uses the current rate of change to estimate future states and assumes a linear model without accounting for uncertainties, Kalman Filter considers process noise and measurement (sensor) noise, incorporating a state-space model predicting system behaviour over time.</p>
+                            </section>
+                            <section class="content-section">
+                            <h3>Prelab 7</h3>
+                            <p>Throughout Lab 5, the timing budget proposed was 20 ms for the loop speed, which results in the ToF distance sensing at the frequency of 50 Hz. This was the result of linear extrapolation on the PID Controller, which was able to perform predictions of the intermediate readings based on the previous two data points. In this lab, however, the predictions and updates of the future robot movement was implemented in a more accurate way accounting for noise-resistant state estimation.</p>
+                            <p></p>
+                           
+                            <h3>Lab 7 Tasks</h3>
+                            <h4>Estimating Drag and Momentum</h4>
+                            <p>In order to obtain a deeper understanding of how the Kalman Filter works, I consulted Lecture 13 slides in order to plan out my first calculations. From the lecture, we revisited that by Newton's second law of motion we have: </p>
+                            <div class = "center-container">
+                                <div class = "math-equation">
+                                    $$  F = ma = m\ddot{x}  $$
+                                </div>
+                            </div>
+                            <p>Furthermore, we know that the linear force on the robot in terms of drag <code>d</code> can be descrived as the following: </p>
+                            <div class = "center-container">
+                                <div class = "math-equation">
+                                    $$  F = -d\dot{x} + u  $$
+                                </div>
+                            </div>
+                            <p>where u is the motor input u. Setting the two formulas equal and dividing by mass <code>m</code>, we can describe the system dynamics in the following formula.</p>
+                            <div class = "center-container">
+                                <div class = "math-equation">
+                                    $$  \ddot{x} = -(d/m)*\dot{x} + u/m  $$
+                                </div>
+                            </div>
+                            <p>From here, we are able to obtain our state-space equations. We can do so by taking our system modeling equation  
+                                <span class="math-equation">\( \dot{x} = Ax + Bu \)</span> , where <span class="math-equation">\(A\)</span> represents the current state matrix, <span class="math-equation">\(B\)</span> represents the control input matrix, <span class="math-equation">\(u\)</span> represents the control input to the system, and <span class="math-equation">\( \dot{x}\)</span> represents the range of change of the state variables over time. The state of the system can be represented as a vector:
+                            </p>
+                            <div>
+                                \( x = \begin{bmatrix} x \\ \dot{x} \end{bmatrix} \),
+                            </div>
+                            <p>Furthermore, the expression of <span class="math-equation">\(\ddot{x}\)</span> can be represented in the system equation form:</p>
+                            <div>
+                                \( \begin{bmatrix} \dot{x} \\ \ddot{x} \end{bmatrix} =
+                                \begin{bmatrix} 0 & 1 \\ 0 & -\frac{d}{m} \end{bmatrix}
+                                \begin{bmatrix} x \\ \dot{x} \end{bmatrix}
+                                + \begin{bmatrix} 0 \\ \frac{1}{m} \end{bmatrix} \cdot u \)
+                            </div>
+                            <p>Finally, I drove my car to the wall in order to save arrays containing my ToF distance values, time values, and had the constant PWM input of 170, which is 66.7% as my step response u(t). Hence, I determined the following graphs displaying my Distance versus Time measurement.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/distancevstime_lab7_python.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time Data After the wall run</figcaption>
+                            </figure>
+                            <p>Furthermore, the Speed versus Time graph can thus be obtained by taking the difference of the obtained distance measurements and dividing it by the change in time. The graph ought to look as the following:</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/velocityvstime_lab7_python.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Speed versus Time Data After the wall run</figcaption>
+                            </figure>
+                            <p>From there, we ought to observe the exponential trend of the Speed versus Time graph. For further determining the drag d and the mass m coefficients, we ought to implement the following formula. </p>
+                            <p>
+                                \[
+                                d = \frac{u_{ss}}{\dot{x}_{ss}}
+                                \]
+                            </p>
+                            
+                            <p>
+                                \[
+                                m = \frac{-d \cdot t_{0.9}}{\ln(1 - d \cdot \dot{x}_{ss})} = \frac{-d \cdot t_{0.9}}{\ln(1 - 0.9)}
+                                \]
+                            </p>
+                                
+                                
+                            <p>where <span class="math-equation">\(u_{ss}\)</span> is the steady state input, <span class="math-equation">\(\dot{x}_{ss}\)</span> is the steady state speed, and <span class="math-equation">\(t_{0.9}\)</span> represents the 90% rise time. However, since the noise in the graphs presented are quite noisy, it became difficult to determine where to exactly measure the 90% rise time and the speed at 90% rise time. Thus, an exponential curve was fitted to the speed versus time data.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/velocityvstime_lab7_python2.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Speed versus Time with Exponential Decay Fit</figcaption>
+                            </figure>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/velvstime_lab7_python3.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Speed versus Time with Exponential Decay Fit</figcaption>
+                            </figure>
+                            <p>The obtained parameters will become very useful in the remaining portion of our Python implementation shortly. Analyzing our Distance versus Time graph, we ought to identify a linear region corresponding to the achieved steady state speed near the end of the wall run.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/distance_speed_labeled.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time with the Steady State Speed Labeled</figcaption>
+                            </figure>
+
+                            <p>Analyzing the aforementioned, we can see the calculated mass m and drag d values through the plots.</p>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/dandmvalues.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Drag d and mass m values obtained</figcaption>
+                            </figure>
+
+                            <p>Afterwards, we ought to discretize A and B matrices in order to simulate the Kalman Filter in Python. This is performed as in the following image below.</p>
+
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/matrices_instantiation.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Matrices discretization</figcaption>
+                            </figure>
+                            <p>Therefore, the remaining code for Kalman Filter simulation is attached below, which is influenced by the provided code in the lecture slides. For this code, we ought to instantiate values of sigma 1, sigma 2, and sigma 3. The first two represent the process noise, while sigma 3 represents the sensor noise. </p>
+
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/kalman_python_code.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Drag d and mass m values obtained</figcaption>
+                            </figure>
+
+                            <p>The provided implementation resulted in the following graphs. In order to obtain a better match for the Kalman Filter, there was a heavier reliance on the measurements, which meant that sigma 1 and sigma 2 values were higher than sigma 3. In the first screenshot, my sigma 1 and 2 values were 50, while my sigma 3 value was 20. However, in the second graph, I performed a higher reliance on the model, hence keeping my sigma 3 value at 20, but decreasing my sigma 1 and sigma 2 values to about 10, which resulted in the second presented graph.</p>
+
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/kalman_pythonoutput1.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter Python Simulation - Better Fit, Reliance on the Measurements</figcaption>
+                            </figure>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/kalman_pythonoutput2.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter Python Simulation - Worse Fit, Reliance on the Model</figcaption>
+                            </figure>
+
+                            <h4>Kalman Filter Implementation on the Robot</h4>
+                            <p>Taking a week extension to work on this!</p>
+
+                            
+
+
+
+
+
+
+
+
+
+
+                   
+
+                            <h3>Discussion</h3>
+                            <p>This lab was crucial in gaining a better understanding the benefits of the Kalman Filter. Furthermore, it enabled me great exprience in debugging, tuning values, and evaluating the best solution for the robot with its open-endedness.</p>
+
+
+                        
+                            
+                            <!-- Image Centered -->
+                            <section class="content-section">
+                            
+
+
+                    
+                            </section>
+                            <h4>Acknowledgements and References</h4>
+                            <p>*I worked with Sabian Grier on this lab. My lab page is inspired by Stephan Wagner's Lab 7 page (2024).</p>
+
+                        
+                        <!-- </article> -->
+                    
+                    </body>
+ 
+                    
+
+                    
+
+                    
+                    
+
+                    <!-- Posts -->
+
+
+                    <!-- Footer -->
+                </div>
+                </div>
+            <!-- Footer -->
+            <footer id="footer">
+                    <!-- <section>
+                        <form method="post" action="#">
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" />
+                                </div>
+                                <div class="field">
+                                    <label for="email">Email</label>
+                                    <input type="text" name="email" id="email" />
+                                </div>
+                                <div class="field">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <ul class="actions">
+                                <li><input type="submit" value="Send Message" /></li>
+                            </ul>
+                        </form>
+                    </section>
+                    <section class="split contact"> -->
+                        <section>
+                            <h3>EMAIL @ </h3>
+                            <p><a href="#">kd374@cornell.edu</a></p>
+                        </section>
+                </footer> 
+
+            <!-- Copyright -->
+                <div id="copyright">
+                    <ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+                </div>
+
+        </div>
+
+    <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+
+</body>
+</html>
+                    
+
+                      
