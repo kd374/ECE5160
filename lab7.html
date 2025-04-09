@@ -299,7 +299,7 @@ x = np.array([[-tof_data[0]], [0]]) # tof from collected data</code></pre>
 </figure>
 <p>Hence, we can define convariances and diagonal convariance matrices  <span class="math-equation">\( \sum_u\)</span> and  <span class="math-equation">\( \sum_z\)</span>.</p>
 <div>
-    \( \sum_z = \sigma_{sensornoise}^2 = 20^2 mm^2= 400 mm^2  \)
+    \( \sum_z = \sigma_{sensornoise}^2 = \sigma_{3}^2 = 20^2 mm^2= 400 mm^2  \)
 </div>
 <p>The process noise <span class="math-equation">\( \sigma_1\)</span> and <span class="math-equation">\( \sigma_2\)</span> were set to 70 each, as we would like to have higher reliance on the measurements. The code implementing the noise can be found below:</p>
 <pre><code>
@@ -500,7 +500,7 @@ Matrix<1> u = {1};</code></pre>
         d_term = Kd * (error1 - old_error) / dt;
         pwm = p_term + i_term + d_term;
     }
-    // Update motors the same was as in Lab 5
+    // Update motors the same way as in Lab 5
     break;
 }</code></pre> 
 <p>The provided code for <code>PID_KALMAN</code> works in such a way where I incorporate an update step incorporating valid ToF readings with the PID loop code from Lab 5. I started the update step by taking my code from Lab 5, incorporating the matrices and variable updates per each iteration as per the provided code in lecture slides, and ensured that my PID update step is functional. Afterwards, I introduced a separate counter variable j in order to loop through the Kalman filter distances which are dependent on the computed <code>mu</code> value. Afterwards, the computed KF distances are appended to the Kalman Filter distances array, while ToF recorded distances were appended to the separate ToF distances array, similarly to how they were appended in Lab 5.
