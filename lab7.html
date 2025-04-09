@@ -512,40 +512,64 @@ Matrix<1> u = {1};</code></pre>
 
     <p>Furthermore, I had slight issues where the filter is predicting the distances between ToF readings, due to the fact that the predicted values did not follow the trend of the data towards the next update value, this can be reflected in the first trial with my prediction step implemented below, where my prediction step was more similar to the previous update step on the graphs attached below:
         <figure style="margin: 0; text-align: center;">
-            <img src="images/noisierversion_kf.png" alt="Lab 7" width="320" style="display: block; margin: 0 auto;">
-            <img src="images/noisierversion_kf2.png" alt="Lab 7" width="335" style="display: block; margin: 0 auto;">
+            <img src="images/noisierversion_kf.png" alt="Lab 7" width="500" style="display: block; margin: 0 auto;">
+            <img src="images/noisierversion_kf2.png" alt="Lab 7" width="500" style="display: block; margin: 0 auto;">
             <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Initial Distance versus Time Kalman Filter graphs with the prediction step implemented, with motor speed of 255</figcaption>
         </figure>
 
+
+
         
         <p>In order to fix this, I consulted with TA Mikayla who shared that she delt with the same issue in her implementation last year, and advised me to multiply my B matrix with a certain positive integer constant, in order to have the noise in the trend of the data follow the slope better. I settled for multiplying matrix B by the value of <code>10</code> and achieved the following results: </p>
-                           
-                                <img src="images/kf_kp0.1_ki0.000001_kd5_speed120.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 120</figcaption>
+                           <figure>
+                                <img src="images/kf_kp0.1_ki0.000001_kd5_speed120.png" alt="Lab 7" width="500" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 120. For this graph, the tuned values were Kp = 0.1, Ki = 0.00001, and Kd = 5.</figcaption>
                             </figure>
-                                <img src="images/kf_kp0.05_ki0.000001_kd5_speed220.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 220</figcaption>
-                                <img src="images/kf_kp0.05_ki0.000001_kd5_speed255.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 255</figcaption>
-                                <p>The video representation can be shown below.</p>
+                                <img src="images/kf_kp0.05_ki0.000001_kd5_speed220.png" alt="Lab 7" width="500" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 220. For this graph, the tuned values were Kp = 0.05, Ki = 0.00001, and Kd = 5.</figcaption>
+                                <img src="images/kf_kp0.05_ki0.000001_kd5_speed255.png" alt="Lab 7" width="500" style="display: block; margin: 0 auto;">
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 255. For this graph, the tuned values were Kp = 0.05, Ki = 0.00001, and Kd = 5.</figcaption>
+
+                                <p>Ultimately, I was able to obtain the following graphs after tuning:</p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/kf_distancevstime.png" alt="Lab 7" width="500" style="display: block; margin: 0 auto;">
+                                    <img src="images/pwmvstime.png" alt="Lab 7" width="500" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Initial Distance versus Time Kalman Filter graphs with the prediction step implemented, with motor speed of 255</figcaption>
+                                </figure>
+
+                                <p>The video representation can be shown below. All of the videos were filmed with the tuned values of Kp = 0.35, Ki = 0.00001, and Kd = 5. The speeds were varied to be 220-255 for the purposes of these videos.</p>
                                 <iframe width="300" height ="400"
-                                src="https://youtube.com/embed/In3cxlxCVBk"  
+                                src="https://youtube.com/embed/EsCdgzaob64"  
                                 title="Lab 6: P Controller Tuned" 
                                 frameborder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                 allowfullscreen>
                                 </iframe>
                                 <iframe width="300" height ="400"
-                                src="https://youtube.com/embed/_AA9sqyTgPs"  
+                                src="https://youtube.com/embed/CAExGG7IDHI"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/rswLkWW_JSs"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/yrREQWjjfiE"  
                                 title="Lab 6: P Controller Tuned" 
                                 frameborder="0" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                 allowfullscreen>
                                 </iframe>
                     
+                
 
-
-
+                                
 
 
 
@@ -556,7 +580,7 @@ Matrix<1> u = {1};</code></pre>
                             <h3>Discussion</h3>
                             <p>This lab was crucial in gaining a better understanding the benefits of the Kalman Filter. Furthermore, it enabled me great exprience in debugging, tuning values, and evaluating the best solution for the robot with its open-endedness.</p>
 
-                            <h3>DEBUGGING AND ISSUES FACED COMMENTS</h3>
+                            <h3>DEBUGGING AND COMMENTS on faced issues </h3>
                             <p>One of the issues which slowed my process down was not adapting my <code>Delta_T</code> value needed for the discrediced Ad and Bd matrices in my robot implementation Kalman Filter code to the actual sampling time of my ToF sensor data. Once I ran the code for sampling time from Lab 6, as well as determined the sampling time of ToF sensors is about 20 ms as per Serial print statements, I was able to obtain much less noisy Kalman Filter data, and more accurate predictions once the ToF sensor data was not available.</p>
                             
                             <!-- Image Centered -->
@@ -567,7 +591,7 @@ Matrix<1> u = {1};</code></pre>
                     
                             </section>
                             <h4>Acknowledgements and References</h4>
-                            <p>*I worked with Sabian Grier on this lab. My lab page is inspired by Mikayla Lahr's (2024) and Stephan Wagner's Lab 7 page (2024). Super special thanks to TA Mikayla for her great advice on Robot implementation of Kalman Filter, as well as TA Cheney and TA Cameron for their insights on understanding Kalman Filter better.</p>
+                            <p>*I worked with Sabian Grier on this lab. My lab page is inspired by Mikayla Lahr's (2024) and Stephan Wagner's Lab 7 page (2024). Super special thanks to TA Mikayla for her great advice on Robot implementation of Kalman Filter, as well as TA Cheney and TA Cameron for their insights on understanding Kalman Filter better. Furthermore, since my motor drivers overheated and broke in the earlier stages of testing my Kalman filter, Kelvin lent me his car. The code is entirely mine.</p>
 
                         
                         <!-- </article> -->
