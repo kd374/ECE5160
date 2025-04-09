@@ -1,1 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<title>ECE5160 Portfolio</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+<body class="is-preload">
+		<!-- Wrapper -->
+		<!--	<div id="wrapper" class="fade-in"> -->
+
+				<!-- Intro -->
+                <div id="intro">
+                    <h1>LAB 8</h1>
+                    <p>Stunts!</p>
+                    <ul class="actions">
+                        <li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+                    </ul>
+                </div>
+
+            <!-- Header -->
+            <header id="header">
+                    <a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 8</a>
+                </header>
+
+                
+
+            <!-- Nav -->
+                <nav id="nav">
+                    <ul class="links">
+                        <li class="active"><a href="index.html">LAB 8</a></li>
+                    </ul>
+                    <ul class="icons">
+                        <li><a href="https://www.linkedin.com/in/katarina-duric/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li> 
+                        <li><a href="https://github.com/kd374" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+                </nav>
+
+				<!-- Main -->
+                <div id="main">
+
+                    <!-- Featured Post -->
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>LAB 8</title>
+                    
+                        <!-- Inline CSS for this page only -->
+                        <style>
+                            /* Reduce spacing between paragraphs, sections, and images */
+                            p, h3, h2, pre, img {
+                                margin-bottom: 10px; /* Less space between rows */
+                            }
+                    
+                            /* Reduce spacing between sections */
+                            .content-section {
+                                margin-bottom: 15px; /* Less space between sections */
+                                padding-bottom: 5px;
+                                
+                                border-bottom: 1px solid #ddd;  /* Adds a light gray line */
+                                padding-bottom: 15px;
+                                margin-bottom: 20px;
+
+                            }
+                    
+                            /* Make subtitles (h3) left-aligned */
+                            h3 {
+                                text-align: left;
+                                font-size: 20px; /* Adjust subtitle font size */
+                                margin-left: 5px;
+                            }
+                    
+                            /* Center images */
+                            .center-content img {
+                                display: block;
+                                margin: 0 auto;
+                                width: 500px; /* Adjust width */
+                                height: auto;
+                            }
+
+                            .math-equation {
+                                font-size: 18px;
+                                display:inline-block;
+                            }
+                    
+                            /* Center code blocks */
+                            pre {
+                                background-color: #f4f4f4;
+                                padding: 10px;
+                                border-radius: 5px;
+                                overflow-x: auto;
+                                text-align: left;
+                                font-family: monospace;
+                            }
+                        </style>
+                          <!-- MathJax for LaTeX rendering -->
+                        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+                        <script id="MathJax-script" async
+                        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+                        </script>
+
+                        
+                    </head>
+                    <body>
+
+                    
+                        <!-- Featured Post -->
+                        <article class="post featured">
+                            <header class="major">
+                                <span class="date">April 9th, 2025</span>
+                                <h2>LAB 8 - STUNTS!</h2>
+                            </header>
+                    
+                            <!-- Introduction -->
+                            <section class="content-section">
+                            <h3>Introduction</h3>
+                            <p>The aim of this lab was to incorporate everything we have learned so far and implement it into an interesting stunt of our robot. For this lab, I chose to do a flip as my stunt. </p>
+                            <p>Throughout this lab, I will be testing the robot at the start line of 1-2 meters away from the wall, after which it will move forward up until 1 feet distance (which will be marked with blue tape in videos). The car will then perform a flip, after which it will manage to drive back to the start line.</p>
+                            </section>
+                            <section class="content-section">
+                            <h3>Implementation of Flip Stunt</h3>
+                            <p>In order to achieve the flip stunt, I experimented a lot with PID control for the detection of 1-feet distance to the wall before the flip. However, I realised that open-loop control enabled me simpler implementation and testing, and since open-loop is allowed for this lab, I opted for it instead for the purposes of simpler debugging. The robot was programmed to be able to start from a stationary position which is 1-2 meters away from the wall, and once it reaches 0.5 meters from the wall, it accelerates at the opposite direction - that is backwards - at full speed, which results in it performing a flip. Considering that the performed flip is a front flip, in order for the robot to be able to go back to its original position, it has to go backwards again as its current position is now the opposite from the position right before the flip. This backwards movement is now performed at somewhat a lower PWM value in order to accelerate back to its original start line.</p>
+                            
+<pre><code>case STUNT:
+
+float counter = 0;
+
+success = robot_cmd.get_next_value(t1);
+    if (!success)
+        return;
+
+success = robot_cmd.get_next_value(t2);
+    if (!success)
+        return;
+
+success = robot_cmd.get_next_value(t3);
+    if (!success)
+        return;
+
+success = robot_cmd.get_next_value(pwm1);
+    if (!success)
+        return;
+
+success = robot_cmd.get_next_value(pwm2);
+    if (!success)
+        return;
+
+success = robot_cmd.get_next_value(pwm3);
+    if (!success)
+        return;
+
+t0 = millis();
+distanceSensor1.startRanging();
+
+while(m < 500){
+    while(((millis()-t0) < t1)){
+        //move forwards
+    time_data[i] = millis();
+    pwm_data[i] = pwm1;
+    analogWrite(PIN1, pwm1);
+    analogWrite(PIN0, 0);
+    analogWrite(PIN3, pwm1);
+    analogWrite(PIN2, 0);
+    tof_data[i] = distanceSensor1.getDistance();
+    counter++;
+    }
+
+        //move backwards
+    while((millis()-t0)<(t1 + t2)){
+    time_data[i] = millis();
+    pwm_data[i] = -pwm2; 
+    analogWrite(PIN1, 0);
+    analogWrite(PIN0, -pwm2);
+    analogWrite(PIN3, 0);
+    analogWrite(PIN2, -pwm2);
+    tof_data[i] = distanceSensor1.getDistance();
+    counter++;
+    }
+
+        //backwards after flip
+    while((millis()-t0)<(t1+t2+t3)){
+    time_data[i] = millis();
+    pwm_data[i] = -pwm3; 
+    analogWrite(PIN1, 0);
+    analogWrite(PIN0, -pwm3);
+    analogWrite(PIN3, 0);
+    analogWrite(PIN2, -pwm3);
+    tof_data[i] = distanceSensor1.getDistance();
+    counter++;
+    }
+
+        //still collecting data after the robot is stopped
+    while((millis()-t0)<(t1+t2+t3+t4)){
+    time_data[i] = millis();
+    pwm_data[i] = 0; 
+    //car is stopped
+    analogWrite(PIN1, 0);
+    analogWrite(PIN0, 0);
+    analogWrite(PIN3, 0);
+    analogWrite(PIN2, 0);
+    tof_data[i] = distanceSensor1.getDistance();
+    counter++;
+    }
+}
+
+for(int i = 0; i < ARRAY_LENGTH; i++){
+    tx_estring_value.clear();
+    tx_estring_value.append(time_data[i]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(tof_data[i]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(pwm_data[i]);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+} 
+break;
+</code></pre>
+
+<p>The implementation of the code was relatively simple as it requires open-loop control with manual adjustments of individual times for forwards and backwards movement, as well as stopping the car. The PWM values while driving the car forwards and backwards for the first time were kept at the maximum of 255 to fully accelerate the car to its maximum for the momentum to build up and flip the car. The last PWM value was experimentally determined to be 80 for the car to return to its start line. Furthermore the implementation of the <code>analogWrite()</code> functons for each of the pins was very easy to implement, since it is something that I performed in Lab 4 as well. </p>
+
+<p>On the Python side of things, I implemented the notification handler called <code>stunt_data</code> for collecting the data arrays for time data, PWM data, and ToF distance data collected and sent through Bluetooth. Afterwards, the only command I had to run for the flip stunt to activate is the command attached below. The <code>send_command()</code> function for the <code>STUNT</code> case allowed me to experiment with time and PWM values.</p>
+<pre><code>time_data = []
+tof_data = []
+pwm_data = []
+
+def stunt_data(uuid, bytes):
+    s = ble.bytearray_to_string(bytes)
+    if("|" in s):
+        notif= s.split("|")
+        time_data.append(float(notif[0]))
+        tof_data.append(float(notif[1]))
+        pwm_data.append(float(notif[2]))
+        
+ble.start_notify(ble.uuid['RX_STRING'], stunt_data)</code></pre>
+<pre><code>ble.send_command(CMD.STUNT,"800|800|1000|255|255|80") #[t1, t2, t3, pwm1, pwm2, pwm3]
+</code></pre>
+
+<p>Another major reason for the success of flipping the robot is weight balancing. Considering that the ToF sensor was oriented in the directon towards the wall, in order to perform a front flip, the car had to have larger weight at the front of the car. Therefore, in order to achieve this, the remaining 750 mAh battery was placed, as well as two smaller 50 g weights which I was able to borrow from Sabian Grier and attach to the front of the robot. </p>
+
+<h3>Flip Results</h3>
+
+
+
+                    
+
+
+
+
+
+
+
+
+                   
+
+                            <h3>Discussion</h3>
+                            <p>This lab was very fun to implement, and I liked that it incorporated knowledge from different labs into a fun stunt. </p>
+
+                            <h3>Bloopers!</h3>
+
+                            <!-- Image Centered -->
+                            <section class="content-section">
+                        
+
+                    
+                            </section>
+                            <h4>Acknowledgements and References</h4>
+                            <p>*I worked with Becky Lee and Annabel Lian throughout this lab.</p>
+
+                        
+                        <!-- </article> -->
+                    
+                    </body>
+ 
+                    
+
+                    
+
+                    
+                    
+
+                    <!-- Posts -->
+
+
+                    <!-- Footer -->
+                </div>
+                </div>
+            <!-- Footer -->
+            <footer id="footer">
+                    <!-- <section>
+                        <form method="post" action="#">
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" />
+                                </div>
+                                <div class="field">
+                                    <label for="email">Email</label>
+                                    <input type="text" name="email" id="email" />
+                                </div>
+                                <div class="field">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <ul class="actions">
+                                <li><input type="submit" value="Send Message" /></li>
+                            </ul>
+                        </form>
+                    </section>
+                    <section class="split contact"> -->
+                        <section>
+                            <h3>EMAIL @ </h3>
+                            <p><a href="#">kd374@cornell.edu</a></p>
+                        </section>
+                </footer> 
+
+            <!-- Copyright -->
+                <div id="copyright">
+                    <ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+                </div>
+
+        </div>
+
+    <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+
+</body>
+</html>
+                    
+
+                      
 
