@@ -249,7 +249,9 @@ enum CommandTypes
     COLLECT_DMP_DATA, 
     PID_DMP_TURN, 
     PID_ON,
-    PID_OFF
+    PID_OFF, 
+    PID_KALMAN,
+    SEND_KF_DATA
 };
 
 void
@@ -1059,6 +1061,209 @@ handle_command()
               Serial.println("DMP Data Sent!");
           break;
           }
+           case PID_KALMAN: 
+           {
+             distanceSensor1.setIntermeasurementPeriod(20);
+             distanceSensor1.setTimingBudgetInMs(20);
+             //PID stuff from lab 5
+             int i = 0;
+             int k = 0;
+             int j = 0;
+             unsigned long last_time = millis();
+             int distance1 = 0;
+             float current_dist;
+             float error1;
+             float target_dist = 304;
+             float pwm;
+             float error_sum;
+             float p_term;
+             float i_term;
+             float d_term;
+             float old_error;
+             float kf_distance;
+     
+             Ad  = I + Delta_T * A ;
+             Bd = Delta_T * B;
+             Cd = C;
+     
+             distanceSensor1.startRanging();  //Write configuration bytes to initiate measurement
+             Serial.println("Staring Kalman Filter with PID!");
+             //Build the Array
+             int t_0 = millis();
+             // This is used to calculate dtin
+             int prev_time = t_0;
+             while (!distanceSensor1.checkForDataReady())
+             {
+                 delay(1);
+             }
+             distance1 =  distanceSensor1.getDistance();
+             distanceSensor1.clearInterrupt();
+             mu = {(float) distance1, 0.0};
+             while ((i < ARRAY_LENGTH && j < ARRAY_LENGTH2) && millis() - t_0 < 5000) {
+               time_data[i] = millis();
+               if (distanceSensor1.checkForDataReady()) {
+                 dt = millis() - prev_time;
+                 prev_time = millis();
+                 //time_data[i] = prev_time;
+                 distance1 = distanceSensor1.getDistance();  //Get the result of the measurement from the sensor
+                 // distanceSensor1.stopRanging();
+                 distanceSensor1.clearInterrupt();
+                 //distanceSensor1.startRanging();
+                 distance_data1[i] = distance1;
+                 i++;
+                 //Serial.print("TOF Dis:"); Serial.print(distance1); Serial.println();
+                 y = (float) distance1; //y(0,0) = (float) distance1;
+                 mu_p = Ad*mu + Bd*u;
+                 sigma_p = Ad*sigma*~Ad + sigma_u;
+                 sigma_m = Cd*sigma_p*~Cd + sigma_z;
+                 kkf_gain = sigma_p*~Cd*Inverse(sigma_m);
+                 y_m = y-Cd*mu_p;
+                 mu = mu_p + kkf_gain * y_m;
+                 sigma = I - kkf_gain*Cd*sigma_p;
+                 // mus[i] = mu(0);
+                 kf_distance = mu(0,0);
+                 kf_distance = (float) kf_distance;
+                 if (j < ARRAY_LENGTH2) { 
+                   kf_distance_array[j] = kf_distance;
+                   kf_time[j] = millis();
+                   j++;
+                   Serial.println(j);
+                   //Serial.print("KF Up:"); Serial.print(kf_distance); Serial.println();
+                 }
+                 //j++;
+                 // Start of Control Loop Calculations
+                 current_dist = distance1;
+                 distance1 = mu(0,0);
+                 old_error = error1;
+                 error1 = current_dist - target_dist; 
+                 //PID Control
+                 error_sum = error_sum + (error1 * dt / 1000);
+                 p_term = Kp * error1;
+                 i_term = Ki * error_sum;
+                 if (dt > 0) {
+                   d_term = Kd * (error1 - old_error) / dt;
+                 } else {
+                   d_term = 0;
+                 }
+                 d_term = Kd * (error1 - old_error) / dt;
+                 pwm = p_term + i_term + d_term;
+                 //i++;
+               }
+               else{
+                 mu_p = Ad*mu + Bd*u;
+                 sigma_p = Ad*sigma*~Ad + sigma_u;
+                 kf_distance = mu_p(0,0);
+                 kf_distance = (float) kf_distance;
+                 mu = mu_p;
+                 sigma = sigma_p;
+                 if (j < ARRAY_LENGTH2) { 
+                   kf_distance_array[j] = kf_distance;
+                   kf_time[j] = millis();
+                   j++;
+                   Serial.println(j);
+                   //Serial.print("KF Pr:"); Serial.print(kf_distance); Serial.println();
+                 }
+                 dt = millis() - prev_time;
+                 prev_time = millis();
+                 //time_data[i] = prev_time;
+                 //run PID loop to get control input ...
+                 current_dist = kf_distance;
+                 old_error = error1;
+                 error1 = current_dist - target_dist; 
+                 //PID Control
+                 error_sum = error_sum + (error1 * dt / 1000);
+                 p_term = Kp * error1;
+                 i_term = Ki * error_sum;
+                 if (dt > 0) {
+                   d_term = Kd * (error1 - old_error) / dt;
+                 } else {
+                   d_term = 0;
+                 }
+                 d_term = Kd * (error1 - old_error) / dt;
+                 pwm = p_term + i_term + d_term;
+                 //j++;
+                 Serial.print("dt value is:");
+                 Serial.println(dt);
+               }
+               // Control Signal Saturation
+               if (pwm > maxSpeed) pwm = maxSpeed;
+               if (pwm < -maxSpeed) pwm = -maxSpeed;
+     
+               pwm_data[i] = pwm;
+               u = pwm/maxSpeed; //170;
+               if (pwm < 0) {                   //previous code: pwm > 0
+                 analogWrite(MotorRightBackward, 0);          // Kelvin's car: right backward
+                 analogWrite(MotorRightForward, abs(pwm) + 5);    // Kelvin's car: right foward
+                 analogWrite(MotorLeftForward, abs(pwm) * 1.8 + 12);  // Kelvin's car: left forward (PIN3,pwm*2.0 + 12);
+                 analogWrite(MotorLeftBackward, 0);          // Kelvin's car: left backward
+               } else if (pwm > 0) {            //previous code: pwm < 0
+                 // pwm = abs(pwm);
+                 analogWrite(MotorRightBackward, abs(pwm) + 5);
+                 analogWrite(MotorRightForward, 0);
+                 analogWrite(MotorLeftForward, 0);
+                 analogWrite(MotorLeftBackward, abs(pwm) * 1.8 + 12);  //(PIN2,abs(pwm)*2.0 + 12);
+               } else {
+                 analogWrite(MotorRightBackward, 0);
+                 analogWrite(MotorRightForward, 0);
+                 analogWrite(MotorLeftForward, 0);
+                 analogWrite(MotorLeftBackward, 0);
+               }
+             }
+             analogWrite(MotorRightBackward, 0);
+             analogWrite(MotorRightForward, 0);
+             analogWrite(MotorLeftForward, 0);
+             analogWrite(MotorLeftBackward, 0);
+     
+             // for (int k = 0; k < ARRAY_LENGTH; k++) {
+             //   if (time_data[k] == 0) break;
+             //   else {
+             //   tx_estring_value.clear();
+             //   tx_estring_value.append(distance_data1[k]);
+             //   tx_estring_value.append("|");
+             //   tx_estring_value.append(pwm_data[k]);
+             //   tx_estring_value.append("|");
+             //   tx_estring_value.append(time_data[k]);
+             //   tx_estring_value.append("|");
+             //   tx_estring_value.append(kf_distance_array[k]);
+             //   tx_estring_value.append("|");
+             //   tx_estring_value.append(kf_time[k]);
+             //   tx_characteristic_string.writeValue(tx_estring_value.c_str());
+             //   Serial.println(tx_characteristic_string);
+             // }
+             // }
+             // Serial.println("START_PID finished sending data!");
+             break;
+           }
+     
+           case SEND_KF_DATA: 
+           {
+               for (int k = 0; k < ARRAY_LENGTH; k++) {
+                 if (time_data[k] == 0) break;
+                 else {
+                 tx_estring_value.clear();
+                 tx_estring_value.append(distance_data1[k]);
+                 tx_estring_value.append("|");
+                 tx_estring_value.append(pwm_data[k]);
+                 tx_estring_value.append("|");
+                 tx_estring_value.append(time_data[k]);
+                 tx_estring_value.append("|");
+                 tx_estring_value.append(kf_distance_array[k]);
+                 tx_estring_value.append("|");
+                 tx_estring_value.append(kf_time[k]);
+                 tx_estring_value.append("|");
+                 tx_estring_value.append(p_term_data[k]);
+                 tx_estring_value.append("|");
+                 tx_estring_value.append(i_term_data[k]);
+                 tx_estring_value.append("|");
+                 tx_estring_value.append(d_term_data[k]);
+     
+                 tx_characteristic_string.writeValue(tx_estring_value.c_str());
+                 Serial.println(tx_characteristic_string);
+                 }
+               }
+               Serial.println("START_PID finished sending data!");
+               break;
+           }
         default:
             Serial.print("Invalid Command Type: ");
             Serial.println(cmd_type);
