@@ -170,9 +170,9 @@ distanceSensor1.startRanging();
     time_data[i] = millis();
     pwm_data[i] = -pwm2; 
     analogWrite(PIN1, 0);
-    analogWrite(PIN0, -pwm2);
+    analogWrite(PIN0, pwm2);
     analogWrite(PIN3, 0);
-    analogWrite(PIN2, -pwm2);
+    analogWrite(PIN2, pwm2);
     tof_data[i] = distanceSensor1.getDistance();
     counter++;
     }
@@ -182,9 +182,9 @@ distanceSensor1.startRanging();
     time_data[i] = millis();
     pwm_data[i] = -pwm3; 
     analogWrite(PIN1, 0);
-    analogWrite(PIN0, -pwm3);
+    analogWrite(PIN0, pwm3);
     analogWrite(PIN3, 0);
-    analogWrite(PIN2, -pwm3);
+    analogWrite(PIN2, pwm3);
     tof_data[i] = distanceSensor1.getDistance();
     counter++;
     }
