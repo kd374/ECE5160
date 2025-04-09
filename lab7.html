@@ -155,6 +155,8 @@
                                 \begin{bmatrix} x \\ \dot{x} \end{bmatrix}
                                 + \begin{bmatrix} 0 \\ \frac{1}{m} \end{bmatrix} \cdot u \)
                             </div>
+
+
                             <p>Finally, I drove my car to the wall in order to save arrays containing my ToF distance values, time values, and had the constant PWM input of 170, which is 66.7% as my step response u(t). Hence, I determined the following graphs displaying my Distance versus Time measurement.</p>
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/distancevstime_lab7_python.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
@@ -194,34 +196,150 @@
                                 <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time with the Steady State Speed Labeled</figcaption>
                             </figure>
 
-                            <p>Analyzing the aforementioned, we can see the calculated mass m and drag d values through the plots.</p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/dandmvalues.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Drag d and mass m values obtained</figcaption>
-                            </figure>
+                            <p>Analyzing the presented graphs indicating Speed versus Time with the Exponential Decay Fit, as well as the calculated steady state speed indicated on the graph above and the aforementioned formulas, we have obtained vital information in determining the drag d as well as the mass m. From the analysis of the two graphs above, it can be inferred that the steady state speed <span class="math-equation">\(\dot{x}_{ss}\)</span> is 2.47 m/s, the 90% rise time is calculated on the exponential fit graph to be 0.427 s, and the speed at 90% rise time is 2.044 m/s. Hence, thedrag and mass of the system can be computed as the following:</p>
+                            <p>
+                                \[
+                                d = \frac{u_{ss}}{\dot{x}_{ss}} = \frac{1}{2.47 m/s} = 0.405 kg/s
+                                \]
+                            </p>
+                            
+                            <p>
+                                \[
+                                m = \frac{-d \cdot t_{0.9}}{\ln(1 - d \cdot \dot{x}_{ss})} = \frac{-d \cdot t_{0.9}}{\ln(1 - 0.9)} = \frac{-0.405 kg/s \cdot 0.427 s}{\ln(0.1)} = 0.075 kg
+                                \]
+                            </p>
 
-                            <p>Afterwards, we ought to discretize A and B matrices in order to simulate the Kalman Filter in Python. This is performed as in the following image below.</p>
 
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/matrices_instantiation.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Matrices discretization</figcaption>
-                            </figure>
-                            <p>Therefore, the remaining code for Kalman Filter simulation is attached below, which is influenced by the provided code in the lecture slides. For this code, we ought to instantiate values of sigma 1, sigma 2, and sigma 3. The first two represent the process noise, while sigma 3 represents the sensor noise. </p>
+                            <h4>Initialize the Kalman Filter</h4>
+                            <p>Afterwards, we ought to discretize A and B matrices in order to simulate the Kalman Filter in Python. From the previously presented formulas, we learned that  <span class="math-equation">\( \dot{x} = Ax + Bu \)</span>, where we can represent matrices A and B as:</p>
+                            <div>
+                                \( A =
+                                \begin{bmatrix} 0 & 1 \\ 0 & -\frac{d}{m} \end{bmatrix} =
+                                \begin{bmatrix} 0 & 1 \\ 0 & -\frac{0.405}{0.075} \end{bmatrix}
+                                \begin{bmatrix} 0 & 1 \\ 0 &  -5.4 \end{bmatrix}
+                                 \)
+                            </div>
+                            <div>
+                                \( B =
+                                \begin{bmatrix} 0  \\ \frac{1}{m} \end{bmatrix} =
+                                \begin{bmatrix} 0  \\ \frac{1}{0.075} \end{bmatrix} =
+                                \begin{bmatrix} 0  \\ {13.3} \end{bmatrix} 
+                                 \)
+                            </div>
+                            <p></p>
+                            <p></p>
+                            <p></p>
+                            <p></p>
+                            <p></p>
+                            <p></p>
 
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/kalman_python_code.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Drag d and mass m values obtained</figcaption>
-                            </figure>
+                            <p>The proposed matrices can be discretized using the Python code:</p>
+                            <pre><code>import numpy as np
 
-                            <p>The provided implementation resulted in the following graphs. In order to obtain a better match for the Kalman Filter, there was a heavier reliance on the measurements, which meant that sigma 1 and sigma 2 values were higher than sigma 3. In the first screenshot, my sigma 1 and 2 values were 50, while my sigma 3 value was 20. However, in the second graph, I performed a higher reliance on the model, hence keeping my sigma 3 value at 20, but decreasing my sigma 1 and sigma 2 values to about 10, which resulted in the second presented graph.</p>
+# Define the continuous-time A and B matrices
+A = np.array([[0, 1],
+                [0, -5.3977]])
+B = np.array([[0],
+                [113.3]])
+
+# Sampling time
+dt = 0.02  # 20 ms
+
+# Dimension of the state space
+n = 2
+
+# Discretization
+Ad = np.eye(n) + dt * A
+Bd = dt * B
+
+print("Discretized A (Ad):")
+print(Ad)
+print("\nDiscretized B (Bd):")
+print(Bd)
+print(dt)</code></pre>
+
+<p>The sampling time dt indicated in the code above was determined through determining the loop frequency, and calculating <code>1/{loop frequency}</code>, which in my case gave the value of 0.02. Hence, the discretized matrices were calculated as the following:</p> 
+<div>
+    \( A_{Discretized}      = Ad  =
+    \begin{bmatrix} 1 & 0.2 \\ 0 & 0.892 \end{bmatrix} 
+     \)
+</div>
+<div>
+    \( B_{Discretized} = Bd =
+    \begin{bmatrix} 0  \\ 0.399 \end{bmatrix} 
+     \)
+</div>
+
+<p>Furthermore, it is important to note that we ought to incorporate the C matrix as well, representing the states measured. The lecture slides proposed a negative coefficient, however, I turned that into a positive coefficient instead in order to represent the positive distance data.</p>
+<div>
+    \( C =
+    \begin{bmatrix} 1  \\ 0 \end{bmatrix} 
+     \)
+</div>
+
+<p>This can be reflected in the following Python code implementation:</p>
+<pre><code>
+time_data = np.array(time_data[start_point:end_point]) - time[start_point]
+tof_data = tof_data[start_point:end_point]
+uss = 1
+
+C = np.array([[1, 0]]) # Initialized C matrix
+x = np.array([[-tof_data[0]], [0]]) # tof from collected data</code></pre>
+
+<p>The ultimate step of the Python initialization of the Kalman Filter was to make estimations for both process and measurement noise. They are defined based on the sampling time <code>dt</code> and the sensor variance <code>dx</code>, and can be expressed by the following expressions. The first two represent the process noise, while sigma 3 represents the sensor noise.</code></p>
+<div>
+    \( \sigma_1 = \sigma_2 = \sqrt{\frac{10^2}{dt}}  \)
+</div>
+<div>\[\sigma_3 = \sqrt{\frac{10^2}{dx}}\]</div>
+
+<p>As previously mentioned, the sampling time for the position as well as velocity is determined by the ToF sampling period of 20 ms. For the sensor noise, I examined the datasheet of the ToF sensors in order to match the ranging error at long-distance proposed by the manufacturer, as in the following diagram for long range distance:</p>
+<figure style="margin: 0; text-align: center;">
+    <img src="images/manufacturer_noise.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Manufacturer's noise description for the ToF sensor</figcaption>
+</figure>
+<p>Hence, we can define convariances and diagonal convariance matrices  <span class="math-equation">\( \sum_u\)</span> and  <span class="math-equation">\( \sum_z\)</span>.</p>
+<div>
+    \( \sum_z = \sigma_{sensornoise}^2 = 20^2 mm^2= 400 mm^2  \)
+</div>
+<p>The process noise <span class="math-equation">\( \sigma_1\)</span> and <span class="math-equation">\( \sigma_2\)</span> were set to 70 each, as we would like to have higher reliance on the measurements. The code implementing the noise can be found below:</p>
+<pre><code>
+# Process noise
+sigma_1 = 70
+sigma_2 = 70
+
+# Sensor noise
+sigma_3 = 20
+
+sigma_u = np.array([[sigma_1**2, 0], [0, sigma_2**2]]) 
+sigma_z = np.array([[sigma_3**2]]) 
+</code></pre>
+
+<h4>Implementation in Python</h4>
+<p>After we have initialized all the required matrices and variables, we ought to implement a Kalman Filter function in order to process the data. I based my function on the code provided in lecture slides. Furthermore, I made an upade in my function only if the sensor readings are valid: </p>
+<pre><code>
+def kalman_filter(mu, sigma, u, y, update = True):
+    mu_p = Ad.dot(mu) + Bd.dot(u) 
+    sigma_p = Ad.dot(sigma.dot(Ad.transpose())) + sigma_u
+    if update == False:
+        return mu_p, sigma_p
+    sigma_m = C.dot(sigma_p.dot(C.transpose())) + sigma_z
+    kkf_gain = sigma_p.dot(C.transpose().dot(np.linalg.inv(sigma_m)))
+
+    y_m = y - C.dot(mu_p)
+    mu = mu_p + kkf_gain.dot(y_m)
+    sigma = (np.eye(2) - kkf_gain.dot(C)).dot(sigma_p)
+
+    return mu, sigma</code></pre>
+
+    <p>Afterwards, I was able to plot the data which proves that the Kalman filter is able to interpolate in-between the measured ToF data points. The following graphs will show the importance of covariance matrices. Particularly, with the increase in sensor noise covariance, the Kalman Filter ultimately puts much higher trust in the model, which causes it to estimate states which differ from the measurements from the ToF sensor. That would be great in the application where the dynamic model is very accurate, but the sensors performing the measurements were noisy. However, considering that our ToF sensors are decently accurate, the best tuned Kalman Filter is the one shown in the first graph below, where the sensor covariance was the lowest (<span class="math-equation">\( \sigma_3\)</span>), while model covariances (<span class="math-equation">\( \sigma_1\)</span> and <span class="math-equation">\( \sigma_2\)</span>) were much larger than sensor covariance.
 
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/kalman_pythonoutput1.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter Python Simulation - Better Fit, Reliance on the Measurements</figcaption>
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter Python Simulation - Better Fit, since higher reliance on the Measurements (<span class="math-equation">\(\sigma_1\)</span> = <span class="math-equation">\( \sigma_2\)</span> = 70, <span class="math-equation">\( \sigma_3\)</span>= 20)</figcaption>
                             </figure>
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/kalman_pythonoutput2.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter Python Simulation - Worse Fit, Reliance on the Model</figcaption>
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter Python Simulation - Worse Fit, since higher reliance on the Model ((<span class="math-equation">\(\sigma_1\)</span> = <span class="math-equation">\( \sigma_2\)</span> = 50, <span class="math-equation">\( \sigma_3\)</span>= 58)</figcaption>
                             </figure>
 
                             <h4>Kalman Filter Implementation on the Robot</h4>
@@ -248,8 +366,23 @@
     break;
 }
                             </code></pre>
-                            <p>In order to change the set Kp, Ki, Kd, and maxSpeed values (the speed of hte car ranging 0-255), I utilized the function written in Lab 5 <code>CHANGE_GAIN</code>. After creating the Kalman Filter, I instantiated the required matrices used in the Python implementation.</p>
-                            <pre><code>float d = 0.26991;
+                            <p>In order to change the set Kp, Ki, Kd, and maxSpeed values (the speed of the car ranging 0-255), I utilized the function written in Lab 5 <code>CHANGE_GAIN</code>. The code included from Lab 5 can be found below:
+
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/change_gain2.png" alt="Lab 7" width="320" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">CHANGE_GAIN case for transmitting the gain values through Bluetooth, included from Lab 5</figcaption>
+                                </figure>
+<p>On the Python side, I instantiated a notification handler similar how I coded it in previous labs. I </p>
+<figure style="margin: 0; text-align: center;">
+    <img src="images/pid_kalman_python1.png" alt="Lab 7" width="320" style="display: block; margin: 0 auto;">
+    <img src="images/pid_kalman_python3.png" alt="Lab 7" width="335" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Python code for running the Kalman Filter on the robot and obtaining the data arrays</figcaption>
+</figure>
+
+
+
+                             <p>   After simulating the Kalman Filter in Python, I instantiated the required matrices used in the Python implementation.</p>
+                            <pre><code>float d = 0.405;
 float t_r = 0.42659;
 float m = (-d*t_r)/log(.1);
 
@@ -259,10 +392,10 @@ float sigma_3 = 20;
 
 Matrix<2,2> A = {0, 1,
         0, -1*(d/m)}; 
-Matrix<2,1> B = {1, 15*(1/m)};  //0, 1/m
+Matrix<2,1> B = {1, 15*(1/m)}; 
 Matrix<1,2> C = {1,0}; 
 
-float Delta_T = 0.01; //10.0; //0.2
+float Delta_T = 0.02; # 20 ms
 Matrix<2,2> I = {1, 0,
                     0, 1};
 Matrix<2,2> Ad;
@@ -272,45 +405,24 @@ Matrix<2,1> Bd;
 Matrix<1,2> Cd;
 // Cd = C;
 
-    Matrix<2,2> sigma_u = {sigma_1*sigma_1, 0,
+Matrix<2,2> sigma_u = {sigma_1*sigma_1, 0,
                         0, sigma_2*sigma_2};
 Matrix<1> sigma_z = {sigma_3*sigma_3};
-
 Matrix<2,1> mu_p;
 Matrix<2,2> sigma_p;
 Matrix<1> sigma_m;
-
 Matrix<2,1> kkf_gain;
-
 Matrix<1> y_m;
-
 Matrix<1> y;
-
 Matrix<2,1> mu = {1,0}; //{set_distance, 0}
 Matrix<2,2> sigma = {400, 0, 
                 0, 100};
 
 Matrix<1> u = {1};</code></pre>
-                                <p>Afterwards, Kalman Filter was implemented into my Lab 5 PID controller lab code. </p>
+                                <p>Afterwards, Kalman Filter was implemented into my Lab 5 PID controller lab code. The full code displaying the update and prediction steps for the Kalman Filter is shown below </p>
                                 <pre><code>case PID_KALMAN: 
 {
-    distanceSensor1.setIntermeasurementPeriod(20);
-    distanceSensor1.setTimingBudgetInMs(20);
-    //PID stuff from lab 5
-    int i = 0;
-    int k = 0;
-    int j = 0;
-    unsigned long last_time = millis();
-    int distance1 = 0;
-    float current_dist;
-    float error1;
-    float target_dist = 304;
-    float pwm;
-    float error_sum;
-    float p_term;
-    float i_term;
-    float d_term;
-    float old_error;
+    //...PID variable instantiation from Lab 5
     float kf_distance;
 
     Ad  = I + Delta_T * A ;
@@ -319,9 +431,7 @@ Matrix<1> u = {1};</code></pre>
 
     distanceSensor1.startRanging();  //Write configuration bytes to initiate measurement
     Serial.println("Staring Kalman Filter with PID!");
-    //Build the Array
     int t_0 = millis();
-    // This is used to calculate dtin
     int prev_time = t_0;
     while (!distanceSensor1.checkForDataReady())
     {
@@ -332,17 +442,13 @@ Matrix<1> u = {1};</code></pre>
     mu = {(float) distance1, 0.0};
     while ((i < ARRAY_LENGTH && j < ARRAY_LENGTH2) && millis() - t_0 < 5000) {
     time_data[i] = millis();
-    if (distanceSensor1.checkForDataReady()) {
+    if (distanceSensor1.checkForDataReady()) { //ToF sensor data available
         dt = millis() - prev_time;
         prev_time = millis();
-        //time_data[i] = prev_time;
         distance1 = distanceSensor1.getDistance();  //Get the result of the measurement from the sensor
-        // distanceSensor1.stopRanging();
         distanceSensor1.clearInterrupt();
-        //distanceSensor1.startRanging();
         distance_data1[i] = distance1;
         i++;
-        //Serial.print("TOF Dis:"); Serial.print(distance1); Serial.println();
         y = (float) distance1; //y(0,0) = (float) distance1;
         mu_p = Ad*mu + Bd*u;
         sigma_p = Ad*sigma*~Ad + sigma_u;
@@ -351,36 +457,26 @@ Matrix<1> u = {1};</code></pre>
         y_m = y-Cd*mu_p;
         mu = mu_p + kkf_gain * y_m;
         sigma = I - kkf_gain*Cd*sigma_p;
-        // mus[i] = mu(0);
         kf_distance = mu(0,0);
         kf_distance = (float) kf_distance;
         if (j < ARRAY_LENGTH2) { 
         kf_distance_array[j] = kf_distance;
         kf_time[j] = millis();
         j++;
-        Serial.println(j);
-        //Serial.print("KF Up:"); Serial.print(kf_distance); Serial.println();
         }
-        //j++;
         // Start of Control Loop Calculations
         current_dist = distance1;
         distance1 = mu(0,0);
         old_error = error1;
         error1 = current_dist - target_dist; 
-        //PID Control
+        //PID Control from Lab 5
         error_sum = error_sum + (error1 * dt / 1000);
         p_term = Kp * error1;
         i_term = Ki * error_sum;
-        if (dt > 0) {
-        d_term = Kd * (error1 - old_error) / dt;
-        } else {
-        d_term = 0;
-        }
         d_term = Kd * (error1 - old_error) / dt;
         pwm = p_term + i_term + d_term;
-        //i++;
     }
-    else{
+    else{ // ToF sensor data not available, make predictions with Kalman Filter
         mu_p = Ad*mu + Bd*u;
         sigma_p = Ad*sigma*~Ad + sigma_u;
         kf_distance = mu_p(0,0);
@@ -391,71 +487,46 @@ Matrix<1> u = {1};</code></pre>
         kf_distance_array[j] = kf_distance;
         kf_time[j] = millis();
         j++;
-        Serial.println(j);
-        //Serial.print("KF Pr:"); Serial.print(kf_distance); Serial.println();
         }
         dt = millis() - prev_time;
         prev_time = millis();
-        //time_data[i] = prev_time;
-        //run PID loop to get control input ...
         current_dist = kf_distance;
         old_error = error1;
         error1 = current_dist - target_dist; 
-        //PID Control
+        //PID Control from Lab 5
         error_sum = error_sum + (error1 * dt / 1000);
         p_term = Kp * error1;
         i_term = Ki * error_sum;
-        if (dt > 0) {
-        d_term = Kd * (error1 - old_error) / dt;
-        } else {
-        d_term = 0;
-        }
         d_term = Kd * (error1 - old_error) / dt;
         pwm = p_term + i_term + d_term;
-        //j++;
-        Serial.print("dt value is:");
-        Serial.println(dt);
     }
-    // Control Signal Saturation
-    if (pwm > maxSpeed) pwm = maxSpeed;
-    if (pwm < -maxSpeed) pwm = -maxSpeed;
-
-    pwm_data[i] = pwm;
-    u = pwm/maxSpeed; //170;
-    if (pwm < 0) {                   //previous code: pwm > 0
-        analogWrite(MotorRightBackward, 0);          // Kelvin's car: right backward
-        analogWrite(MotorRightForward, abs(pwm) + 5);    // Kelvin's car: right foward
-        analogWrite(MotorLeftForward, abs(pwm) * 1.8 + 12);  // Kelvin's car: left forward (PIN3,pwm*2.0 + 12);
-        analogWrite(MotorLeftBackward, 0);          // Kelvin's car: left backward
-    } else if (pwm > 0) {            //previous code: pwm < 0
-        // pwm = abs(pwm);
-        analogWrite(MotorRightBackward, abs(pwm) + 5);
-        analogWrite(MotorRightForward, 0);
-        analogWrite(MotorLeftForward, 0);
-        analogWrite(MotorLeftBackward, abs(pwm) * 1.8 + 12);  //(PIN2,abs(pwm)*2.0 + 12);
-    } else {
-        analogWrite(MotorRightBackward, 0);
-        analogWrite(MotorRightForward, 0);
-        analogWrite(MotorLeftForward, 0);
-        analogWrite(MotorLeftBackward, 0);
-    }
-    }
-    analogWrite(MotorRightBackward, 0);
-    analogWrite(MotorRightForward, 0);
-    analogWrite(MotorLeftForward, 0);
-    analogWrite(MotorLeftBackward, 0);
-
+    // Update motors the same was as in Lab 5
     break;
 }</code></pre> 
-                            <p>Kalman Filter run resulted in the following graphs:</p>
-                            <figure style="margin: 0; text-align: center;">
+<p>The provided code for <code>PID_KALMAN</code> works in such a way where I incorporate an update step incorporating valid ToF readings with the PID loop code from Lab 5. I started the update step by taking my code from Lab 5, incorporating the matrices and variable updates per each iteration as per the provided code in lecture slides, and ensured that my PID update step is functional. Afterwards, I introduced a separate counter variable j in order to loop through the Kalman filter distances which are dependent on the computed <code>mu</code> value. Afterwards, the computed KF distances are appended to the Kalman Filter distances array, while ToF recorded distances were appended to the separate ToF distances array, similarly to how they were appended in Lab 5.
+   <p> However, there is a point to note. Firstly, I found it quite challenging, but rewarding to finally see the Kalman Filter implemented on the robot. Some of the issues I have had during the runs is my ToF sensor data updating very slowly, which I was able to confirm through sampling time code in python provided in Lab 5 and 6. I was able to solve the issue through incorporating </p>
+    <div>distanceSensor1.setIntermeasurementPeriod(20);</div>
+   <div> distanceSensor1.setTimingBudgetInMs(20);</div> 
+   <p>for my sensor, which fixed the issue. 
+    <p>Afterward, I was ready to work on the predicton step, which would enable Kalman Filter functionality and prediction for when ToF sensor data is not available. Hence, with the attached final iteration of the code above, if the update step runs of the Kalman Filter runs, then the distance measurement is used as per the ToF reading (labeled as //ToF sensor data available in the code). Otherwise, if the prediction step runs, then we ought to take the most recent value of mu in the PID controller.</p>
+
+    <p>Furthermore, I had slight issues where the filter is predicting the distances between ToF readings, due to the fact that the predicted values did not follow the trend of the data towards the next update value, this can be reflected in the first trial with my prediction step implemented below, where my prediction step was more similar to the previous update step on the graphs attached below:
+        <figure style="margin: 0; text-align: center;">
+            <img src="images/noisierversion_kf.png" alt="Lab 7" width="320" style="display: block; margin: 0 auto;">
+            <img src="images/noisierversion_kf2.png" alt="Lab 7" width="335" style="display: block; margin: 0 auto;">
+            <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Initial Distance versus Time Kalman Filter graphs with the prediction step implemented, with motor speed of 255</figcaption>
+        </figure>
+
+        
+        <p>In order to fix this, I consulted with TA Mikayla who shared that she delt with the same issue in her implementation last year, and advised me to multiply my B matrix with a certain positive integer constant, in order to have the noise in the trend of the data follow the slope better. I settled for multiplying matrix B by the value of <code>10</code> and achieved the following results: </p>
+                           
                                 <img src="images/kf_kp0.1_ki0.000001_kd5_speed120.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter on speed 120</figcaption>
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 120</figcaption>
                             </figure>
                                 <img src="images/kf_kp0.05_ki0.000001_kd5_speed220.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter on speed 220</figcaption>
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 220</figcaption>
                                 <img src="images/kf_kp0.05_ki0.000001_kd5_speed255.png" alt="Lab 7" width="400" style="display: block; margin: 0 auto;">
-                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Kalman Filter on speed 255</figcaption>
+                                <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Distance versus Time graph with Kalman Filter, with motor speed of 255</figcaption>
                                 <p>The video representation can be shown below.</p>
                                 <iframe width="300" height ="400"
                                 src="https://youtube.com/embed/In3cxlxCVBk"  
@@ -485,8 +556,8 @@ Matrix<1> u = {1};</code></pre>
                             <h3>Discussion</h3>
                             <p>This lab was crucial in gaining a better understanding the benefits of the Kalman Filter. Furthermore, it enabled me great exprience in debugging, tuning values, and evaluating the best solution for the robot with its open-endedness.</p>
 
-
-                        
+                            <h3>DEBUGGING AND ISSUES FACED COMMENTS</h3>
+                            <p>One of the issues which slowed my process down was not adapting my <code>Delta_T</code> value needed for the discrediced Ad and Bd matrices in my robot implementation Kalman Filter code to the actual sampling time of my ToF sensor data. Once I ran the code for sampling time from Lab 6, as well as determined the sampling time of ToF sensors is about 20 ms as per Serial print statements, I was able to obtain much less noisy Kalman Filter data, and more accurate predictions once the ToF sensor data was not available.</p>
                             
                             <!-- Image Centered -->
                             <section class="content-section">
@@ -496,7 +567,7 @@ Matrix<1> u = {1};</code></pre>
                     
                             </section>
                             <h4>Acknowledgements and References</h4>
-                            <p>*I worked with Sabian Grier on this lab. My lab page is inspired by Stephan Wagner's Lab 7 page (2024).</p>
+                            <p>*I worked with Sabian Grier on this lab. My lab page is inspired by Mikayla Lahr's (2024) and Stephan Wagner's Lab 7 page (2024). Super special thanks to TA Mikayla for her great advice on Robot implementation of Kalman Filter, as well as TA Cheney and TA Cameron for their insights on understanding Kalman Filter better.</p>
 
                         
                         <!-- </article> -->
@@ -564,3 +635,6 @@ Matrix<1> u = {1};</code></pre>
 
 </body>
 </html>
+                    
+
+                      
