@@ -132,6 +132,33 @@
                             summary:focus {
                                 outline: none;
                             }
+                            table {
+                            width: 60%;
+                            border-collapse: collapse;
+                            margin: 20px auto;
+                            font-family: Arial, sans-serif;
+                            }
+
+                            th, td {
+                            border: 1px solid #898181;
+                            padding: 12px;
+                            text-align: center;
+                            vertical-align: middle;
+                            }
+
+                            th {
+                            background-color: #f5f5f5;
+                            font-weight: bold;
+                            text-align: center !important;
+                            }
+
+                            tr:nth-child(even) {
+                            background-color: #f9f9f9;
+                            }
+
+                            tr:hover {
+                            background-color: #f1f1f1;
+                            }
                         </style>
                           <!-- MathJax for LaTeX rendering -->
                         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -439,7 +466,9 @@ ble.start_notify(ble.uuid['RX_STRING'], lab9_turns)</code></pre>
 
                                 <p>Afterwards, the PID control gains, as well as the maximum speed (from 0 to 255) were set by running the command in Python in order to tune the robot well for the tiles surface, as appropriate for the lab setup. The Arduino code for <code>CHANGE_GAIN</code> case will be attached for reference from Lab 5.</p>
                                 <pre><code>ble.send_command(CMD.CHANGE_GAIN, "3.5|0.000001|2|150") # Python end</code></pre>
-                                <pre><code>  case CHANGE_GAIN: # Arduino end
+                                <details>
+                                    <summary>CHANGE_GAIN code shown here for reference</summary>
+                               <pre><code> case CHANGE_GAIN: # Arduino end
     {
         float new_kp; float new_ki; float new_kd; float new_maxSpeed;
         
@@ -465,6 +494,7 @@ ble.start_notify(ble.uuid['RX_STRING'], lab9_turns)</code></pre>
         maxSpeed = new_maxSpeed;
         break;
     }</code></pre>
+</details>
 
                                 <p>After this, the command for running <codd>PID_TURN_FULL</code> case was initiated, which starts the rotation of the robot. The command can be found below. With this, we are ready to receive and analyze the collected data!</p>
                                 <pre><code>ble.send_command(CMD.PID_TURN_FULL, "")</code></pre>
@@ -479,7 +509,7 @@ ble.start_notify(ble.uuid['RX_STRING'], lab9_turns)</code></pre>
                                 <h4>Testing in the Lab and Polar Plots</h4>
                                 <p>After the optimized tuning, I was able to test my robot in the lab space. The static room in the lab can be mapped out as the following diagram below. The diagram also denotes the points in which I took the measurements, the four points indicated in the lab handout, (-3,-2), (5, 3), (5, -3), (0, 3), and the origin (0, 0) in which I also took measurements for a better reference of the overall image of the room. </p>
                                 <figure style="margin: 0; text-align: center;">
-                                    <img src="images/floor_mapping.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">
+                                    <img src="images/static_room_2.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Static testing room with tested coordinates labeled</figcaption>
                                 </figure>
                                     
@@ -542,12 +572,167 @@ print(actual_yaw)
 
                                     <p>As can be inferred from my Polar Plots, since my robot's original positionality at every coordinate is in positive x-axis direction, then in my code for polar plots above, I implemented the following line <code>ax.set_theta_direction(-1)</code>, which enabled the rotation of the measured angles to start at 0 at the positive x-axis direction, so that I am able to more easily visualise the view of my robot moving thorugh space at the set coordinate as if I am looking down at the coordinate. Furthermore, the data looks as expected through comparing it to previous year's lab pages, such as TA Daria Kot's (2024).</p>
                                     <h4>Merge and Plot Readings</h4>
-                                    
+                                    <p>Considering the aforementioned directionality of the robot initially at the origin, we can notice that with the particular orientation I chose, we can determine the transformation matrix from polar coordinates to Cartesian system. Hence, for the given measured angle value - theta value - we can predict the behaviour of the matrix as the following: </p>
+                                    <table border="1">
+                                        <!-- Header row (optional) -->
+                                        <tr>
+                                          <th>angle - theta</th>
+                                          <th>x</th>
+                                          <th>y</th>
+                                        </tr>
+                                      
+                                        <!-- Data rows -->
+                                        <tr>
+                                          <td>0</td>
+                                          <td>1</td>
+                                          <td>0</td>
+                                        </tr>
+                                        <tr>
+                                          <td>90</td>
+                                          <td>0</td>
+                                          <td>-1</td>
+                                        </tr>
+                                        <tr>
+                                          <td>180</td>
+                                          <td>-1</td>
+                                          <td>0</td>
+                                        </tr>
+                                        <tr>
+                                          <td>270</td>
+                                          <td>0</td>
+                                          <td>1</td>
+                                        </tr>
+                                      </table>
 
 
+                                <p>which effectivaly represents <code> x = r * cos (&theta;)</code>, and <code>y = -r * sin(&theta;)</code>. Based on that, the transformation matrix would look like the following:
+                                    <div>
+                                        \( \begin{bmatrix} {x} \\ {y} \end{bmatrix} =
+                                         \begin{bmatrix} r*cos(&theta;) \\ -r*sin(&theta;) \end{bmatrix} \)
+                                    </div>  
+
+                                <p>Based on that, we can make the following implementation to convert to Cartesian form in Python. This was performed for each of the datasets for every coordinate point. The example for coordinate of (5, 3) is provided below.</p>
+                                <pre><code>x_53 = []
+y_53 = []
+
+for i in range(len(radians[0:37])):
+    x_53.append(tof_distance[i] * np.cos(radians[i]) / (2.54*12*10))
+    y_53.append(-1.0 * tof_distance[i] * np.sin(radians[i]) / (2.54*12*10))
+
+plt.figure()
+plt.scatter(x_53, y_53, marker='o')
+plt.xlabel('Distance in x (ft)')
+plt.ylabel('Distance in y (ft)')
+plt.title('Room Scan at (5, 3)')
+plt.show()
+</code></pre>
+<p>As can be inferred from the code, there is a conversion implemented on the appended value to the two arrays, since values on the polar plot were expressed in milimeters (hence inches * feet * milimeters conversion). Afterwards, I was able to obtain plots for each of the coordinate points. </p>
+<figure style="margin: 0; text-align: center;">
+    <img src="images/cartesian_00.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Cartesian system of Reading (0,0)</figcaption>
+</figure>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/cartesian_32.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Cartesian system of Reading (-3,-2)</figcaption>
+</figure>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/cartesian_5-3.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Cartesian system of Reading (5,-3)</figcaption>
+</figure>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/cartesian_53.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Cartesian system of Reading (5,3)</figcaption>
+</figure>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/cartesian_03.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Cartesian system of Reading (0,3)</figcaption>
+</figure>
+
+<p>However, these Cartesian systems are relative, and do not quite fit into the global perspective of the Cartesian system relative to (0,0) reading. Hence, we ought to add the coordinates of the rotation center from which the points were taken to each of the obtained and stored pairs of x and y. This can be performed through manipulating and translating the array sets in Python as the following:</p>
+<pre><code># (0, 0)
+x_00_global = np.array(x_00)
+y_00_global = np.array(y_00)
+
+# (5, 3) 
+x_53_global = np.array(x_53) + 5.0
+y_53_global = np.array(y_53) + 3.0
+
+# (5, -3)
+x_5_neg3_global = np.array(x_5_neg3) + 5.0
+y_5_neg3_global = np.array(y_5_neg3) - 3.0
+
+# (0, 3) 
+x_03_global = np.array(x_03)
+y_03_global = np.array(y_03) + 3.0
+
+# (-3, -2)
+x_32_global = np.array(x_32) - 3.0
+y_32_global = np.array(y_32) - 2.0
+
+plt.figure()
+plt.scatter(x_32_global, y_32_global, c='g', marker='o')
+plt.scatter(x_53_global, y_53_global, c='b', marker='o')
+plt.scatter(x_03_global, y_03_global, c='r', marker='o')
+plt.scatter(x_5_neg3_global, y_5_neg3_global, c='m', marker='o')
+plt.scatter(x_00_global, y_00_global, c='c', marker='o')
+plt.scatter([-3, 5, 0, 5], [-2, 3, 3, -3], c='b', marker='x', label='Turn Locations')
+plt.xlabel('X coordinate (ft)')
+plt.ylabel('Y coordinate (ft)')
+plt.title('Merged Mapped Space Without Lines')
+plt.show()</code></pre>
+
+<p>Running the attached code after performing the translation of our obtained arrays, we ought to obtain something like the following.</p>
 
 
+<figure style="margin: 0; text-align: center;">
+    <img src="images/merged_without_lines2.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Merged Map of the Room</figcaption>
+</figure>
+<p>As can be inferred from the image, the captured distances ad the trend of the static room are clearly detectable, with the square-shaped box in the upper-right corner well detected. Through experimentation, I determined the coordinates which represent the walls of the room, and added them to my proposed plot of the global space.</p>
+<pre><code>wall_x = [-5.25, -5.25, -0.75, -0.75, 0.75, 2, 6.25, 6.25, -2.5, -2.5, -5.2]
+wall_y = [0.5, -4.25, -4.25, -2.5, -2.5, -4.5, -4.5, 4.5, 4.5, 0.5, 0.5]
+box_x = [2.5, 4.25, 4.25, 2.5, 2.5]
+box_y = [-0.5, -0.5, 1.75, 1.75, -0.5]</code></pre>
 
+<figure style="margin: 0; text-align: center;">
+    <img src="images/merged_with_lines2.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Merged Map of the Room with Wall Contours</figcaption>
+</figure>
+
+<p>Finally, cleaning up the distances that are far away from the contours through code, we ought to obtain something similar to the following:</p>
+<figure style="margin: 0; text-align: center;">
+    <img src="images/merged_with_lines2_better.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Merged Map of the Room with Wall Contours, Cleaned Up</figcaption>
+</figure>
+
+<p>As can be inferred, the proposed mapped global map is able to detect the contours of the proposed static room very accurately relative to the four points. We ought to convert the lists into the lists of the form (x_start, y_start), and (x_end, y_end) as was noted in the manual. Below is the attached code for doing so, as well as the outputted lists:</p>
+<pre><code>wall_start = []
+wall_end = []
+box_start = []
+box_end = []
+for i in range(len(wall_x) - 1):
+    wall_start += [[wall_x[i], wall_y[i]]]
+    wall_end += [[wall_x[i+1], wall_y[i+1]]]
+for i in range(len(box_x) - 1):
+    box_start += [[box_x[i], box_y[i]]]
+    box_end += [[box_x[i+1], box_y[i+1]]]</code></pre>
+
+<pre><code>[[-5.25, 0.5], [-5.25, -4.25], [-0.75, -4.25], [-0.75, -2.5], [0.75, -2.5], [2, -4.5], [6.25, -4.5], [6.25, 4.5], [-2.5, 4.5], [-2.5, 0.5]] # wall_start
+[[-5.25, -4.25], [-0.75, -4.25], [-0.75, -2.5], [0.75, -2.5], [2, -4.5], [6.25, -4.5], [6.25, 4.5], [-2.5, 4.5], [-2.5, 0.5], [-5.2, 0.5]] # wall_end
+[[2.5, -0.5], [4.25, -0.5], [4.25, 1.75], [2.5, 1.75]] # box_start
+[[4.25, -0.5], [4.25, 1.75], [2.5, 1.75], [2.5, -0.5]] # box_end
+    </code></pre>
+
+    <h3>Bloopers - kind of</h3>
+    <p>While testing my robot and plotting my data, since my sensor was very noisy, and through reading the Example1_readDistance script from SparkFun VL53L1X 4m Laser Distance Sensor examples, I realized with TA Cameron that my measurements were very fault and that my sensor would not read distances above 200 mm. The ultimate fix was changing the timing budget to 200 ms, as proposed earlier, but mostly resoldering the connections. However, even though noisy and faulty, the sensors produces interesting images on the polar plots. </p>
+    <figure style="margin: 0; text-align: center;">
+        <img src="images/bird_blooper.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+        <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Polar plot that looks like a bird?</figcaption>
+    </figure>
 
 
 
