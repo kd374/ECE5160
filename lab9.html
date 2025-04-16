@@ -319,8 +319,8 @@ for (int j = 0; j < steps; j++) {
     // Arrays for logging set as global variables
     // double actual_yaw_data[steps];
     // double expected_yaw_data[steps];
-    // unsigned long time_data[steps];
-    // int distance_data[steps];
+    // unsigned long timestamps[steps];
+    // int tof_data[steps];
 
     icm_20948_DMP_data_t data;
     distanceSensor0.startRanging();
@@ -393,11 +393,11 @@ for (int j = 0; j < steps; j++) {
 
         if (pwm < -100) {
             analogWrite(PIN0, abs(pwm)); analogWrite(PIN1, 0);
-            analogWrite(PIN3*1.1, abs(pwm)); analogWrite(PIN2, 0);
+            analogWrite(PIN3, abs(pwm)*1.1); analogWrite(PIN2, 0);
         }
         else if (pwm > 100) {
             analogWrite(PIN0, 0); analogWrite(PIN1, abs(pwm));
-            analogWrite(PIN3, 0); analogWrite(PIN2*1.1, abs(pwm));
+            analogWrite(PIN3, 0); analogWrite(PIN2, abs(pwm)*1.1);
         }
         else {
             analogWrite(PIN0, 0); analogWrite(PIN1, 0);
