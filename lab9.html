@@ -93,6 +93,45 @@
                                 text-align: left;
                                 font-family: monospace;
                             }
+                            details {
+                                width: 100%;
+                                padding: 10px;
+                                border: 2px solid #ccc;
+                                border-radius: 8px;
+                                background-color: #f4f4f4;
+                                margin: 10px 0;
+                                font-family: 'monospace', Times, serif, sans-serif;
+                                transition: all 0.3s ease;
+                            }
+
+                            details[open] {
+                                background-color: #f4eae7; /* Different bg when expanded */
+                                border-color: #ec96ad;
+                            }
+
+                            summary {
+                                font-weight: bold;
+                                cursor: pointer;
+                                list-style: none;  /* removes default triangle */
+                                position: relative;
+                                padding-left: 20px;
+                            }
+
+                            /* Optional: Add a custom arrow */
+                            summary::before {
+                                content: '▶';
+                                position: absolute;
+                                left: 0;
+                                transition: transform 0.3s ease;
+                            }
+
+                            details[open] summary::before {
+                                transform: rotate(90deg); /* Rotate arrow when open */
+                            }
+
+                            summary:focus {
+                                outline: none;
+                            }
                         </style>
                           <!-- MathJax for LaTeX rendering -->
                         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -115,26 +154,334 @@
                             <!-- Introduction -->
                             <section class="content-section">
                             <h3>Introduction</h3>
-                            <p>The aim of this lab was to incorporate everything we have learned so far and implement it into an interesting stunt of our robot. For this lab, I chose to do a flip as my stunt. </p>
-                            <p>Throughout this lab, I will be testing the robot at the start line of 1-2 meters away from the wall, after which it will move forward up until 1 feet distance (which will be marked with blue tape in videos). The car will then perform a flip, after which it will manage to drive back to the start line.</p>
+                            <p>The aim of this lab is to familiarize ourselves with the technique of mapping by utilizing the ToF sensor readings, and doing so by mapping the static room that was set up in the class lab space. The map set up by the instructors will further be used in localization and navigation labs later on.</p>
+                            <p>The primary goal of the lab was to successfully collect ToF readings and map the obstacles and walls of the room that was set up in the lab, based on four different marked locations within the composed static room. There were various possible approaches to this lab, however, I chose to solve it through utilizing knowledge obtained in Lab 6 on Digital Motion Processing (DMP), which enabled me to obtain consistent ToF readings through keeping track of my measured and expected yaw values, through proposing consistent angular increments.</p>
+                          
                             </section>
                             <section class="content-section">
-                            <h3>Implementation of Flip Stunt</h3>
-                            <p>In order to achieve the flip stunt, I experimented a lot with PID control for the detection of 1-feet distance to the wall before the flip. However, I realised that open-loop control enabled me simpler implementation and testing, and since open-loop is allowed for this lab, I opted for it instead for the purposes of simpler debugging. The robot was programmed to be able to start from a stationary position which is 1-2 meters away from the wall, and once it reaches 0.5 meters from the wall, it accelerates at the opposite direction - that is backwards - at full speed, which results in it performing a flip. Considering that the performed flip is a front flip, in order for the robot to be able to go back to its original position, it has to go backwards again as its current position is now the opposite from the position right before the flip. This backwards movement is now performed at somewhat a lower PWM value in order to accelerate back to its original start line.</p>
-                            
+                            <h3>Control and Obtaining ToF Readings</h3>
+                            <p>As aforementioned, I opted for approaching the lab through implementing closed-loop control using DMP as per obtained Lab 6 knowledge, which ought to help me obtain low-noise angle measurements for the yaw. Upon defining my global variables, I obtain the initial yaw value through setting a while loop which reads the quarternion from the IMU and successfully converts it inot a yaw value, similarly to how we performed the measurement in Lab 6. The code for this can be found below:</p>
+                            <pre><code>icm_20948_DMP_data_t data;
+distanceSensor0.startRanging();
+
+// Obtain the initial yaw
+while (true) {
+    myICM.readDMPdataFromFIFO(&data);
+    if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+        (data.header & DMP_header_bitmap_Quat6)) {
+    double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+    double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+    double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+    double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+    double qw = q0, qx = q2, qy = q1, qz = -q3;
+    double t3 = 2.0 * (qw * qz + qx * qy);
+    double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+    initial_yaw = atan2(t3, t4) * 180.0 / PI;
+    break;
+    }
+    for (int step = 0; step < steps; step++) {
+        target_yaw = initial_yaw + step * yaw_step;
+        if (target_yaw > 180) target_yaw -= 360;
+        if (target_yaw < -180) target_yaw += 360;
+    //...Perform PID Turn Loop//
+}                 </code></pre>
+                            <p>Furthermore, I initiate <code>distanceSensor0.startRanging();</code> function on the sensor before starting PID control on the robot in order to start the sensor's timing budget. Afterwards, I perform the calculations of my next target yaw at every angle increment of 10 degrees. The for loop was set to have the total number of steps to be 37, in order to compute the full circle in increments of 10. The further update of target yaw normalizes the values to be within the range of [-180 degrees, 180 degrees] through decrementing 360 degrees if target yaw is greater than 180, and incrementing 360 degrees for the cases of target yaw being smaller than -180 degrees, in order to achieve consistency. Furthermore, this is also performed in order to maintain PID control, as we would not want to perform unnecessary turns of our robot due to a miscalculation in the error (since the target yaw is subtracted from current yaw angle, and hence if target yaw were to be negative and close to -180, it would induce a large positive angle which would initiate the excessive turning, while in reality the turn could be of a much smaller angle if normalized - for instance, <code>error = current_yaw - target_yaw = -178 - (-178) = 356</code>, which should have yielded the turn of <code>4</code> degrees instead). </p>
+                            <p>Afterwards, PID Loop Control is established in order to reach the successive target yaw values, as can be seen in the code portion attached below. The PID control is performed based on the equations proposed in Lab 5, and error is computed upon every step increment of 10 degrees. With setting the error less than 2 degrees check, we ensure that we avoid infinite loops, annd accept a small yet precise tolerance to noise, checking the preciseness of the target angle constantly. What is more, the set timeout for the sensor is 3 seconds, after which the robot is programmed to perform a stop, as can be seen in the full lab code section attached below.</p>
+                            <pre><code>for (int step = 0; step < steps; step++) {
+    target_yaw = initial_yaw + step * yaw_step;
+    if (target_yaw > 180) target_yaw -= 360;
+    if (target_yaw < -180) target_yaw += 360;
+
+    bool targetReached = false;
+    unsigned long turnStartTime = millis();
+
+    // PID Turn Loop
+    while (!targetReached && millis() - turnStartTime < 3000) {
+        myICM.readDMPdataFromFIFO(&data);
+        if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+            (data.header & DMP_header_bitmap_Quat6)) {
+
+        double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+        double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+        double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+        double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+        double qw = q0, qx = q2, qy = q1, qz = -q3;
+        double t3 = 2.0 * (qw * qz + qx * qy);
+        double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+        current_yaw = atan2(t3, t4) * 180.0 / PI;
+
+        dt = (millis() - last_time) / 1000.0;
+        last_time = millis();
+
+        error = current_yaw - target_yaw;
+        if (error > 180) error -= 360;
+        if (error < -180) error += 360;
+
+        error_sum += error * dt;
+        if (error_sum > 150) error_sum = 150;
+        if (error_sum < -150) error_sum = -150;
+
+        p_term = Kp * error;
+        i_term = Ki * error_sum;
+        d_term = Kd * (error - prev_error) / dt;
+        pwm = p_term + i_term + d_term;
+
+        prev_error = error;
+
+        if (abs(error) < 2.0) {
+            targetReached = true;
+            break;
+        } 
+//...Perform motor rotation code//</code></pre>
+                            <p>Lastly, the Tof distance reading is collected upon performing a one second delay which enables accurate sensor reading. Furthermore, the sensor is reset for the next ToF reading through performing <code>distanceSensor0.clearInterrupt();</code>, as well as <code>distanceSensor0.stopRanging();</code> and then starting the sensor again through <code>distanceSensor0.startRanging();</code>. The accumulated values for the particular step increment in the total of 37 steps are appended to their respective arrays, and sent over through Bluetooth to Python for plotting and easier analysis. The arrays I sent over for plotting were the expected yaw measurements, recorded yaw measurements, times they were recorded, as well as the ToF distances at that particular angle and timestamp readings.</p>
+
+                            <pre><code>    //Get distance
+    int distance_tof = 0;
+    if (distanceSensor0.checkForDataReady()) {
+        distance_tof = distanceSensor0.getDistance();
+        distanceSensor0.clearInterrupt();
+        distanceSensor0.stopRanging();
+        distanceSensor0.startRanging();
+        Serial.println(distance_tof);
+    }
+
+    // Save data to arrays
+    expected_yaw_data[step] = step * 10;
+    actual_yaw_data[step] = current_yaw;
+    timestamps[step] = millis();
+    tof_data[step] = distance_tof;
+}
+
+//Send collected data arrays
+for (int j = 0; j < steps; j++) {
+    tx_estring_value.clear();
+    tx_estring_value.append(expected_yaw_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(actual_yaw_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(timestamps[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(tof_data[j]);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+}</code></pre>
+
+<p>For reference, a full code used for the lab is inclulded below. It ought to be clarified that I used a calibration constant of 1.1 which I multiplied with the pin outputs representing the left set of wheels, as was determined in lab 4.</p>
 
 
-                            <h3>Discussion</h3>
-                            <p>This lab was very fun to implement, and I liked that it incorporated knowledge from different labs into a fun stunt. </p>
+
+
+
 
                             <!-- Image Centered -->
                             <section class="content-section">
+
+                            <details>
+                                <summary>Full lab code shown here for reference</summary>
+                              
+<pre><code>case PID_TURN_FULL:
+{
+    const int steps = 37;
+    const float yaw_step = 10.0;
+    double initial_yaw = 0;
+    double target_yaw, current_yaw;
+    float error = 0, prev_error = 0, error_sum = 0;
+    float dt = 0;
+    float pwm = 0, p_term, i_term, d_term;
+    unsigned long last_time = millis();
+
+    // Arrays for logging set as global variables
+    // double actual_yaw_data[steps];
+    // double expected_yaw_data[steps];
+    // unsigned long time_data[steps];
+    // int distance_data[steps];
+
+    icm_20948_DMP_data_t data;
+    distanceSensor0.startRanging();
+
+    // Obtain the initial yaw
+    while (true) {
+    myICM.readDMPdataFromFIFO(&data);
+    if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+        (data.header & DMP_header_bitmap_Quat6)) {
+        double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+        double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+        double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+        double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+        double qw = q0, qx = q2, qy = q1, qz = -q3;
+        double t3 = 2.0 * (qw * qz + qx * qy);
+        double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+        initial_yaw = atan2(t3, t4) * 180.0 / PI;
+        break;
+    }
+    }
+
+    for (int step = 0; step < steps; step++) {
+    target_yaw = initial_yaw + step * yaw_step;
+    if (target_yaw > 180) target_yaw -= 360;
+    if (target_yaw < -180) target_yaw += 360;
+
+    bool targetReached = false;
+    unsigned long turnStartTime = millis();
+
+    // PID Turn Loop
+    while (!targetReached && millis() - turnStartTime < 3000) {
+        myICM.readDMPdataFromFIFO(&data);
+        if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+            (data.header & DMP_header_bitmap_Quat6)) {
+
+        double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+        double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+        double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+        double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+        double qw = q0, qx = q2, qy = q1, qz = -q3;
+        double t3 = 2.0 * (qw * qz + qx * qy);
+        double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+        current_yaw = atan2(t3, t4) * 180.0 / PI;
+
+        dt = (millis() - last_time) / 1000.0;
+        last_time = millis();
+
+        error = current_yaw - target_yaw;
+        if (error > 180) error -= 360;
+        if (error < -180) error += 360;
+
+        error_sum += error * dt;
+        if (error_sum > 150) error_sum = 150;
+        if (error_sum < -150) error_sum = -150;
+
+        p_term = Kp * error;
+        i_term = Ki * error_sum;
+        d_term = Kd * (error - prev_error) / dt;
+        pwm = p_term + i_term + d_term;
+
+        prev_error = error;
+
+        if (abs(error) < 2.0) {
+            targetReached = true;
+            break;
+        }
+
+        if (pwm > maxSpeed) pwm = maxSpeed;
+        if (pwm < -maxSpeed) pwm = -maxSpeed;
+
+        if (pwm < -80) {
+            analogWrite(PIN0, abs(pwm)); analogWrite(PIN1, 0);
+            analogWrite(PIN3*1.1, abs(pwm)); analogWrite(PIN2, 0);
+        }
+        else if (pwm > 80) {
+            analogWrite(PIN0, 0); analogWrite(PIN1, abs(pwm));
+            analogWrite(PIN3, 0); analogWrite(PIN2*1.1, abs(pwm));
+        }
+        else {
+            analogWrite(PIN0, 0); analogWrite(PIN1, 0);
+            analogWrite(PIN3, 0); analogWrite(PIN2, 0);
+        }
+
+        delay(10);
+        }
+    }
+
+    // Stop the motors
+    analogWrite(PIN0, 0); analogWrite(PIN1, 0);
+    analogWrite(PIN3, 0); analogWrite(PIN2, 0);
+
+    delay(1000); // Pause for 1 second at this angle
+
+    // Get distance
+    int distance_tof = 0;
+    if (distanceSensor0.checkForDataReady()) {
+        distance_tof = distanceSensor0.getDistance();
+        distanceSensor0.clearInterrupt();
+        distanceSensor0.stopRanging();
+        distanceSensor0.startRanging();
+        Serial.println(distance_tof);
+    }
+
+    // Save data to arrays
+    expected_yaw_data[step] = step * 10;
+    actual_yaw_data[step] = current_yaw;
+    timestamps[step] = millis();
+    tof_data[step] = distance_tof;
+    }
+
+    //Send collected data arrays
+    for (int j = 0; j < steps; j++) {
+    tx_estring_value.clear();
+    tx_estring_value.append(expected_yaw_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(actual_yaw_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(timestamps[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(tof_data[j]);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    }
+
+    Serial.println("A full 360 turn complete. Sending the data!");
+    break;
+} </code></pre>                 </details>
+
+                                <p>Apart from the proposed Arduino code, on the Python side of things, I implemented a notification handler for collecting the data arrays, similarly to how I have performed it in previous labs.</p>
+                                <pre><code>expected_yaw = []
+actual_yaw = []
+timestamp = []
+tof_distance = []
+def lab9_turns(uuid, bytes):
+    s = ble.bytearray_to_string(bytes)
+    if("|" in s):
+        sep_notif = s.split("|")
+        expected_yaw.append(float(sep_notif[0]))
+        actual_yaw.append(float(sep_notif[1]))
+        timestamp.append(float(sep_notif[2]))
+        tof_distance.append(float(sep_notif[3]))
+        
+ble.start_notify(ble.uuid['RX_STRING'], lab9_turns)</code></pre>
+
+                                <p>Afterwards, the PID control gains, as well as the maximum speed (from 0 to 255) were set by running the command in Python in order to tune the robot well for the tiles surface, as appropriate for the lab setup. The Arduino code for <code>CHANGE_GAIN</code> case will be attached for reference from Lab 5.</p>
+                                <pre><code>ble.send_command(CMD.CHANGE_GAIN, "3.5|0.000001|2|150") # Python end</code></pre>
+                                <pre><code>  case CHANGE_GAIN: # Arduino end
+    {
+        float new_kp; float new_ki; float new_kd; float new_maxSpeed;
+        
+        success = robot_cmd.get_next_value(new_kp);
+        if(!success)
+        return;
+
+        success = robot_cmd.get_next_value(new_ki);
+        if(!success)
+        return;
+
+        success = robot_cmd.get_next_value(new_kd);
+        if(!success)
+        return;
+
+        success = robot_cmd.get_next_value(new_maxSpeed);
+        if(!success)
+        return;
+
+        Kp = new_kp;
+        Ki = new_ki;
+        Kd = new_kd;
+        maxSpeed = new_maxSpeed;
+        break;
+    }</code></pre>
+
+                                <p>After this, the command for running <codd>PID_TURN_FULL</code> case was initiated, which starts the rotation of the robot. The command can be found below. With this, we are ready to receive and analyze the collected data!</p>
+                                <pre><code>ble.send_command(CMD.PID_TURN_FULL, "")</code></pre>
+                                
+                                <p>Another significant thing to note is that even though one of DMP's main benefits is the fact that it greatly minimizes drift, as will be seen in later parts of this lab report with the static room wall mapping, there was a slight translation in the axis that did corresponded to minor error and noise, especially in initial stages of testing. Through conversation with Aidan McNay in open hours, I learned to change my sensors' timing bdget to 200 ms for sampling, as well as intermeasurement period to 250 ms in-between samples. Particularly, I was not allowing my sensors to have enough time to appropriately measure distances, which resulted in a lot of incorrect measurements being accumulated, producing indigestible and inaccurate plots. The plots might not have been useful for further analysis and mapping, but surely produced some pretty shapes, as can be seen in bloopers section below!</p>
+
+
+
+                                <h3>Discussion</h3>
+                                <p>This lab was one of the most interesting labs in my opinion, it presents us with a new chapter into localization and planning, as well as incorporates the knowledge obtained in many previous labs, fundamentally Lab 6.</p>
+    
                         
 
                     
                             </section>
                             <h4>Acknowledgements and References</h4>
-                            <p>*I worked with Becky Lee on this lab, and got help from Ben Liao on understanding conversion to global frame. I referenced Ben Liao's website (2025) since I got help from him, as well as Wenyi Fu's website (2024) in order to understand the material better.</p>
+                            <p>*I worked with Becky Lee on this lab, and Ben Liao who helped me with understanding conversion to global frame. I referenced Ben Liao's website (2025) since I got help from him, as well as Wenyi Fu's website (2024) in order to understand the material better. Apart from the Becky and Ben, thank you to TA Cameron for helping me fix my ToF sensor connections, as well as TA Cheney for generously prolonging his office hours for testing purposes.</p>
 
                         
                         <!-- </article> -->
