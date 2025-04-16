@@ -364,11 +364,11 @@ for (int j = 0; j < steps; j++) {
         if (pwm > maxSpeed) pwm = maxSpeed;
         if (pwm < -maxSpeed) pwm = -maxSpeed;
 
-        if (pwm < -80) {
+        if (pwm < -100) {
             analogWrite(PIN0, abs(pwm)); analogWrite(PIN1, 0);
             analogWrite(PIN3*1.1, abs(pwm)); analogWrite(PIN2, 0);
         }
-        else if (pwm > 80) {
+        else if (pwm > 100) {
             analogWrite(PIN0, 0); analogWrite(PIN1, abs(pwm));
             analogWrite(PIN3, 0); analogWrite(PIN2*1.1, abs(pwm));
         }
@@ -470,6 +470,89 @@ ble.start_notify(ble.uuid['RX_STRING'], lab9_turns)</code></pre>
                                 <pre><code>ble.send_command(CMD.PID_TURN_FULL, "")</code></pre>
                                 
                                 <p>Another significant thing to note is that even though one of DMP's main benefits is the fact that it greatly minimizes drift, as will be seen in later parts of this lab report with the static room wall mapping, there was a slight translation in the axis that did corresponded to minor error and noise, especially in initial stages of testing. Through conversation with Aidan McNay in open hours, I learned to change my sensors' timing bdget to 200 ms for sampling, as well as intermeasurement period to 250 ms in-between samples. Particularly, I was not allowing my sensors to have enough time to appropriately measure distances, which resulted in a lot of incorrect measurements being accumulated, producing indigestible and inaccurate plots. The plots might not have been useful for further analysis and mapping, but surely produced some pretty shapes, as can be seen in bloopers section below!</p>
+                                <h4>Initial steps - testing the code in the hallway</h4>
+                                <p>Initially, as I wanted to tune my PID gains corresponding to the surface used for this lab, I tuned my gains accordingly on the tiles in the hallway outside of the lab room. I experienced a lot of issues with my robot making small circles around the proposed center, instead of being able to rotate in place, or within 1 tile. In order to address these issues, I firstly experimented with with different calibration factors applied to the proposed PWM values on my wheels' outputs in order to find the right balance. However, throguh experimentation I determined that the most optimal value which produced the besr results was the calibration factor proposed in lab 4, of 1.1 applied to the left wheels' pin outputs.
+                                </p>
+                                <p>Secondly, I slightly lowered all of my gains as compared to Lab 6 optimizations, considering that I wanted to achieve very small angle rotations (that is 10 degrees per turn), which ultimately reflected in less overshoot and better adjustment to the target yaw. The optimized values were found to be Kp = 3.5, Ki = 0.000001, and Kd = 2, while I kept the maximum speed of rotation to about 150.</p>
+                                <p>Another fix that drastically changed my results, was experimenting with the deadband values for left and right motors. Increasing the deadband significantly reduced visible motor wear, as well as filtered out the PWM jitter from PID trying to collect minor errors. My robot's performance looked much cleaner, and was able to maintain its positionality within 1 tile and about the origin, as can be seen in the video below of the robot mapping performance.</p>
+
+                                <h4>Testing in the Lab and Polar Plots</h4>
+                                <p>After the optimized tuning, I was able to test my robot in the lab space. The static room in the lab can be mapped out as the following diagram below. The diagram also denotes the points in which I took the measurements, the four points indicated in the lab handout, (-3,-2), (5, 3), (5, -3), (0, 3), and the origin (0, 0) in which I also took measurements for a better reference of the overall image of the room. </p>
+                                <figure style="margin: 0; text-align: center;">
+                                    <img src="images/floor_mapping.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Static testing room with tested coordinates labeled</figcaption>
+                                </figure>
+                                    
+                                  <p>For reference of my robot's performance, below is a video showing my robot's mapping performance at the mapped location (5, -3).</p>
+                                  <iframe width="300" height ="400"
+                                  src="https://youtube.com/embed/wfnBE0lYjRc"  
+                                  title="Lab 6: P Controller Tuned" 
+                                  frameborder="0" 
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                  allowfullscreen>
+                                  </iframe>
+
+            
+                                  
+                                  <p>Afterwards, I determined the polar plots for each of the coordinate's datasets. The code attached below represents the code used for all attached polar plots. I took the advice proposed in the handout about maintaining the starting positionality of the robot in all testing coordinates constant, hence I pointed my robot along positive x-axis and rotated clockwise 360 degrees. Furthermore, I determined that there was a distance between the robot's center of rotation and my used ToF sensor of about 7.5 cm, which was accounted for as the pre-processing on the data in order to obtain morr accurate measurements of the mapping when determining the polar plots. </p>
+                                  <pre><code>global radians
+
+neg_actual_yaw = [x for x in actual_yaw]
+radians = np.radians(neg_actual_yaw)
+plt.figure()
+ax = plt.subplot(111, polar=True)
+ax.plot(radians[0:37], tof_distance[0:37], marker='o')
+
+# Set angle ticks (degrees)
+ax.set_thetagrids(np.arange(0, 360, 30), fontsize = 10)  # Set tick marks every 45°
+ax.set_theta_direction(-1)
+
+ax.set_title("Polar Plot of 360 Degree Scan, Reading at (5, 3)", va='bottom', pad = 30)
+plt.show()
+print(radians)
+print(tof_distance)
+print(actual_yaw)
+                                    </code></pre>
+
+                                    <p>With the code applied to all the datasets accumulated at each of the measuring coordinates, I was able to obtain the following polar plots:</p>
+                                    <figure style="margin: 0; text-align: center;">
+                                        <img src="images/polarplot_00.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+                                        <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Polar Plot of Reading (0,0)</figcaption>
+                                    </figure>
+
+                                    <figure style="margin: 0; text-align: center;">
+                                        <img src="images/polarplot_32.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+                                        <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Polar Plot of Reading (-3,-2)</figcaption>
+                                    </figure>
+
+                                    <figure style="margin: 0; text-align: center;">
+                                        <img src="images/polarplot_5-3.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+                                        <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Polar Plot of Reading (5,-3)</figcaption>
+                                    </figure>
+
+                                    <figure style="margin: 0; text-align: center;">
+                                        <img src="images/polarplot_53.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+                                        <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Polar Plot of Reading (5,3)</figcaption>
+                                    </figure>
+
+                                    <figure style="margin: 0; text-align: center;">
+                                        <img src="images/polarplot_03.png" alt="Lab 9" width="500" style="display: block; margin: 0 auto;">
+                                        <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Polar Plot of Reading (0,3)</figcaption>
+                                    </figure>
+
+                                    <p>As can be inferred from my Polar Plots, since my robot's original positionality at every coordinate is in positive x-axis direction, then in my code for polar plots above, I implemented the following line <code>ax.set_theta_direction(-1)</code>, which enabled the rotation of the measured angles to start at 0 at the positive x-axis direction, so that I am able to more easily visualise the view of my robot moving thorugh space at the set coordinate as if I am looking down at the coordinate. Furthermore, the data looks as expected through comparing it to previous year's lab pages, such as TA Daria Kot's (2024).</p>
+                                    <h4>Merge and Plot Readings</h4>
+                                    
+
+
+
+
+
+
+
+
+
+
 
 
 
