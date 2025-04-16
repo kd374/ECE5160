@@ -223,7 +223,7 @@ while (true) {
     unsigned long turnStartTime = millis();
 
     // PID Turn Loop
-    while (!targetReached && millis() - turnStartTime < 3000) {
+    while (!targetReached && millis() - turnStartTime < 2000) {
         myICM.readDMPdataFromFIFO(&data);
         if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
             (data.header & DMP_header_bitmap_Quat6)) {
@@ -512,8 +512,18 @@ ble.start_notify(ble.uuid['RX_STRING'], lab9_turns)</code></pre>
                                     <img src="images/static_room_2.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">
                                     <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Static testing room with tested coordinates labeled</figcaption>
                                 </figure>
+
+                                <p>Here is an example of my system while it was untuned, at (-3,-2) coordinates. While it was untuned, it took shorter time to rotate, however, would send faulty and noisy measurements (cheeck the bloopers section at the end for reference!).</p>
                                     
-                                  <p>For reference of my robot's performance, below is a video showing my robot's mapping performance at the mapped location (5, -3).</p>
+                                <iframe width="300" height ="400"
+                                src="https://youtube.com/embed/mSDC8pmeL4U"  
+                                title="Lab 6: P Controller Tuned" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                                </iframe>
+
+                                  <p>For reference of my robot's performance, below is a video showing my robot's mapping performance at the mapped location (5, -3). This is an example of a tuned system. The system was able to measure yaw values very accurately, as well as the distance values at a very large range, but in order to do so, a longer period for reading the yaw value was implemented, increased to about 2000 ms. </p>
                                   <iframe width="300" height ="400"
                                   src="https://youtube.com/embed/wfnBE0lYjRc"  
                                   title="Lab 6: P Controller Tuned" 
@@ -521,6 +531,13 @@ ble.start_notify(ble.uuid['RX_STRING'], lab9_turns)</code></pre>
                                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                                   allowfullscreen>
                                   </iframe>
+
+
+                                  <p>Analyzing the data arrays that were sent over Bluetooth, I was able to confirm the accuracy of my measurements through plotting the actual yaw values and the expected yaw values over the time they were recorded. The plot once the system was tuned looked like the following:</p>
+                                  <figure style="margin: 0; text-align: center;">
+                                    <img src="images/angle_ vs_time_lab9.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">
+                                    <figcaption style="margin: 0; padding-top: 2px; padding-bottom: 20px; padding-left: px;">Angles vs Time Plot of the tuned system, Kp = 3.5, Ki = 0.000001, Kd = 2, speed = 150</figcaption>
+                                </figure>
 
             
                                   
