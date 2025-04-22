@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<title>ECE5160 Portfolio</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+<body class="is-preload">
+		<!-- Wrapper -->
+		<!--	<div id="wrapper" class="fade-in"> -->
+
+				<!-- Intro -->
+                <div id="intro">
+                    <h1>LAB 10</h1>
+                    <p>Grid Localization using Bayes Filter (Simulation)</p>
+                    <ul class="actions">
+                        <li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+                    </ul>
+                </div>
+
+            <!-- Header -->
+            <header id="header">
+                    <a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 10</a>
+                </header>
+
+                
+
+            <!-- Nav -->
+                <nav id="nav">
+                    <ul class="links">
+                        <li class="active"><a href="index.html">LAB 10</a></li>
+                    </ul>
+                    <ul class="icons">
+                        <li><a href="https://www.linkedin.com/in/katarina-duric/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li> 
+                        <li><a href="https://github.com/kd374" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+                </nav>
+
+				<!-- Main -->
+                <div id="main">
+
+                    <!-- Featured Post -->
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>LAB 10</title>
+                    
+                        <!-- Inline CSS for this page only -->
+                        <style>
+                            /* Reduce spacing between paragraphs, sections, and images */
+                            p, h3, h2, pre, img {
+                                margin-bottom: 10px; /* Less space between rows */
+                            }
+                    
+                            /* Reduce spacing between sections */
+                            .content-section {
+                                margin-bottom: 15px; /* Less space between sections */
+                                padding-bottom: 5px;
+                                
+                                border-bottom: 1px solid #ddd;  /* Adds a light gray line */
+                                padding-bottom: 15px;
+                                margin-bottom: 20px;
+
+                            }
+                    
+                            /* Make subtitles (h3) left-aligned */
+                            h3 {
+                                text-align: left;
+                                font-size: 20px; /* Adjust subtitle font size */
+                                margin-left: 5px;
+                            }
+                    
+                            /* Center images */
+                            .center-content img {
+                                display: block;
+                                margin: 0 auto;
+                                width: 500px; /* Adjust width */
+                                height: auto;
+                            }
+
+                            .math-equation {
+                                font-size: 18px;
+                                display:inline-block;
+                            }
+                    
+                            /* Center code blocks */
+                            pre {
+                                background-color: #f4f4f4;
+                                padding: 10px;
+                                border-radius: 5px;
+                                overflow-x: auto;
+                                text-align: left;
+                                font-family: monospace;
+                            }
+                            details {
+                                width: 100%;
+                                padding: 10px;
+                                border: 2px solid #ccc;
+                                border-radius: 8px;
+                                background-color: #f4f4f4;
+                                margin: 10px 0;
+                                font-family: 'monospace', Times, serif, sans-serif;
+                                transition: all 0.3s ease;
+                            }
+
+                            details[open] {
+                                background-color: #f4eae7; /* Different bg when expanded */
+                                border-color: #ec96ad;
+                            }
+
+                            summary {
+                                font-weight: bold;
+                                cursor: pointer;
+                                list-style: none;  /* removes default triangle */
+                                position: relative;
+                                padding-left: 20px;
+                            }
+
+                            /* Optional: Add a custom arrow */
+                            summary::before {
+                                content: '▶';
+                                position: absolute;
+                                left: 0;
+                                transition: transform 0.3s ease;
+                            }
+
+                            details[open] summary::before {
+                                transform: rotate(90deg); /* Rotate arrow when open */
+                            }
+
+                            summary:focus {
+                                outline: none;
+                            }
+                            table {
+                            width: 60%;
+                            border-collapse: collapse;
+                            margin: 20px auto;
+                            font-family: Arial, sans-serif;
+                            }
+
+                            th, td {
+                            border: 1px solid #898181;
+                            padding: 12px;
+                            text-align: center;
+                            vertical-align: middle;
+                            }
+
+                            th {
+                            background-color: #f5f5f5;
+                            font-weight: bold;
+                            text-align: center !important;
+                            }
+
+                            tr:nth-child(even) {
+                            background-color: #f9f9f9;
+                            }
+
+                            tr:hover {
+                            background-color: #f1f1f1;
+                            }
+                        </style>
+                          <!-- MathJax for LaTeX rendering -->
+                        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+                        <script id="MathJax-script" async
+                        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+                        </script>
+
+                        
+                    </head>
+                    <body>
+
+                    
+                        <!-- Featured Post -->
+                        <article class="post featured">
+                            <header class="major">
+                                <span class="date">April 23rd, 2025</span>
+                                <h2>LAB 10 - Grid Localization using Bayes Filter (Simulation)</h2>
+                            </header>
+                    
+                            <!-- Introduction -->
+                            <section class="content-section">
+                            <h3>Introduction</h3>
+                            <p>The aim of this lab is to develop a Python simulation in order to localize a virtual robot in a two-dimensional space environment, which resembles the static room set up in the lab space for mapping (in Lab 9). The grid localization in this lab is performed in Python by implementing a Bayes Filter. The inputs of the Bayes Filter are the sensor measurements, control inputs, and a belief of robot's position within the map. The output for the Filter is the robot's position on the map. 
+                            </section>
+                            <section>
+                            <h3>Localization</h3>
+                            <p>Localization represents a process in which our robot uses the information about its surrounding based on probability in order to infer its position, due to the fact that it does not have the "true" knowledge of its position. In order to implement localization, we develop the Bayes Filter on our robot, which operates on a "belief" - which is influenced by sensor measurements and control inputs, allowing the robot to make a prediction of its position in space. With the sensor measurements and control inputs updating, the robot ought to update its belief as well due to the Bayesian interference.</p>
+                            <h3>Bayes Filter Algorithm Implementation</h3>
+                            <>
+
+
+
+                                <h3>Discussion</h3>
+                                <p>This lab was one of the most interesting labs in my opinion, it presents us with a new chapter into localization and planning, as well as incorporates the knowledge obtained in many previous labs, fundamentally Lab 6.</p>
+    
+                        
+
+                    
+                            </section>
+                            <h4>Acknowledgements and References</h4>
+                            <p>*I referenced Mikayla Lahr's website (2024) and Stephan Wagner's website (2024). Special thanks to TA Cheney for his help!</p>
+
+                        
+                        <!-- </article> -->
+                    
+                    </body>
+ 
+                    
+
+                    
+
+                    
+                    
+
+                    <!-- Posts -->
+
+
+                    <!-- Footer -->
+                </div>
+                </div>
+            <!-- Footer -->
+            <footer id="footer">
+                    <!-- <section>
+                        <form method="post" action="#">
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" />
+                                </div>
+                                <div class="field">
+                                    <label for="email">Email</label>
+                                    <input type="text" name="email" id="email" />
+                                </div>
+                                <div class="field">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <ul class="actions">
+                                <li><input type="submit" value="Send Message" /></li>
+                            </ul>
+                        </form>
+                    </section>
+                    <section class="split contact"> -->
+                        <section>
+                            <h3>EMAIL @ </h3>
+                            <p><a href="#">kd374@cornell.edu</a></p>
+                        </section>
+                </footer> 
+
+            <!-- Copyright -->
+                <div id="copyright">
+                    <ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+                </div>
+
+        </div>
+
+    <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+
+</body>
+</html>
+                    
+
+                      
