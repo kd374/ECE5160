@@ -284,13 +284,48 @@
                                 bel = loc.bel[prev_x-1,prev_y-1,prev_a-1]
                                 loc.bel_bar[cur_x,cur_y,cur_a] += (prob*bel) </code></pre>
         <h4>Sensor model</h4>
-        <p></p>
+        <p>The sensor model step is based on finding the probability of the sensor measurements, which are modeled as the Gaussian distribution. The value of 18 represents the 18 different distance readings. The input is represented in the one-dimensional observation array obs for the pose of the robot. The returned array is represented in the same one-dimensional array with the likelihood of each of the events prob_array.</p>
+
+        <pre><code>def sensor_model(obs):
+    """ This is the equivalent of p(z|x).
+
+
+    Args:
+        obs ([ndarray]): A 1D array consisting of the true observations for a specific robot pose in the map 
+
+    Returns:
+        [ndarray]: Returns a 1D array of size 18 (=loc.OBS_PER_CELL) with the likelihoods of each individual sensor measurement
+    """
+    prob_array = np.zeros(18)
+    for i in range(18):
+        prob_array[i] = loc.gaussian(loc.obs_range_data[i], obs[i], loc.sensor_sigma)
+
+    return prob_array </code></pre>
+
+    <h4>Update Step</h4>
+    <p>The update step represents the belief of the robot per grid cell. Hence, the probability <code>(p(z|x))</code>is multiplied by the predicted belief <code>loc.bel_bar</code> to obtain <code>loc.bel</code>, or the belief, which is further normalized.</p>
+
+
+    <pre><code>def update_step():
+    """ Update step of the Bayes Filter.
+    Update the probabilities in loc.bel based on loc.bel_bar and the sensor model.
+    """
+    for cur_x in range(mapper.MAX_CELLS_X):
+        for cur_y in range(mapper.MAX_CELLS_Y):
+            for cur_a in range(mapper.MAX_CELLS_A):
+                prob = np.prod(sensor_model(mapper.get_views(cur_x,cur_y,cur_a)))
+                loc.bel[cur_x,cur_y,cur_a] = loc.bel_bar[cur_x,cur_y,cur_a] * prob
+    loc.bel = loc.bel / np.sum(loc.bel)</code></pre>
+
+    <h3>Results</h3>
+    <p>The videos representing the trajectory simulation without the Bayes filter. The deterministic odometry model is plotted in red, while the ground truth is represented in green. As can be inferred from the videos, the odometry model is not very reliable.</p>
+
 
 
 
                             </section>
                                 <h3>Discussion</h3>
-                                <p>This lab was one of the most interesting labs in my opinion, it presents us with a new chapter into localization and planning, as well as incorporates the knowledge obtained in many previous labs, fundamentally Lab 6.</p>
+                                <p>This lab was very interesting, as it provided a great introduction into Bayes Filtering, prior to expanding onto it and implementing it in Lab 11.</p>
     
                         
 
