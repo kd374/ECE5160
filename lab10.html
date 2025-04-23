@@ -318,7 +318,16 @@
     loc.bel = loc.bel / np.sum(loc.bel)</code></pre>
 
     <h3>Results</h3>
-    <p>The videos representing the trajectory simulation without the Bayes filter. The deterministic odometry model is plotted in red, while the ground truth is represented in green. As can be inferred from the videos, the odometry model is not very reliable.</p>
+    <p>The following video represents the trajectory simulation without the Bayes filter. The deterministic odometry model is plotted in red, while the ground truth is represented in green. As can be inferred from the video, the odometry model is not very reliable.</p>
+    <iframe width="300" height ="400"
+    src="https://youtube.com/embed/0XhaHY72roc"  
+    title="Lab 6: P Controller Tuned" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    allowfullscreen>
+    </iframe>
+    
+    <p>The following video represents adding the Bayes Filter to the localization simulation. With this simulation, we have the probabilistic belief indicated in blue, which has a close accuracy in approximation of the robot's true position. The probabilistic approach reflects the sensor data being more consistent and trustworthy when it is oriented around the walls, and less trustworthy in larger unconstrained spaces. The probabilistic belief can be seen to follow the ground truth plotted in green pretty well, while the odometry model represented in red still has a non-reliable trajectory.</p>
 
 
 
