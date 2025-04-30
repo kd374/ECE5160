@@ -185,168 +185,174 @@
                             </section>
                             <section>
                             <h3>Lab Tasks</h3>
+                            <p>For this lab, I made a copy of the lab11_sim.ipynb and lab11_real.ipynb provided scripts and places them into the notebooks directory, as well as made a copy of localization_extras.py and places it into the FastRobots-sim-release directory. For the code to be functional with the Bluetooth module, I copied base_ble.py, ble.py, connection.yaml, and cmd_types.py files into the notebooks directory as well.</p>
                             <h4>Localization Simulation</h4>
-                            
-
-
-
-
-
-
-
-                            <h3>Localization</h3>
-                            <p>Localization represents a process in which our robot uses the information about its surrounding based on probability in order to infer its position, due to the fact that it does not have the "true" knowledge of its position. In order to implement localization, we develop the Bayes Filter on our robot, which operates on a "belief" - which is influenced by sensor measurements and control inputs, allowing the robot to make a prediction of its position in space. With the sensor measurements and control inputs updating, the robot ought to update its belief as well due to the Bayesian interference. The state of the robot is represented in x and y coordinates, where x coordinates were defined same as in Lab 9, <code>-5.5 ft < x < 6.5 ft</code>, and y coordinates were defined same as in Lab 9, <code>-4.5 ft < y < 4.5 ft</code>. Furthermore, the orientation of the robot can be described as the following: <code>- 180 degrees < &theta; < 180 degrees</code>.</p>
-                            <p>The 3D space around the robot is discretized into a grid of the volume of 12x9x9 cells, where each of the cells can be represented in 1x1 ft of planar space and 20 degrees of orientation.</p>
-                            <h3>Bayes Filter Algorithm Implementation</h3>
-                            <p>Bayes Filter is a probabilistic algorithm used for estimating state of a dynamic system given observations, by leveraging Bayesian inference, through which it constantly updates beliefs about the state based on updated sensor measurements and control inputs. The prediction step of the Filter increases the belief uncertainty, while the update step decreases the belief uncertainty. The algorithm was presented to us in class Lecture 20, and can be described by the following figure:</p>
+                            <p>The first proposed task of the lab asked us to perform the Bayes Filter simulation based on the provided lab11_sim.ipynb script, which ought produce comparable results to what we produced with the Python implementation in Lab 10. The screenshot of the final output can be found below. The green line represents the ground truth, the belief is represented in blue, while the odometry model is represented in red. It can be inferred, similarly to in Lab 10, ground truth and belief are close together, while the odometry model does not effectively and accurately replicate the odometry and belief.</p>
                             <figure style="margin: 0; text-align: center;">
-                                <img src="images/bayes_filter_algorithm.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">Bayes Filter Algorithm</figcaption>
-                            </figure>
-
-                            <p>From the figure above, it can be inferred that <span class="math-equation">\(bel(x_{t-1})\)</span> represents the previous belief, which can be described as a 3D matrix, where each element further represents the probability that the robot is located in the compatible grid vell. Furthermore, <span class="math-equation">\(u_{t}\)</span> represents the current control input changing the pose from <span class="math-equation">\(x_{t-1}\)</span> to <span class="math-equation">\(x_{t}\)</span>, while <span class="math-equation">\(z_{t}\)</span> represents the current sensor rate of 18 readings with 20 degree increments. The algorithm performs through looping through the range of <span class="math-equation">\(x_{t}\)</span> values, described in the form of (<span class="math-equation">\(x, y, &theta;\)</span>) at each point in time. Hence, new belief with each iteration is determined, through multiplying the new state's probability with the previous state's probability, resulting into the sum of all multiplications represented in the prediction belief  <span class="math-equation">\( \overline{\mathrm{bel}}(x_t) \)</span>. The belief is thus updated by multiplying the probability of new sensor readings at the current pose and performing the normalization with &eta; after which  <span class="math-equation">\( {\mathrm{bel}}(x_t) \)</span> is obtained and returned.
-  </p>                         
-                            <p>The figure below represents the odometry model parameters, which can be used to describe the control inputs, as follows from Lecture 18 on Bayes Filter.. The odometry model represents the difference between two poses of the robot as initial rotation, translation, as well as final rotation.  </p>
-                            <figure style="margin: 0; text-align: center;">
-                                <img src="images/odometry_models.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">Odometry Model Parameters</figcaption>
+                                <img src="images/bayes_filter_idealrun_lab11.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">Bayes Filter Algorithm run based on the lab11_sim.ipynb script, indicating odometry model (red), belief (blue), and ground truth (green)</figcaption>
                             </figure>
                             <p></p>
-                            </section>
-                            <section>
-                            <h4>Compute Control</h4>
-                                <p>As aforementioned, the odometry model is computed through taking the difference between the previous and the current pose of the robot, and hence determining the initial rotation, translation, and final rotation, as in the formulas described in the <i>Odometry Model Parameters</i> figure above. This can be determined through NumPy's <code>arctan2()</code> function. The rotations are normalized to [-180, 180], and are calculated, as well as the translation.</p>
-                                <pre><code>def compute_control(cur_pose, prev_pose):
-    """ Given the current and previous odometry poses, this function extracts
-    the control information based on the odometry motion model.
+                            <p></p>
+                            <h4>Arduino Implementation</h4>
+                            <p>My Arduino code remained very much the same compared to the code provided in Lab 9. The predominant changes to my code were the fact that I set the number of increments (in my code, refered to as steps) to be 18, and the target_yaw, or the angle of increment was changed to be -20 degrees, as opposed to the positive 10 degrees for the angle and 36 steps for the number of increments from Lab 9. Furthermore, I made another change to separate the for loop in which I send my collected data arrays over to Python in a separate case, called <code>SEND_ORIENTATION_DATA</code>. For this reason, the steps variable was instantiated globally, instead of in the main control case, <code>PID_TURN_FULL</code>, since the variable is also called in the <code>SEND_ORIENTATION_DATA</code> case. The code for this case, as well as the primary case <code>PID_TURN_FULL</code> can be seen below. </p>
 
-    Args:
-        cur_pose  ([Pose]): Current Pose
-        prev_pose ([Pose]): Previous Pose 
+                            <details>
+                                <summary>Full lab 11 Arduino code shown here for reference</summary>
+                              
+<pre><code>case PID_TURN_FULL:
+{
+    const int steps = 18; // this variable is set globally
+    const float yaw_step = -20.0;
+    double initial_yaw = 0;
+    double target_yaw, current_yaw;
+    float error = 0, prev_error = 0, error_sum = 0;
+    float dt = 0;
+    float pwm = 0, p_term, i_term, d_term;
+    unsigned long last_time = millis();
 
-    Returns:
-        [delta_rot_1]: Rotation 1  (degrees)
-        [delta_trans]: Translation (meters)
-        [delta_rot_2]: Rotation 2  (degrees)
-    """
-    y_comp = cur_pose[1] - prev_pose[1]
-    x_comp = cur_pose[0] - prev_pose[0]
-    theta_prev = prev_pose[2]
-    theta_cur = cur_pose[2]
-    delta_1 = np.degrees(math.atan2(y_comp, x_comp)) - theta_prev
-    delta_rot_1 = mapper.normalize_angle(delta_1)
-    delta_trans = math.sqrt(y_comp**2+x_comp**2)
-    delta_rot_2 = mapper.normalize_angle(theta_cur - theta_prev - delta_1)
+    // Arrays for logging set as global variables
+    // double actual_yaw_data[steps];
+    // double expected_yaw_data[steps];
+    // unsigned long timestamps[steps];
+    // int tof_data[steps];
 
-    return delta_rot_1, delta_trans, delta_rot_2  </code></pre>
+    icm_20948_DMP_data_t data;
+    distanceSensor0.startRanging();
 
-    <h4>Odometry Motion Model</h4>
-    <p>The odometry motion model is responsible for the probability that the motion calculated in the previous step was performed. This is performed by taking the previous pose and the current pose through <code>odom_motion_model()</code>, and extracting the odometry model parameters from them using <code>compute_control()</code>, calculating the probabilities of the parameters. Hence, the inputs consist of the current pose, previous pose, and odometry control values <code>(u)</code> for rotation_1, rotation_2, and translation. Knowing the current position as well as the previous position, the odometry control values (u), the return value is the probability <code>p(x'|x,u)</code>that the robot achieved the current position <code>x'</code>. The Gaussian distribution can be examined, while each of the events can be represented as independent. The probability of each of the events is thus multiplied in order to obtain the motion probability.</p>
-    <pre><code>def odom_motion_model(cur_pose, prev_pose, u):
-    """ Odometry Motion Model
+    // Obtain the initial yaw
+    while (true) {
+    myICM.readDMPdataFromFIFO(&data);
+        if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+            (data.header & DMP_header_bitmap_Quat6)) {
+            double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+            double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+            double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+            double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+            double qw = q0, qx = q2, qy = q1, qz = -q3;
+            double t3 = 2.0 * (qw * qz + qx * qy);
+            double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+            initial_yaw = atan2(t3, t4) * 180.0 / PI;
+            break;
+        }
+    }
 
-    Args:
-        cur_pose  ([Pose]): Current Pose
-        prev_pose ([Pose]): Previous Pose
-        (rot1, trans, rot2) (float, float, float): A tuple with control data in the format 
-                                                    format (rot1, trans, rot2) with units (degrees, meters, degrees)
+    for (int step = 0; step < steps; step++) {
+        target_yaw = initial_yaw + step * yaw_step;
+        if (target_yaw > 180) target_yaw -= 360;
+        if (target_yaw < -180) target_yaw += 360;
+
+        bool targetReached = false;
+        unsigned long turnStartTime = millis();
+
+        // PID Turn Loop
+        while (!targetReached && millis() - turnStartTime < 3000) {
+            myICM.readDMPdataFromFIFO(&data);
+            if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+                (data.header & DMP_header_bitmap_Quat6)) {
+
+            double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+            double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+            double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+            double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+            double qw = q0, qx = q2, qy = q1, qz = -q3;
+            double t3 = 2.0 * (qw * qz + qx * qy);
+            double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+            current_yaw = atan2(t3, t4) * 180.0 / PI;
+
+            dt = (millis() - last_time) / 1000.0;
+            last_time = millis();
+
+            error = current_yaw - target_yaw;
+            if (error > 180) error -= 360;
+            if (error < -180) error += 360;
+
+            error_sum += error * dt;
+            if (error_sum > 150) error_sum = 150;
+            if (error_sum < -150) error_sum = -150;
+
+            p_term = Kp * error;
+            i_term = Ki * error_sum;
+            d_term = Kd * (error - prev_error) / dt;
+            pwm = p_term + i_term + d_term;
+
+            prev_error = error;
+
+            if (abs(error) < 2.0) {
+                targetReached = true;
+                break;
+            }
+
+            if (pwm > maxSpeed) pwm = maxSpeed;
+            if (pwm < -maxSpeed) pwm = -maxSpeed;
+
+            if (pwm < -100) {
+                analogWrite(PIN0, abs(pwm)); analogWrite(PIN1, 0);
+                analogWrite(PIN3*1.1, abs(pwm)); analogWrite(PIN2, 0);
+            }
+            else if (pwm > 100) {
+                analogWrite(PIN0, 0); analogWrite(PIN1, abs(pwm));
+                analogWrite(PIN3, 0); analogWrite(PIN2*1.1, abs(pwm));
+            }
+            else {
+                analogWrite(PIN0, 0); analogWrite(PIN1, 0);
+                analogWrite(PIN3, 0); analogWrite(PIN2, 0);
+            }
+
+            delay(10);
+            }
+        }
+
+        // Stop the motors
+        analogWrite(PIN0, 0); analogWrite(PIN1, 0);
+        analogWrite(PIN3, 0); analogWrite(PIN2, 0);
+
+        delay(1000); // Pause for 1 second at this angle
+
+        // Get distance
+        int distance_tof = 0;
+        if (distanceSensor0.checkForDataReady()) {
+            distance_tof = distanceSensor0.getDistance();
+            distanceSensor0.clearInterrupt();
+            distanceSensor0.stopRanging();
+            distanceSensor0.startRanging();
+            Serial.println(distance_tof);
+        }
+
+        // Save data to arrays
+        expected_yaw_data[step] = step * 10;
+        actual_yaw_data[step] = current_yaw;
+        timestamps[step] = millis();
+        tof_data[step] = distance_tof;
+        }
+
+        Serial.println("A full 360 turn complete.");
+        break;
+    } </code></pre>                 </details>
+
+    <pre><code>case SEND_ORIENTATION_DATA: {
+    for (int j = 0; j < steps; j++) {
+        tx_estring_value.clear();
+        tx_estring_value.append(expected_yaw_data[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(actual_yaw_data[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(timestamps[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(tof_data[j]);
+        tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    }
+    Serial.println("360-degree PID turn complete, and data is transmitted.");
+    break;
+}
+</code></pre>
+
+<p></p>
 
 
-    Returns:
-        prob [float]: Probability p(x'|x, u)
-    """
-
-    u_calc = compute_control(cur_pose, prev_pose)
-    rot1_x = mapper.normalize_angle(u_calc[0])
-    rot1_mu = mapper.normalize_angle(u[0])
-    trans1_x = u_calc[1]
-    trans1_mu = u[1]
-    rot2_x = mapper.normalize_angle(u_calc[2])
-    rot2_mu = mapper.normalize_angle(u[2])
-    rot1_prob = loc.gaussian(mapper.normalize_angle(rot1_x-rot1_mu), 0, loc.odom_rot_sigma)
-    trans_prob = loc.gaussian((trans1_x-trans1_mu), 0, loc.odom_trans_sigma)
-    rot2_prob = loc.gaussian(mapper.normalize_angle(rot2_x - rot2_mu), 0, loc.odom_rot_sigma)
-
-    prob = rot1_prob * trans_prob * rot2_prob
-
-    return prob</code></pre>
-
-    <h4>Prediction Step</h4>
-    <p>The prediction step utilized 6 nested loops in order to calculate the probability of the robot moving onto the next grid cell. The inputs are the previous odometry position (prev_odom), as well as the current odometry position (cur_odom). The if statement speeds up the Filter, with the statement checking for the belief greater than 0.0001. If the belief is less than the value, then the code does not proceed with the remaining three for loops, due to the fact that the robot's position is not likely to be in those remaining grid cells. However, if the belief fulfills the greater or equal to condition, then the probability is calculated.</p>
-    <pre><code>def prediction_step(cur_odom, prev_odom):
-    """ Prediction step of the Bayes Filter.
-    Update the probabilities in loc.bel_bar based on loc.bel from the previous time step and the odometry motion model.
-
-    Args:
-        cur_odom  ([Pose]): Current Pose
-        prev_odom ([Pose]): Previous Pose
-    """
-
-    u = compute_control(cur_odom, prev_odom)
-    for prev_x in range(mapper.MAX_CELLS_X):
-        for prev_y in range(mapper.MAX_CELLS_X-3):
-            for prev_a in range(mapper.MAX_CELLS_A):
-                if loc.bel[prev_x,prev_y,prev_a] >= 0.0001:
-                    for cur_x in range(mapper.MAX_CELLS_X):
-                        for cur_y in range(mapper.MAX_CELLS_Y):
-                            for cur_a in range(mapper.MAX_CELLS_A):
-                                prev_pose = mapper.from_map(prev_x,prev_y,prev_a)
-                                current_pose = mapper.from_map(cur_x,cur_y,cur_a)
-                                prob = odom_motion_model(current_pose,prev_pose,u)
-                                bel = loc.bel[prev_x-1,prev_y-1,prev_a-1]
-                                loc.bel_bar[cur_x,cur_y,cur_a] += (prob*bel) </code></pre>
-        <h4>Sensor model</h4>
-        <p>The sensor model step is based on finding the probability of the sensor measurements, which are modeled as the Gaussian distribution. The value of 18 represents the 18 different distance readings. The input is represented in the one-dimensional observation array obs for the pose of the robot. The returned array is represented in the same one-dimensional array with the likelihood of each of the events prob_array.</p>
-
-        <pre><code>def sensor_model(obs):
-    """ This is the equivalent of p(z|x).
+                      
 
 
-    Args:
-        obs ([ndarray]): A 1D array consisting of the true observations for a specific robot pose in the map 
 
-    Returns:
-        [ndarray]: Returns a 1D array of size 18 (=loc.OBS_PER_CELL) with the likelihoods of each individual sensor measurement
-    """
-    prob_array = np.zeros(18)
-    for i in range(18):
-        prob_array[i] = loc.gaussian(loc.obs_range_data[i], obs[i], loc.sensor_sigma)
-
-    return prob_array </code></pre>
-
-    <h4>Update Step</h4>
-    <p>The update step represents the belief of the robot per grid cell. Hence, the probability <code>(p(z|x))</code>is multiplied by the predicted belief <code>loc.bel_bar</code> to obtain <code>loc.bel</code>, or the belief, which is further normalized.</p>
-
-
-    <pre><code>def update_step():
-    """ Update step of the Bayes Filter.
-    Update the probabilities in loc.bel based on loc.bel_bar and the sensor model.
-    """
-    for cur_x in range(mapper.MAX_CELLS_X):
-        for cur_y in range(mapper.MAX_CELLS_Y):
-            for cur_a in range(mapper.MAX_CELLS_A):
-                prob = np.prod(sensor_model(mapper.get_views(cur_x,cur_y,cur_a)))
-                loc.bel[cur_x,cur_y,cur_a] = loc.bel_bar[cur_x,cur_y,cur_a] * prob
-    loc.bel = loc.bel / np.sum(loc.bel)</code></pre>
-
-    <h3>Results</h3>
-    <p>The following video represents the trajectory simulation without the Bayes filter. The deterministic odometry model is plotted in red, while the ground truth is represented in green. As can be inferred from the video, the odometry model is not very reliable.</p>
-    <iframe width="300" height ="400"
-    src="https://youtube.com/embed/0XhaHY72roc"  
-    title="Lab 6: P Controller Tuned" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-    allowfullscreen>
-    </iframe>
-    
-    <p>The following video represents adding the Bayes Filter to the localization simulation. With this simulation, we have the probabilistic belief indicated in blue, which has a close accuracy in approximation of the robot's true position. The probabilistic approach reflects the sensor data being more consistent and trustworthy when it is oriented around the walls, and less trustworthy in larger unconstrained spaces, causing larger errors. The probabilistic belief can be seen to follow the ground truth plotted in green pretty well, while the odometry model represented in red still has a non-reliable trajectory.</p>
-    <iframe width="300" height ="400"
-    src="https://youtube.com/embed/6IDe0z8BFwE"  
-    title="Lab 6: P Controller Tuned" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-    allowfullscreen>
-    </iframe>
-
-    <p>The raw data collected can be found here:  <a href="Run_raw_data.txt">Raw data collected from the run</a> </p>
 
 
 
@@ -359,7 +365,7 @@
                     
                             </section>
                             <h4>Acknowledgements and References</h4>
-                            <p>*I referenced Mikayla Lahr's website (2024) and Stephan Wagner's website (2024). Special thanks to TA Cheney for his help!</p>
+                            <p>*I referenced TA Mikayla Lahr's website (2024). Special thanks to TA Mikayla for all her help with the lab, and helping me understand the Python implementation better!</p>
 
                         
                         <!-- </article> -->
