@@ -393,84 +393,6 @@
 <figure style="margin: 0; text-align: center;">
     <img src="images/lab9_image.jpg" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">Bayes Filter Algorithm run based on the lab11_sim.ipynb script, indicating odometry model (red), belief (blue), and ground truth (green)</figcaption>
 </figure>
-<b>(-3, -2)</b>
-<p>The ground truth was determined to be at the following coordinate represented in meters:</p>
-<figure style="margin: 0; text-align: center;">
-    <img src="images/-3-2coordinate_groundtruth.png" alt="Lab 8" width="150" style="display: block; margin: 0 auto;">
-</figure>
-    <section></section><p></p>
-    <p></p>
-    <p>The outputs of the first run can be found below:</p>
-<div class="image-container">
-    <img src="images/bottom_left_both.png" alt="Image 1" width="350">
-    <img src="images/bottom_left_green.png" alt="Image 2" width="350">
-    <img src="images/bottom_left_blue.png" alt="Image 3" width="350">
-    <figcaption>(-3, -2) Localization Run, from left to right, ground through and belief overlapping graph, ground truth graph, and belief graph</figcaption>
-</div>
-
-<p>The results of the second run are as the following:</p>
-<div class="image-container">
-    <img src="images/bottom_left_both_trial2.png" alt="Image 1" width="350">
-    <img src="images/bottom_left_green.png" alt="Image 2" width="337">
-    <img src="images/bottom_left_blue_trial2 - Copy.png" alt="Image 3" width="350">
-    <figcaption>(-3, -2) Second Localization Run, from left to right, ground through and belief graph, ground truth graph, and belief graph</figcaption>
-</div>
-
-<p>As can be inferred, the ground truth and the belief are at the same point, which can be expected due to the fact that the robot is mostly surrounded by walls from almost all sides, which makes the belief overlab with the ground truth.</p>
-
-<figure style="margin: 0; text-align: center;">
-    <img src="images/bottom_left_celloutput.png" alt="Lab 11" width="600" style="display: block; margin: 0 auto;">
-</figure>
-
-<p>Finally, the video of the rotation for (-3, -2) coordinate can be shown.</p>
-<iframe width="300" height ="400"
-src="https://youtube.com/embed/JBF3eV2z2Ac"  
-title="Lab 6: P Controller Tuned" 
-frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-allowfullscreen>
-</iframe></p>
-
-<p>As can be seen from this run, the belief is slightly dispositioned to the right compared to the ground truth. However, it still maintains relatively close position to the ground truth.</p>
-
-<b>(5, -3)</b>
-<p>The ground truth was determined to be at the following coordinate represented in meters:</p>
-<figure style="margin: 0; text-align: center;">
-    <img src="images/5-3coordinate_groundtruth.png" alt="Lab 8" width="150" style="display: block; margin: 0 auto;">
-</figure>
-    <section></section><p></p>
-    <p></p>
-    <p>The outputs of the first run can be found below:</p>
-    <div class="image-container">
-    <img src="images/bottom_right_blue.png" alt="Image 1" width="350">
-    <img src="images/bottom_right_green.png" alt="Image 2" width="346">
-    <img src="images/bottom_right_blue.png" alt="Image 3" width="350">
-    <figcaption>(5, -3) Localization Run, from left to right, ground through and belief overlapping graph, ground truth graph, and belief graph</figcaption>
-</div>
-
-<p>As can be inferred from the first run at (-5, 3) coordinate, the belief was determined to be at the same point as the ground truth. For both this run, and the outputs of the second run attached below, the ground truth and belief were overlapping. Similarly to the (-3, -2) coordinate, higher accuracy ought to be expected as the robot is surrounded by many walls and a box-shaped obstacle in its view.</p>
-
-<p>The results of the second run are as the following:</p>
-<div class="image-container">
-    <img src="images/bottom_right_blue.png" alt="Image 1" width="350">
-    <img src="images/bottom_right_green.png" alt="Image 2" width="337">
-    <img src="images/bottom_right_blue.png" alt="Image 3" width="350">
-    <figcaption>(5, -3) Second Localization Run, from left to right, ground through and belief overlapping graph, ground truth graph, and belief graph</figcaption>
-</div>
-
-<figure style="margin: 0; text-align: center;">
-    <img src="images/bottom_right_cell_output.png" alt="Lab 11" width="600" style="display: block; margin: 0 auto;">
-</figure>
-
-<p>Finally, the video of the rotation for (5, -3) coordinate can be shown.</p>
-<iframe width="300" height ="400"
-src="https://youtube.com/embed/NuEMaPk1_Ns"  
-title="Lab 6: P Controller Tuned" 
-frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-allowfullscreen>
-</iframe>
-</p>
 
 <b>(5, 3)</b>
 <p>The ground truth was determined to be at the following coordinate represented in meters:</p>
@@ -550,6 +472,85 @@ frameborder="0"
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
 allowfullscreen>
 </iframe>
+		    
+<b>(-3, -2)</b>
+<p>The ground truth was determined to be at the following coordinate represented in meters:</p>
+<figure style="margin: 0; text-align: center;">
+    <img src="images/-3-2coordinate_groundtruth.png" alt="Lab 8" width="150" style="display: block; margin: 0 auto;">
+</figure>
+    <section></section><p></p>
+    <p></p>
+    <p>The outputs of the first run can be found below:</p>
+<div class="image-container">
+    <img src="images/bottom_left_both.png" alt="Image 1" width="350">
+    <img src="images/bottom_left_green.png" alt="Image 2" width="350">
+    <img src="images/bottom_left_blue.png" alt="Image 3" width="350">
+    <figcaption>(-3, -2) Localization Run, from left to right, ground through and belief overlapping graph, ground truth graph, and belief graph</figcaption>
+</div>
+
+<p>The results of the second run are as the following:</p>
+<div class="image-container">
+    <img src="images/bottom_left_both_trial2.png" alt="Image 1" width="350">
+    <img src="images/bottom_left_green.png" alt="Image 2" width="337">
+    <img src="images/bottom_left_blue_trial2 - Copy.png" alt="Image 3" width="350">
+    <figcaption>(-3, -2) Second Localization Run, from left to right, ground through and belief graph, ground truth graph, and belief graph</figcaption>
+</div>
+
+<p>As can be inferred, the ground truth and the belief are at the same point, which can be expected due to the fact that the robot is mostly surrounded by walls from almost all sides, which makes the belief overlab with the ground truth.</p>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/bottom_left_celloutput.png" alt="Lab 11" width="600" style="display: block; margin: 0 auto;">
+</figure>
+
+<p>Finally, the video of the rotation for (-3, -2) coordinate can be shown.</p>
+<iframe width="300" height ="400"
+src="https://youtube.com/embed/JBF3eV2z2Ac"  
+title="Lab 6: P Controller Tuned" 
+frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+allowfullscreen>
+</iframe></p>
+
+<p>As can be seen from this run, the belief is slightly dispositioned to the right compared to the ground truth. However, it still maintains relatively close position to the ground truth.</p>
+
+<b>(5, -3)</b>
+<p>The ground truth was determined to be at the following coordinate represented in meters:</p>
+<figure style="margin: 0; text-align: center;">
+    <img src="images/5-3coordinate_groundtruth.png" alt="Lab 8" width="150" style="display: block; margin: 0 auto;">
+</figure>
+    <section></section><p></p>
+    <p></p>
+    <p>The outputs of the first run can be found below:</p>
+    <div class="image-container">
+    <img src="images/bottom_right_blue.png" alt="Image 1" width="350">
+    <img src="images/bottom_right_green.png" alt="Image 2" width="346">
+    <img src="images/bottom_right_blue.png" alt="Image 3" width="350">
+    <figcaption>(5, -3) Localization Run, from left to right, ground through and belief overlapping graph, ground truth graph, and belief graph</figcaption>
+</div>
+
+<p>As can be inferred from the first run at (-5, 3) coordinate, the belief was determined to be at the same point as the ground truth. For both this run, and the outputs of the second run attached below, the ground truth and belief were overlapping. Similarly to the (-3, -2) coordinate, higher accuracy ought to be expected as the robot is surrounded by many walls and a box-shaped obstacle in its view.</p>
+
+<p>The results of the second run are as the following:</p>
+<div class="image-container">
+    <img src="images/bottom_right_blue.png" alt="Image 1" width="350">
+    <img src="images/bottom_right_green.png" alt="Image 2" width="337">
+    <img src="images/bottom_right_blue.png" alt="Image 3" width="350">
+    <figcaption>(5, -3) Second Localization Run, from left to right, ground through and belief overlapping graph, ground truth graph, and belief graph</figcaption>
+</div>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/bottom_right_cell_output.png" alt="Lab 11" width="600" style="display: block; margin: 0 auto;">
+</figure>
+
+<p>Finally, the video of the rotation for (5, -3) coordinate can be shown.</p>
+<iframe width="300" height ="400"
+src="https://youtube.com/embed/NuEMaPk1_Ns"  
+title="Lab 6: P Controller Tuned" 
+frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+allowfullscreen>
+</iframe>
+</p>
 
 </section>
 
