@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<title>ECE5160 Portfolio</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+<body class="is-preload">
+		<!-- Wrapper -->
+		<!--	<div id="wrapper" class="fade-in"> -->
+
+				<!-- Intro -->
+                <div id="intro">
+                    <h1>LAB 12</h1>
+                    <p>Path Planning and Execution</p>
+                    <ul class="actions">
+                        <li><a href="#header" class="button icon solid solo fa-arrow-down scrolly">Continue</a></li>
+                    </ul>
+                </div>
+
+            <!-- Header -->
+            <header id="header">
+                    <a href="index.html" class="logo">ECE 5160 | Fast Robots: Lab 12</a>
+                </header>
+
+                
+
+            <!-- Nav -->
+                <nav id="nav">
+                    <ul class="links">
+                        <li class="active"><a href="index.html">LAB 12</a></li>
+                    </ul>
+                    <ul class="icons">
+                        <li><a href="https://www.linkedin.com/in/katarina-duric/" class="icon brands fa-linkedin"><span class="label">Linkedin</span></a></li> 
+                        <li><a href="https://github.com/kd374" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+                </nav>
+
+				<!-- Main -->
+                <div id="main">
+
+                    <!-- Featured Post -->
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>LAB 12</title>
+                    
+                        <!-- Inline CSS for this page only -->
+                        <style>
+                            /* Reduce spacing between paragraphs, sections, and images */
+                            p, h3, h2, pre, img {
+                                margin-bottom: 10px; /* Less space between rows */
+                            }
+                    
+                            /* Reduce spacing between sections */
+                            .content-section {
+                                margin-bottom: 15px; /* Less space between sections */
+                                padding-bottom: 5px;
+                                
+                                border-bottom: 1px solid #ddd;  /* Adds a light gray line */
+                                padding-bottom: 15px;
+                                margin-bottom: 20px;
+
+                            }
+                    
+                            /* Make subtitles (h3) left-aligned */
+                            h3 {
+                                text-align: left;
+                                font-size: 20px; /* Adjust subtitle font size */
+                                margin-left: 5px;
+                            }
+                    
+                            /* Center images */
+                            .center-content img {
+                                display: block;
+                                margin: 0 auto;
+                                width: 500px; /* Adjust width */
+                                height: auto;
+                            }
+
+                            .math-equation {
+                                font-size: 18px;
+                                display:inline-block;
+                            }
+                    
+                            /* Center code blocks */
+                            pre {
+                                background-color: #f4f4f4;
+                                padding: 10px;
+                                border-radius: 5px;
+                                overflow-x: auto;
+                                text-align: left;
+                                font-family: monospace;
+                            }
+                            details {
+                                width: 100%;
+                                padding: 10px;
+                                border: 2px solid #ccc;
+                                border-radius: 8px;
+                                background-color: #f4f4f4;
+                                margin: 10px 0;
+                                font-family: 'monospace', Times, serif, sans-serif;
+                                transition: all 0.3s ease;
+                            }
+
+                            details[open] {
+                                background-color: #f4eae7; /* Different bg when expanded */
+                                border-color: #ec96ad;
+                            }
+
+                            summary {
+                                font-weight: bold;
+                                cursor: pointer;
+                                list-style: none;  /* removes default triangle */
+                                position: relative;
+                                padding-left: 20px;
+                            }
+
+                            /* Optional: Add a custom arrow */
+                            summary::before {
+                                content: '▶';
+                                position: absolute;
+                                left: 0;
+                                transition: transform 0.3s ease;
+                            }
+
+                            details[open] summary::before {
+                                transform: rotate(90deg); /* Rotate arrow when open */
+                            }
+
+                            summary:focus {
+                                outline: none;
+                            }
+                            table {
+                            width: 60%;
+                            border-collapse: collapse;
+                            margin: 20px auto;
+                            font-family: Arial, sans-serif;
+                            }
+
+                            th, td {
+                            border: 1px solid #898181;
+                            padding: 12px;
+                            text-align: center;
+                            vertical-align: middle;
+                            }
+
+                            th {
+                            background-color: #f5f5f5;
+                            font-weight: bold;
+                            text-align: center !important;
+                            }
+
+                            tr:nth-child(even) {
+                            background-color: #f9f9f9;
+                            }
+
+                            tr:hover {
+                            background-color: #f1f1f1;
+                            }
+                        </style>
+                          <!-- MathJax for LaTeX rendering -->
+                        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+                        <script id="MathJax-script" async
+                        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+                        </script>
+
+                        
+                    </head>
+                    <body>
+
+                    
+                        <!-- Featured Post -->
+                        <article class="post featured">
+                            <header class="major">
+                                <span class="date">May 14th, 2025</span>
+                                <h2>LAB 12 - Path Planning and Execution</h2>
+                            </header>
+                    
+                            <!-- Introduction -->
+                            <section class="content-section">
+                            <p><i>I worked with Paul Judge on this lab! Paul and I were lab and project partners for Analog IC Design last semester, as well as Embedded Operating Systems lab and project partners two semesters ago, so I am glad we got to be lab partners one last time before graduating! :)</i></p>
+                            <h3>Introduction</h3>
+                            <p>The aim of this lab was to incorporate everything we have learned in the previous labs: closed loop control (Labs 5-7), as well as envornment mapping and localization (Labs 9-11), in order to be able to execute path planning through navigating the robot around the in-lab arena. This is performed through localizing and navigating the robot through the arena by following the set waypoints in the environment.</p>
+                            </section>
+                            <section>
+                            <h3>Lab Tasks</h3>
+                           
+
+
+
+
+
+                      
+
+
+
+
+
+
+                            </section>
+                                <h3>Discussion</h3>
+                                <p>This lab was very interesting, as it provided a great introduction into Bayes Filtering, prior to expanding onto it and implementing it in Lab 11.</p>
+    
+                        
+
+                    
+                            </section>
+                            <h4>Acknowledgements and References</h4>
+                            <p>*I referenced TA Mikayla Lahr's website (2024). Special thanks to TA Mikayla for all her help with the lab, and helping me understand the Python implementation better!</p>
+
+                        
+                        <!-- </article> -->
+                    
+                    </body>
+ 
+                    
+
+                    
+
+                    
+                    
+
+                    <!-- Posts -->
+
+
+                    <!-- Footer -->
+                </div>
+                </div>
+            <!-- Footer -->
+            <footer id="footer">
+                    <!-- <section>
+                        <form method="post" action="#">
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" id="name" />
+                                </div>
+                                <div class="field">
+                                    <label for="email">Email</label>
+                                    <input type="text" name="email" id="email" />
+                                </div>
+                                <div class="field">
+                                    <label for="message">Message</label>
+                                    <textarea name="message" id="message" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <ul class="actions">
+                                <li><input type="submit" value="Send Message" /></li>
+                            </ul>
+                        </form>
+                    </section>
+                    <section class="split contact"> -->
+                        <section>
+                            <h3>EMAIL @ </h3>
+                            <p><a href="#">kd374@cornell.edu</a></p>
+                        </section>
+                </footer> 
+
+            <!-- Copyright -->
+                <div id="copyright">
+                    <ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+                </div>
+
+        </div>
+
+    <!-- Scripts -->
+        <script src="assets/js/jquery.min.js"></script>
+        <script src="assets/js/jquery.scrollex.min.js"></script>
+        <script src="assets/js/jquery.scrolly.min.js"></script>
+        <script src="assets/js/browser.min.js"></script>
+        <script src="assets/js/breakpoints.min.js"></script>
+        <script src="assets/js/util.js"></script>
+        <script src="assets/js/main.js"></script>
+
+</body>
+</html>
+                    
+
+                      
