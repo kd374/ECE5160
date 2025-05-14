@@ -735,7 +735,7 @@ allowfullscreen>
  <p>Now that we have moved to the third waypoint, we perform a similar process as with the second waypoint. We localize first in order to establish that the robot's position in the arena is (1, -1). The localization occurred slightly more in the positive x-direction compared to the proposed waypoint, due to a slight overshoot in PID control. What this ultimately meant is that the robot's predicted depth on the wall (indicated in green) is shown to be straight down from the localization result (indicated in blue), indicating that the robot should drive straight down to reach the fourth waypoint. Instead, it should have been under an angle of -63 degrees if the robot localized exactly at (1, -1). The second figure indicates the localization update step output, with the indicated probability and belief. The third waypoint is covered in the video under the timestemps of 1:27-2:35.</p>
 
  <figure style="margin: 0; text-align: center;">
-    <img src="images/3rd_point_2nd_try.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+    <img src="images/3rd_point_2nd_try.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The third point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
 </figure>
 
 <figure style="margin: 0; text-align: center;">
@@ -746,7 +746,7 @@ allowfullscreen>
  <p>Now that we have moved to the fourth waypoint, we perform a similar process as previously. Considering that the localization for the previous waypoint was slightly inaccurate, the robot drove slightly towards negative x-direction compared to the actual waypoint. The localization reflected in the output being diagonally right and below the actual waypoint. The potentail explanation for this is due to the fact that Bayes Filter's update step (as can be seen from the screenshot below) detected the robot position very close to the wall. Hence, potentially a grid space closer to the wall became the robot's new pose. The fourth waypoint is covered in the video under the timestemps of 2:35-3:34.</p>
 
  <figure style="margin: 0; text-align: center;">
-    <img src="images/4th_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+    <img src="images/4th_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The fourth point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
 </figure>
 
 <figure style="margin: 0; text-align: center;">
@@ -757,7 +757,7 @@ allowfullscreen>
  <p>Now that we have moved to the fifth waypoint, we perform a similar process as previously. What we found interesting is that even though the previous waypoint's localization ended up being slightly incorrect from the fourth waypoint, the robot still managed to move to the fifth waypoint well. This time, the robot settled at a point that is slightly towards right and bottom from the fifth waypoint, which can be reflected in the trajectory plotter results. Even though this was the case, the localized point was in line with the next waypoint well enough for it to move to the next waypoint smoothly. The fifth waypoint is covered in the video under the timestemps of 3:34-4:26.</p>
 
  <figure style="margin: 0; text-align: center;">
-    <img src="images/5th_point_2nd_try.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+    <img src="images/5th_point_2nd_try.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The fifth point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
 </figure>
 
 <figure style="margin: 0; text-align: center;">
@@ -771,7 +771,7 @@ allowfullscreen>
  <p> Similarly to fouth and fifth waypoints' localization results, waypoint seven's localization is slightly in the positive x-direction from the actual waypoint's position. However, there were not invariations in the y-direction, so detecting the depth on the wall (indicated in green), which the robot will use to move towards the waypoint, is accurate. The seventh waypoint is covered in the video under the timestemps of 4:34-5:21.</p>
 
  <figure style="margin: 0; text-align: center;">
-    <img src="images/6th_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+    <img src="images/6th_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The seventh point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
 </figure>
 
 <figure style="margin: 0; text-align: center;">
@@ -782,7 +782,7 @@ allowfullscreen>
 <p> Based on my and Paul's predictions, the robot's movement around this point is slightly impacted by the battery, which is running low based on the video, hence the very well-tuned robot had issues staying in a single spot when localizing. Hence, due to the slight battery issue, the distance towards waypoint eight is slightly underestimated before Bayes Filter localization (indicated in blue) is performed. The robot localizing slightly in the positive x-direction compared to the waypoint (0,3), ended up reflecting in the robot adjusting its angle and driving slightly towards positive x-direction from the waypoint 9 as well (which can be reflected in the green dot on the wall) The eighth waypoint is covered in the video under the timestemps of 5:21-6:39.</p>
 
 <figure style="margin: 0; text-align: center;">
-   <img src="images/7th_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+   <img src="images/7th_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The eighth point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
 </figure>
 
 <figure style="margin: 0; text-align: center;">
