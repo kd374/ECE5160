@@ -185,14 +185,399 @@
                             <p>The aim of this lab was to incorporate everything we have learned in the previous labs: closed loop control (Labs 5-7), as well as envornment mapping and localization (Labs 9-11), in order to be able to execute path planning through navigating the robot around the in-lab arena. This is performed through localizing and navigating the robot through the arena by following the set waypoints in the environment.</p>
                             </section>
                             <section>
-                            <h3>Lab Tasks</h3>
+                            <h3>Lab Setup</h3>
+                            <p>The lab instructions provided us with the following waypoints to navigate throughout the arena. The proposed waypoints are as the following, indicating the start point and the end point, and the screenshot of the arena indicating the path is provided below from the lab handout.</p>
+                            <pre><code>1. (-4, -3)    <--startpoint
+2. (-2, -1)
+3. (1, -1)
+4. (2, -3)
+5. (5, -3)
+6. (5, -2)
+7. (5, 3)
+8. (0, 3)
+9. (0, 0)      <--endpoint</code></pre>
+                            <figure style="margin: 0; text-align: center;">
+                                <img src="images/arena_ideal_planning.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">The proposed ideal naviagtion route throughout the arena</figcaption>
+                            </figure>
+
+<h3>Path Planning Design Choices and Procedure</h3>
+<p>Paul and I wanted to challenge ourselves throughout this lab and perform an entirely closed loop solution. Therefore, our plan was to have the robot calculate the distances it needs to drive from one point to the other, as well as figure out how to retune the angles to move to each of the waypoints. In case of the testing arena being different, our solution should be functional and adaptable to only changing the input map and waypoints. For each of the waypoints, a 5-step solution will be elaborated.</p>
+
+<h4>Step 1: Localization</h4>
+<p>The first step at every point for our robot was to perform localization, and this was performed by utilizing code from Lab 11 on Bayes Filter Localization. The attached code used for the localization step is shown below. This helps the robot determine its position on the map, even in the case of the previous steps being slightly inaccurate.</p>
+<details>
+    <summary>Full lab 11 Arduino code shown here for reference</summary>
+  
+<pre><code>case PID_TURN_FULL:
+{
+const int steps = 18; // this variable is set globally
+const float yaw_step = -20.0;
+double initial_yaw = 0;
+double target_yaw, current_yaw;
+float error = 0, prev_error = 0, error_sum = 0;
+float dt = 0;
+float pwm = 0, p_term, i_term, d_term;
+unsigned long last_time = millis();
+
+// Arrays for logging set as global variables
+// double actual_yaw_data[steps];
+// double expected_yaw_data[steps];
+// unsigned long timestamps[steps];
+// int tof_data[steps];
+
+icm_20948_DMP_data_t data;
+distanceSensor0.startRanging();
+
+// Obtain the initial yaw
+while (true) {
+myICM.readDMPdataFromFIFO(&data);
+if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+(data.header & DMP_header_bitmap_Quat6)) {
+double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+double qw = q0, qx = q2, qy = q1, qz = -q3;
+double t3 = 2.0 * (qw * qz + qx * qy);
+double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+initial_yaw = atan2(t3, t4) * 180.0 / PI;
+break;
+}
+}
+
+for (int step = 0; step < steps; step++) {
+target_yaw = initial_yaw + step * yaw_step;
+if (target_yaw > 180) target_yaw -= 360;
+if (target_yaw < -180) target_yaw += 360;
+
+bool targetReached = false;
+unsigned long turnStartTime = millis();
+
+// PID Turn Loop
+while (!targetReached && millis() - turnStartTime < 3000) {
+myICM.readDMPdataFromFIFO(&data);
+if ((myICM.status == ICM_20948_Stat_Ok || myICM.status == ICM_20948_Stat_FIFOMoreDataAvail) &&
+(data.header & DMP_header_bitmap_Quat6)) {
+
+double q1 = ((double)data.Quat6.Data.Q1) / 1073741824.0;
+double q2 = ((double)data.Quat6.Data.Q2) / 1073741824.0;
+double q3 = ((double)data.Quat6.Data.Q3) / 1073741824.0;
+double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
+double qw = q0, qx = q2, qy = q1, qz = -q3;
+double t3 = 2.0 * (qw * qz + qx * qy);
+double t4 = 1.0 - 2.0 * (qy * qy + qz * qz);
+current_yaw = atan2(t3, t4) * 180.0 / PI;
+
+dt = (millis() - last_time) / 1000.0;
+last_time = millis();
+
+error = current_yaw - target_yaw;
+if (error > 180) error -= 360;
+if (error < -180) error += 360;
+
+error_sum += error * dt;
+if (error_sum > 150) error_sum = 150;
+if (error_sum < -150) error_sum = -150;
+
+p_term = Kp * error;
+i_term = Ki * error_sum;
+d_term = Kd * (error - prev_error) / dt;
+pwm = p_term + i_term + d_term;
+
+prev_error = error;
+
+if (abs(error) < 2.0) {
+targetReached = true;
+break;
+}
+
+if (pwm > maxSpeed) pwm = maxSpeed;
+if (pwm < -maxSpeed) pwm = -maxSpeed;
+
+if (pwm < -100) {
+analogWrite(PIN0, abs(pwm)); analogWrite(PIN1, 0);
+analogWrite(PIN3*1.1, abs(pwm)); analogWrite(PIN2, 0);
+}
+else if (pwm > 100) {
+analogWrite(PIN0, 0); analogWrite(PIN1, abs(pwm));
+analogWrite(PIN3, 0); analogWrite(PIN2*1.1, abs(pwm));
+}
+else {
+analogWrite(PIN0, 0); analogWrite(PIN1, 0);
+analogWrite(PIN3, 0); analogWrite(PIN2, 0);
+}
+
+delay(10);
+}
+}
+
+// Stop the motors
+analogWrite(PIN0, 0); analogWrite(PIN1, 0);
+analogWrite(PIN3, 0); analogWrite(PIN2, 0);
+
+delay(1000); // Pause for 1 second at this angle
+
+// Get distance
+int distance_tof = 0;
+if (distanceSensor0.checkForDataReady()) {
+distance_tof = distanceSensor0.getDistance();
+distanceSensor0.clearInterrupt();
+distanceSensor0.stopRanging();
+distanceSensor0.startRanging();
+Serial.println(distance_tof);
+}
+
+// Save data to arrays
+expected_yaw_data[step] = step * 10;
+actual_yaw_data[step] = current_yaw;
+timestamps[step] = millis();
+tof_data[step] = distance_tof;
+}
+
+Serial.println("A full 360 turn complete.");
+break;
+} 
+
+
+case SEND_ORIENTATION_DATA: {
+    for (int j = 0; j < steps; j++) {
+        tx_estring_value.clear();
+        tx_estring_value.append(expected_yaw_data[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(actual_yaw_data[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(timestamps[j]);
+        tx_estring_value.append("|");
+        tx_estring_value.append(tof_data[j]);
+        tx_characteristic_string.writeValue(tx_estring_value.c_str());
+        }
+        Serial.println("360-degree PID turn complete, and data is transmitted.");
+        break;
+    }
+    </code></pre></details>
+
+<p>On the Python side for the localization step, the Python code from Lab 11 was also used. The code is incorporated below for reference:</p>
+
+<details>
+    <summary>Full lab 11 Python code shown here for reference</summary>
+<pre><code>def perform_observation_loop(self, rot_vel=120):
+    """Perform the observation loop behavior on the real robot, where the robot does  
+    a 360 degree turn in place while collecting equidistant (in the angular space) sensor
+    readings, with the first sensor reading taken at the robot's current heading. 
+    The number of sensor readings depends on "observations_count"(=18) defined in world.yaml.
+
+    Keyword arguments:
+    rot_vel -- (Optional) Angular Velocity for loop (degrees/second)
+    Do not remove this parameter from the function definition, even if you don't use it.
+    Returns:
+    sensor_ranges   -- A column numpy array of the range values (meters)
+    sensor_bearings -- A column numpy array of the bearings at which the sensor readings were taken (degrees)
+    The bearing values are not used in the Localization module, so you may return a empty numpy array
+    """
+
+    global array
+    sensor_ranges = np.zeros(18)[...,None];
+    sensor_bearings = np.zeros(18)[...,None];
+    ble.send_command(CMD.SEND_ORIENTATION_DATA, "")
+
+    while (len(array)<18):
+    asyncio.run(asyncio.sleep(3))
+    for i in range(18):
+    data = array[i].split("|")
+    sensor_ranges[i] = float(data[3])/1000
+    sensor_bearings[i] = float(data[1])
+    print(sensor_ranges[i])
+    print(sensor_bearings[i])
+
+    return sensor_ranges, sensor_bearings
+</code></pre> </details>
+
+<p>For the notification handler, I am using the same code as in the previos labs for obtaining the ToF distances, as well as the yaw data per performing a full turn in order to localize.</p>
+<pre><code>//notification handler from the previous labs, including Lab 11
+expected_yaw = []
+actual_yaw = []
+timestamp = []
+tof_distance = []
+array = []
+def lab11_localize(uuid, bytes):
+    global array
+    s = ble.bytearray_to_string(bytes)
+    array.append(ble.bytearray_to_string(bytes)[:])
+    if("|" in s):
+        sep_notif = s.split("|")
+        expected_yaw.append(float(sep_notif[0]))
+        actual_yaw.append(float(sep_notif[1]))
+        timestamp.append(float(sep_notif[2]))
+        tof_distance.append(float(sep_notif[3]))
+        
+ble.start_notify(ble.uuid['RX_STRING'], lab11_localize)</code></pre>
+
+<h4>Step 2: Calculating the Turn Angle</h4>
+<p>After the localization step, the robot is now aware of its current pose. Our algorithm for calculating the turning angle was for the rovot to use the localized x and y coordinates and hence use them to the angle between the estimated location and its next target waypoint. This can be performed by utilizing the following Python code:</p>
+<pre><code>def calcTurnAngle(robotX, robotY, goalX, goalY):
+    vecX = goalX - robotX
+    vecY = goalY - robotY
+    turnAngle = np.arctan2(vecY,vecX)
+    return turnAngle</code></pre>
+
+<p>The <code>np.arctan2()</code> math function was used in order to obtain the angle in radians. </p>
+<h4>Step 3: Turn</h4>
+<p>After the calculation for finding the correct angle towards the next point is performed, orientation PID control from Lab 6 is performed. This turns the robots to that the ToF sensor faces the waypoint towards which it ought to move next. The code I used for Lab 6 can be found below.</p>
+<details>
+    <summary>Lab 6 Arduino Code can be found for reference below</summary>
+<pre><code>//the following variables are set globally
+int i = 0;
+unsigned long last_time = millis();
+double target_yaw = -30;
+double current_yaw = 0;
+float dt = 0;
+float error_pid;
+float pwm;
+float error_sum = 0.0;
+float p_term = 0.0;
+float i_term = 0.0;
+float d_term = 0.0;
+float old_error;
+//end of global variable definitions
+
+case PID_DMP_TURN: {
+
+//DMP quarternion code snippet attached above which stores roll_data[i], pitch_data[i], yaw_data[i], and time_data[i] values
+...
+// yaw (z-axis rotation)
+double t3 = +2.0 * (qw * qz + qx * qy);
+double t4 = +1.0 - 2.0 * (qy * qy + qz * qz);
+double yaw = atan2(t3, t4) * 180.0 / PI;
+yaw_data[i] = yaw;
+...
+// end of DMP code snippet
+
+dt = (millis()-last_time);
+last_time = millis();
+current_yaw = yaw;
+old_error = error1;
+error1 = current_yaw-target_yaw;
+error_sum = error_sum + error1*dt;
+p_term = Kp * error1;
+i_term = Ki * error_sum;
+d_term = Kd * (error1 - old_error)/dt;
+pwm = p_term + i_term + d_term;
+
+if(pwm > 0)
+{
+    if(pwm > maxSpeed)
+    pwm = maxSpeed;
+}
+else if(pwm < 0)
+{
+    if(pwm < -maxSpeed)
+    pwm = -maxSpeed;
+}
+pwm_data[i] = pwm;
+    if(pwm < -80) { // needs to be clockwise motion because yaw difference is negative
+        analogWrite(PIN0,abs(pwm)); //right backward
+        analogWrite(PIN1,0); // right foward
+        analogWrite(PIN3,abs(pwm)); //left forward 
+        analogWrite(PIN2,0); // left backward
+    }
+    else if(pwm > 80) // 80 was determined to be the minimum spinning PWM in Lab 4
+        { 
+        analogWrite(PIN0,0);
+        analogWrite(PIN1,abs(pwm));
+        analogWrite(PIN3,0);
+        analogWrite(PIN2,abs(pwm));
+    else{
+        analogWrite(PIN0,0);
+        analogWrite(PIN1,0);
+        analogWrite(PIN3,0);
+        analogWrite(PIN2,0);
+    }
+}
+if (myICM.status != ICM_20948_Stat_FIFOMoreDataAvail) // if more data is available then we should read it right away - and not delay
+{
+delay(10);
+}
+
+for (int j = 0; j < i; j++) {
+    tx_estring_value.clear();
+    tx_estring_value.append(pitch_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(roll_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(yaw_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(time_data[j]);
+    tx_estring_value.append("|");
+    tx_estring_value.append(pwm_data[j]);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    }
+Serial.println("PID turning data sent!");
+break;
+}</code></pre>
+</details>
+
+<p>Considering that Step 2 of this process calculates the angle through the provided <code>calcTurnAngle()</code> function, I modified my code for tuning the PID control gains to include modifying the target yaw through the <code>send_command()</code> function on the Python side. This enables passing the specific calculated values from the calcTurnAngle() function depending on what the angle calculated for the respective waypoints is much more easily.</p>
+
+<h4>Step 4: Calculating distance to move to the next Waypoint</h4>
+<p>With the turn step, the robot ought to be oriented so that its ToF sensor looks at the wall to which it ought move using linear PID, and stop once it arrives to the next waypoint. To perform this, we decided to save the coordinates of each of th walls in the arena, by saving them into a numpy array maintaining the form of [x1, y2, x2, y2]. The dimensions can be found below, in meters.</p>
+<pre><code> map = np.array([
+    [-1.6764, -1.3716, -1.6764, 0.1524], # [x1, y1. x2. y2]
+    [-1.6764, 0.1524, -0.762, 0.1524], 
+    [-0.762, 0.1524, -0.762, 1.3716], 
+    [-0.762, 1.3716, 1.9812, 1.3716], 
+    [1.9812, 1.3716, 1.9812, -1.3716], 
+    [1.9812, -1.3716, -1.6764, -1.3716], 
+    [-0.1524, -1.3716, -0.1524, -0.762], 
+    [-0.1524, -0.762, 0.1524, -0.762], 
+    [0.1524, -0.762, 0.1524, -1.3716], 
+    [0.762, -0.1524, 0.762, 0.4572], 
+    [0.762, 0.4572, 1.3716, 0.4572], 
+    [1.3716, 0.4572, 1.3716, -0.1524], 
+    [1.3716, -0.1524, 0.762, -0.1524]
+    ])</code></pre>
+
+<p>This helps us create a <code>depthPredict()</code> function, which takes in the estimation of robot's pose, along with the coordinates of the map. The function returns x and y coordinates of a single point on the wall at which the ToF sensor is oriented. For instance, as can be seen in Figure () below, the green dot represents the point on the wall, while blue dot represents the robot's pose estimation. The code for this function can be seen below.</p>
+<pre><code>def depthPredict(robotX, robotY, robotTheta, robot_map):
+    maxRange = 20
+    # Define the endpoint of the sensor's line of sight (far away)
+    xEnd = robotX + maxRange * np.cos(robotTheta)
+    yEnd = robotY + maxRange * np.sin(robotTheta);
+    cmdr.plot_odom(xEnd, yEnd) 
+    # Initialize minimum depth to a large value
+    minDepth = maxRange
+    minX = 20
+    minY = 20
+
+    # Loop through each wall in the map
+    for i in range(len(robot_map)):
+        # Extract wall coordinates
+        x1 = robot_map[i][0]
+        y1 = robot_map[i][1]
+        x2 = robot_map[i][2]
+        y2 = robot_map[i][3]
+
+        # Check for intersection between sensor line and wall
+        [isect, xInt, yInt] = intersectPoint(robotX, robotY, xEnd, yEnd, x1, y1, x2, y2)
+
+        if isect:
+            # Calculate distance from sensor to intersection point
+            dist = abs(np.sqrt((xInt - robotX)**2 + (yInt - robotY)**2))
+            # dist = abs(np.sqrt((xInt - robotX)**2 + (yInt - robotY)**2) * np.cos(robotTheta));
+
+            # Update minimum depth if this intersection is closer
+            if dist < minDepth:
+                minDepth = dist
+                minX = xInt
+                minY = yInt
+
+    return minX, minY</code></pre>
                            
 
 
 
 
 
-                      
+               <p>https://youtu.be/vM8jMCjmw0I</p>       
 
 
 
