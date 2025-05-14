@@ -791,10 +791,13 @@ allowfullscreen>
 <h4>Waypoint 9: (0, 0)</h4>
  <p>Since this was the ending waypoint of our path planning journey, there was no need for us to perform localization and planning on this waypoint. The ninth waypoint is covered in the video under the timestamps 6:39-6:59.</p>
 
+<h3>Challenges and Issues Faced</h3>
+<p>Considering that we decided to partner up, Paul and I implemented our Python code for both of our robots, but we decided to run our individual Arduino code from previous labs as the basis for our individual Arduino code portion. Even though the Python code worked successfully on our individual robots, my robot would often struggle with completing and going through the whole arena without disconnecting from Bluetooth. Paul's robot showed higher consistency with the runs, so we decided to dedicate our time into tunning the gains of PID control for his robot instead. This allowed us to utilize our time effectively for performing optimizations.</p>
+<p>Another challenge for us was using the Kalman Filter to optimize the robot movement towards a new waypoint better. We, however, realized that we had to retune
                             </section>
                                 <h3>Discussion</h3>
-                                <p>This was a very rewarding lab. It allowed us to incorporate all of the puzzle pieces and finally put it all together! I learned a lot about hardware and software debugging throughout this course, and it was nice to put all the bits and pieces of the hard work together!</p>
-    
+                                <p>This was a very rewarding lab. Paul and I are very satisfied with the robot's performance, as well as being able to achieve what was previously a challenge for the both of us. It allowed us to incorporate all of the puzzle pieces and finally put it all together! I learned a lot about hardware and software debugging throughout this course, and it was nice to put all the bits and pieces of the hard work together!</p>
+                                <p>The issue we struggled the most throughout this lab was the unpredictability of how accurate our localizations would be. Even though our localization performed well enough to estimate robot's position, sometimes our localization would be slightly off-centered from the actual waypoint. A potential future solution for such a problem would be increasing the number of grid spaces for the Bayes Filtering. Another potential solution for such a problem would be storing more ToF sensor measurements for more accurate results. With the computations for the Bayes Filter being performed on a computer, this would potentially not impact the navigation time through the arena negatively.</p>
                         
 
                     
