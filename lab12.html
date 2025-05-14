@@ -199,7 +199,7 @@
                             <figure style="margin: 0; text-align: center;">
                                 <img src="images/arena_ideal_planning.png" alt="Lab 8" width="500" style="display: block; margin: 0 auto;">The proposed ideal naviagtion route throughout the arena</figcaption>
                             </figure>
-
+                            &nbsp;
 <h3>Path Planning Design Choices and Procedure</h3>
 <p>Paul and I wanted to challenge ourselves throughout this lab and perform an entirely closed loop solution. Therefore, our plan was to have the robot calculate the distances it needs to drive from one point to the other, as well as figure out how to retune the angles to move to each of the waypoints. In case of the testing arena being different, our solution should be functional and adaptable to only changing the input map and waypoints. For each of the waypoints, a 5-step solution will be elaborated.</p>
 
@@ -412,6 +412,7 @@ def lab11_localize(uuid, bytes):
         
 ble.start_notify(ble.uuid['RX_STRING'], lab11_localize)</code></pre>
 
+&nbsp;
 <h4>Step 2: Calculating the Turn Angle</h4>
 <p>After the localization step, the robot is now aware of its current pose. Our algorithm for calculating the turning angle was for the rovot to use the localized x and y coordinates and hence use them to the angle between the estimated location and its next target waypoint. This can be performed by utilizing the following Python code:</p>
 <pre><code>def calcTurnAngle(robotX, robotY, goalX, goalY):
@@ -421,6 +422,7 @@ ble.start_notify(ble.uuid['RX_STRING'], lab11_localize)</code></pre>
     return turnAngle</code></pre>
 
 <p>The <code>np.arctan2()</code> math function was used in order to obtain the angle in radians. </p>
+&nbsp;
 <h4>Step 3: Turn</h4>
 <p>After the calculation for finding the correct angle towards the next point is performed, orientation PID control from Lab 6 is performed. This turns the robots to that the ToF sensor faces the waypoint towards which it ought to move next. The code I used for Lab 6 can be found below.</p>
 <details>
@@ -518,8 +520,9 @@ break;
 
 <p>Considering that Step 2 of this process calculates the angle through the provided <code>calcTurnAngle()</code> function, I modified my code for tuning the PID control gains to include modifying the target yaw through the <code>send_command()</code> function on the Python side. This enables passing the specific calculated values from the calcTurnAngle() function depending on what the angle calculated for the respective waypoints is much more easily.</p>
 
+&nbsp;
 <h4>Step 4: Calculating distance to move to the next Waypoint</h4>
-<p>With the turn step, the robot ought to be oriented so that its ToF sensor looks at the wall to which it ought move using linear PID, and stop once it arrives to the next waypoint. To perform this, we decided to save the coordinates of each of th walls in the arena, by saving them into a numpy array maintaining the form of [x1, y2, x2, y2]. The dimensions can be found below, in meters.</p>
+<p>With the turn step, the robot ought to be oriented so that its ToF sensor looks at the wall to which it ought move using linear PID, and stop once it arrives to the next waypoint. In order for this to work, a ray is projected from the robot's front, and the nearest point of intersection between the ray and one of the walls is recorded. We decided to save the coordinates of each of the walls in the arena, by saving them into a numpy array maintaining the form of [x1, y2, x2, y2]. The dimensions can be found below, in meters.</p>
 <pre><code> map = np.array([
     [-1.6764, -1.3716, -1.6764, 0.1524], # [x1, y1. x2. y2]
     [-1.6764, 0.1524, -0.762, 0.1524], 
@@ -562,7 +565,6 @@ break;
         if isect:
             # Calculate distance from sensor to intersection point
             dist = abs(np.sqrt((xInt - robotX)**2 + (yInt - robotY)**2))
-            # dist = abs(np.sqrt((xInt - robotX)**2 + (yInt - robotY)**2) * np.cos(robotTheta));
 
             # Update minimum depth if this intersection is closer
             if dist < minDepth:
@@ -571,13 +573,144 @@ break;
                 minY = yInt
 
     return minX, minY</code></pre>
-                           
+    <p>The following function is crucial in determining the points on the wall in which the ray intersects.</p>
+    <pre><code>def intersectPoint(x1, y1, x2, y2, x3, y3, x4, y4):
+    x = []
+    y = []
+    ua = []
+    
+    denom = (y4-y3)*(x2-x1)-(x4-x3)*(y2-y1)
+    
+    if denom == 0:
+        # if denom = 0, lines are parallel
+        isect = False
+    else:
+        ua = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3))/denom
+        ub = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3))/denom
+        # if (0 <= ua <= 1) and (0 <= ub <= 1), intersection point lies on line
+        # segments
+        if ua >= 0 and ub >= 0 and ua <= 1 and ub <= 1:
+            isect = True
+            x = x1 + ua*(x2-x1)
+            y = y1 + ua*(y2-y1)
+        else:
+            # else, the intersection point lies where the infinite lines
+            # intersect, but is not on the line segments
+            isect = False
+    return isect, x, y</code></pre>
 
+    <p>Based on the robot's orientation towards the next waypoint once the turning of the angle is performed, it can be deduced that the next waypoint lies somewhere between the robot's current pose and the point that was calculated on the wall. Hence, the distance from the aforementioned point on the wall to the desired waypoint is the same distance at which we ought to stop the robot's movement to lie on the waypoint. This can be performed with the following code snippet:</p>
+    <pre><code>def calcStopDist(wallX, wallY, goalX, goalY):
+    stopDist = np.sqrt((wallX-goalX)**2 + (wallY - goalY)**2)
+    return stopDist*1000 # Converting to mm</code></pre>
 
+    &nbsp;
+<h4>Step 5: Moving towards the desired waypoint</h4>
+<p>The last step of the 5-step process was to send the obtained distance that needs to be performed towards the waypoint to our robot. Upon this, the robot performs linear PID control from Lab 5, but incorporating Kalman Filter from Lab 7 in order to drive towards the wall, and ultimately stop and settle at the waypoint by utilizing Kalman filter. The code I used for this is similar to my Lab 7 code.</p>
+<details>  
+    <summary>Full Lab 7 Arduino code shown here for reference</summary>
+    <pre><code>case PID_KALMAN: 
+{
+    //...PID variable instantiation from Lab 5
+    float kf_distance;
 
+    Ad  = I + Delta_T * A ;
+    Bd = Delta_T * B;
+    Cd = C;
 
+    distanceSensor1.startRanging();  //Write configuration bytes to initiate measurement
+    Serial.println("Staring Kalman Filter with PID!");
+    int t_0 = millis();
+    int prev_time = t_0;
+    while (!distanceSensor1.checkForDataReady())
+    {
+        delay(1);
+    }
+    distance1 =  distanceSensor1.getDistance();
+    distanceSensor1.clearInterrupt();
+    mu = {(float) distance1, 0.0};
+    while ((i < ARRAY_LENGTH && j < ARRAY_LENGTH2) && millis() - t_0 < 5000) {
+    time_data[i] = millis();
+    if (distanceSensor1.checkForDataReady()) { //ToF sensor data available
+        dt = millis() - prev_time;
+        prev_time = millis();
+        distance1 = distanceSensor1.getDistance();  //Get the result of the measurement from the sensor
+        distanceSensor1.clearInterrupt();
+        distance_data1[i] = distance1;
+        i++;
+        y = (float) distance1; //y(0,0) = (float) distance1;
+        mu_p = Ad*mu + Bd*u;
+        sigma_p = Ad*sigma*~Ad + sigma_u;
+        sigma_m = Cd*sigma_p*~Cd + sigma_z;
+        kkf_gain = sigma_p*~Cd*Inverse(sigma_m);
+        y_m = y-Cd*mu_p;
+        mu = mu_p + kkf_gain * y_m;
+        sigma = I - kkf_gain*Cd*sigma_p;
+        kf_distance = mu(0,0);
+        kf_distance = (float) kf_distance;
+        if (j < ARRAY_LENGTH2) { 
+        kf_distance_array[j] = kf_distance;
+        kf_time[j] = millis();
+        j++;
+        }
+        // Start of Control Loop Calculations
+        current_dist = distance1;
+        distance1 = mu(0,0);
+        old_error = error1;
+        error1 = current_dist - target_dist; 
+        //PID Control from Lab 5
+        error_sum = error_sum + (error1 * dt / 1000);
+        p_term = Kp * error1;
+        i_term = Ki * error_sum;
+        d_term = Kd * (error1 - old_error) / dt;
+        pwm = p_term + i_term + d_term;
+    }
+    else{ // ToF sensor data not available, make predictions with Kalman Filter
+        mu_p = Ad*mu + Bd*u;
+        sigma_p = Ad*sigma*~Ad + sigma_u;
+        kf_distance = mu_p(0,0);
+        kf_distance = (float) kf_distance;
+        mu = mu_p;
+        sigma = sigma_p;
+        if (j < ARRAY_LENGTH2) { 
+        kf_distance_array[j] = kf_distance;
+        kf_time[j] = millis();
+        j++;
+        }
+        dt = millis() - prev_time;
+        prev_time = millis();
+        current_dist = kf_distance;
+        old_error = error1;
+        error1 = current_dist - target_dist; 
+        //PID Control from Lab 5
+        error_sum = error_sum + (error1 * dt / 1000);
+        p_term = Kp * error1;
+        i_term = Ki * error_sum;
+        d_term = Kd * (error1 - old_error) / dt;
+        pwm = p_term + i_term + d_term;
+    }
+    // Update motors the same way as in Lab 5
+    break;
+    }</code></pre>
+</details>     
 
-               <p>https://youtu.be/vM8jMCjmw0I</p>       
+<p></p>
+<p>
+&nbsp;
+
+</p>
+
+<h3>Final results and Demonstration of Path Planning</h3>
+<p>The video demonstrating our implementation of path planning around the lab arena can be seen below. Based on the video, I will be covering and describing each of the waypoints individually, the obtained localization data for each of them, as well as discussing difficulties we have faced with tuning our parameters.</p>
+<iframe width="300" height ="400"
+src="https://youtube.com/embed/vM8jMCjmw0I"  
+title="Lab 6: P Controller Tuned" 
+frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+allowfullscreen>
+</iframe></p>
+ 
+
 
 
 
@@ -586,7 +719,7 @@ break;
 
                             </section>
                                 <h3>Discussion</h3>
-                                <p>This lab was very interesting, as it provided a great introduction into Bayes Filtering, prior to expanding onto it and implementing it in Lab 11.</p>
+                                <p>This was a </p>
     
                         
 
