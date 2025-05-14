@@ -713,23 +713,46 @@ allowfullscreen>
 <p>As can be inferred from the video, in our proposed path planning solution, there are six waypoints that are being localized out of eight, with the exception of the start waypoint already being the known pose of the robot, and the last waypoint, since once it is reached, we have already completed the navigation through the arena.</p>
 
 <h4>Waypoint 1: (-4, -3)</h4>
-<p>Our robot starts off with its ToF sensor initially being oriented in the direction of positive x-axis, representing the initial yaw value of 0, as in Lab 9 and Lab 11. Considering that there was not a reason to perform localization, as our robot is aware of its pose at the start point, the second indicated step of calculating the correct turn angle towards the subsequent waypoint is calculated. In this particular case, the calculated angle is -45 degrees, and the ToF sensor ends up seeing the following distance on the wall opposite of the ToF sensor, whcih looks as the following. This helps us move to the next waypoints, whil still be oriented and seeing this point on the wall. Using linear PID with Kalman Filter, we move in the direction towards the point we see on the wall, but settle once overlay with the waypoint.</p>
+<p>Our robot starts off with its ToF sensor initially being oriented in the direction of positive x-axis, representing the initial yaw value of 0, as in Lab 9 and Lab 11. Considering that there was not a reason to perform localization, as our robot is aware of its pose at the start point and the starting point is always the same, localization is skipped, and the second indicated step of calculating the correct turn angle towards the subsequent waypoint is calculated. The calculated angle is 45 degrees, the robot moves in the counterclockwise direction, and the ToF sensor ends up seeing the following distance on the wall opposite of the ToF sensor, which looks as the following (indicated in green). This helps us move to the next waypoints, while still being oriented and seeing this point on the wall. Using linear PID with Kalman Filter, we move in the direction towards the point we see on the wall, but settle once overlay with the waypoint. The first point is represented in the video in timestamps 0:00-0:28.</p>
 
 <figure style="margin: 0; text-align: center;">
     <img src="images/1st_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The first point's depth prediction indicated in a green dot</figcaption>
 </figure>
 
-<h4>Waypoint 2: (-1, 1)</h4>
- <p>Now that we have moved to the second waypoint, we localize first in order to establish the robot's pose in the arena. The following image shows the estimated current pose of the robot in green. The robot then corrects its angle as before, and after performing the aforementioned functions in step 4, sees the point closest to it on the wall it is facing, and uses that to estimate its distance to the next waypoint. The depth prediction point on the wall is reflected in the green plot on the graph below. </p>
+<h4>Waypoint 2: (-2, -1)</h4>
+ <p>Now that we have moved to the second waypoint, we localize first in order to establish the robot's pose in the arena and confir that it is (-2, -1). The following image shows the localized position of our robot in blue. Even though the robot overshoots the waypoint, the localization was accurate enough for it to still be able to accurately estimate the turn angle towards the third waypoint. The robot then corrects its angle as before, and after performing the aforementioned functions in step 4, sees the point closest to it on the wall it is facing, and uses that to estimate its distance to the next waypoint. The depth prediction point on the wall is reflected in the green plot on the graph below. The second figure indicates the localization update step output, with the indicated probability and belief. The second waypoint is covered in the video under the timestamps of 0:28-1:27.</p>
 
  <figure style="margin: 0; text-align: center;">
     <img src="images/2nd_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
 </figure>
 
-<p>Furthermore, the localization enabled us with the following predictions of belief and probability:</p>
 <figure style="margin: 0; text-align: center;">
     <img src="images/2nd_point_num.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
 </figure>
+
+<h4>Waypoint 3: (1, -1)</h4>
+ <p>Now that we have moved to the third waypoint, we perform a similar process as with the second waypoint. We localize first in order to establish that the robot's position in the arena is (1, -1). The localization occurred slightly more in the positive x-direction compared to the proposed waypoint, due to a slight overshoot in PID control. What this ultimately meant is that the robot's predicted depth on the wall (indicated in green) is shown to be straight down from the localization result (indicated in blue), indicating that the robot should drive straight down to reach the fourth waypoint. Instead, it should have been under an angle of -63 degrees if the robot localized exactly at (1, -1). The second figure indicates the localization update step output, with the indicated probability and belief. The third waypoint is covered in the video under the timestemps of 1:27-2:35.</p>
+
+ <figure style="margin: 0; text-align: center;">
+    <img src="images/3rd_point_2nd_try.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+</figure>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/3rd_point_num.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The third point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+</figure>
+
+<h4>Waypoint 4: (2, -3)</h4>
+ <p>Now that we have moved to the fourth waypoint, we perform a similar process as previously. Considering that the localization for the previous waypoint was slightly inaccurate, the robot drove slightly towards negative x-direction compared to the actual waypoint. The following image shows the estimated current pose of the robot in green. The robot then corrects its angle as before, and after performing the aforementioned functions in step 4, sees the point closest to it on the wall it is facing, and uses that to estimate its distance to the next waypoint. The depth prediction point on the wall is reflected in the green plot on the graph below. The second figure indicates the localization update step output, with the indicated probability and belief. The third waypoint is covered in the video under the timestemps of 1:27-2:35.</p>
+
+ <figure style="margin: 0; text-align: center;">
+    <img src="images/4th_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+</figure>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/3rd_point_2nd_try.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The third point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+</figure>
+
+
 
 
 
@@ -737,14 +760,14 @@ allowfullscreen>
 
                             </section>
                                 <h3>Discussion</h3>
-                                <p>This was a </p>
+                                <p>This was a very rewarding lab. It allowed us to incorporate all of the puzzle pieces and finally put it all together.</p>
     
                         
 
                     
                             </section>
                             <h4>Acknowledgements and References</h4>
-                            <p>*I referenced TA Mikayla Lahr's website (2024). Special thanks to TA Mikayla for all her help with the lab, and helping me understand the Python implementation better!</p>
+                            <p>*Thank you to all course staff this semester for great support! As aforementioned, I worked with Paul Judge all throughout this lab.
 
                         
                         <!-- </article> -->
