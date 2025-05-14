@@ -709,9 +709,27 @@ frameborder="0"
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
 allowfullscreen>
 </iframe></p>
- 
 
+<p>As can be inferred from the video, in our proposed path planning solution, there are six waypoints that are being localized out of eight, with the exception of the start waypoint already being the known pose of the robot, and the last waypoint, since once it is reached, we have already completed the navigation through the arena.</p>
 
+<h4>Waypoint 1: (-4, -3)</h4>
+<p>Our robot starts off with its ToF sensor initially being oriented in the direction of positive x-axis, representing the initial yaw value of 0, as in Lab 9 and Lab 11. Considering that there was not a reason to perform localization, as our robot is aware of its pose at the start point, the second indicated step of calculating the correct turn angle towards the subsequent waypoint is calculated. In this particular case, the calculated angle is -45 degrees, and the ToF sensor ends up seeing the following distance on the wall opposite of the ToF sensor, whcih looks as the following. This helps us move to the next waypoints, whil still be oriented and seeing this point on the wall. Using linear PID with Kalman Filter, we move in the direction towards the point we see on the wall, but settle once overlay with the waypoint.</p>
+
+<figure style="margin: 0; text-align: center;">
+    <img src="images/1st_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The first point's depth prediction indicated in a green dot</figcaption>
+</figure>
+
+<h4>Waypoint 2: (-1, 1)</h4>
+ <p>Now that we have moved to the second waypoint, we localize first in order to establish the robot's pose in the arena. The following image shows the estimated current pose of the robot in green. The robot then corrects its angle as before, and after performing the aforementioned functions in step 4, sees the point closest to it on the wall it is facing, and uses that to estimate its distance to the next waypoint. The depth prediction point on the wall is reflected in the green plot on the graph below. </p>
+
+ <figure style="margin: 0; text-align: center;">
+    <img src="images/2nd_point.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+</figure>
+
+<p>Furthermore, the localization enabled us with the following predictions of belief and probability:</p>
+<figure style="margin: 0; text-align: center;">
+    <img src="images/2nd_point_num.png" alt="Lab 12" width="500" style="display: block; margin: 0 auto;">The second point's depth prediction indicated in a green dot, and current pose per localization indicated in the blue point.</figcaption>
+</figure>
 
 
 
